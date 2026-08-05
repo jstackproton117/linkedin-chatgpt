@@ -31,6 +31,9 @@ class SQLiteConnection:
     def execute(self, sql, params=()):
         return self._conn.execute(sql, params)
 
+    def executemany(self, sql, params_list):
+        self._conn.executemany(sql, params_list)
+
     def executescript(self, sql):
         self._conn.executescript(sql)
 
@@ -51,6 +54,16 @@ class PostgresConnection:
         # string value, so a blind replace is fine — no real SQL parser needed.
         cur = self._conn.cursor()
         cur.execute(sql.replace("?", "%s"), params)
+        return cur
+
+    def executemany(self, sql, params_list):
+        # One round-trip for the whole batch instead of one per row — this is
+        # what makes a full poll fit inside Vercel's function time limit
+        # against a real remote Postgres (measured: without this, ~1,300
+        # individual score inserts alone pushed a full poll to 68s against
+        # Neon, over Hobby's 60s ceiling).
+        cur = self._conn.cursor()
+        cur.executemany(sql.replace("?", "%s"), params_list)
         return cur
 
     def commit(self):

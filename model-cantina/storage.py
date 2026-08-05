@@ -107,36 +107,85 @@ def record_poll_results(conn, source_key, tier, records):
     score_type, raw_payload (optional dict).
     Commits on success. Logs one poll_completed event with summary counts, plus
     one new_model_found event per newly discovered model.
+
+    Batches DB round-trips rather than doing one SELECT+INSERT per record —
+    against a local SQLite file the per-record cost is negligible, but against
+    a real remote Postgres (Vercel/Neon) each round-trip is real network
+    latency: a ~230-record source at one round-trip per record measured at
+    68s total for a full 11-source poll, over Vercel Hobby's 60s function
+    ceiling. One bulk SELECT to resolve already-known models, plus one
+    executemany() for all score inserts, is what makes the poll fit.
     """
+    if not records:
+        _update_source(conn, source_key, tier, "ok")
+        log_event(conn, "poll_completed", source=source_key,
+                   payload={"new_models": 0, "scores_recorded": 0})
+        conn.commit()
+        return {"new_models": 0, "scores_recorded": 0}
+
+    distinct_names = list({r["name"] for r in records})
+    placeholders = ", ".join("?" for _ in distinct_names)
+    existing_rows = conn.execute(
+        f"SELECT id, name, org FROM models WHERE name IN ({placeholders})", distinct_names
+    ).fetchall()
+    existing_by_key = {(row["name"], row["org"]): row["id"] for row in existing_rows}
+
     new_models = 0
-    scores_recorded = 0
+    model_id_by_key = {}
     for r in records:
-        model_id, created = _get_or_create_model(
-            conn,
-            r["name"],
-            org=r.get("org"),
-            weight_availability=r.get("weight_availability"),
-            local_runnable=r.get("local_runnable"),
-            modalities=r.get("modalities"),
+        key = (r["name"], r.get("org"))
+        if key in model_id_by_key:
+            continue
+        if key in existing_by_key:
+            model_id = existing_by_key[key]
+            # Refresh mutable attributes for models we already knew about —
+            # small subset of the batch in practice, individual round-trips
+            # here are fine (the score-insert loop below is the hot path).
+            updates, params = [], []
+            if r.get("weight_availability") is not None:
+                updates.append("weight_availability = ?")
+                params.append(r["weight_availability"])
+            if r.get("local_runnable") is not None:
+                updates.append("local_runnable = ?")
+                params.append(1 if r["local_runnable"] else 0)
+            if r.get("modalities") is not None:
+                updates.append("modalities = ?")
+                params.append(json.dumps(r["modalities"]))
+            if updates:
+                params.append(model_id)
+                conn.execute(f"UPDATE models SET {', '.join(updates)} WHERE id = ?", params)
+        else:
+            model_id, created = _get_or_create_model(
+                conn, r["name"], org=r.get("org"),
+                weight_availability=r.get("weight_availability"),
+                local_runnable=r.get("local_runnable"),
+                modalities=r.get("modalities"),
+            )
+            if created:
+                new_models += 1
+                log_event(conn, "new_model_found", source=source_key, model_id=model_id,
+                           payload={"name": r["name"], "org": r.get("org")})
+        model_id_by_key[key] = model_id
+
+    collected_at = now_iso()
+    score_rows = [
+        (
+            model_id_by_key[(r["name"], r.get("org"))],
+            source_key,
+            r["category"],
+            r.get("score"),
+            r.get("score_type"),
+            collected_at,
+            json.dumps(r["raw_payload"]) if r.get("raw_payload") is not None else None,
         )
-        if created:
-            new_models += 1
-            log_event(conn, "new_model_found", source=source_key, model_id=model_id,
-                       payload={"name": r["name"], "org": r.get("org")})
-        conn.execute(
-            "INSERT INTO scores (model_id, source, category, score, score_type, "
-            "collected_at, raw_payload) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (
-                model_id,
-                source_key,
-                r["category"],
-                r.get("score"),
-                r.get("score_type"),
-                now_iso(),
-                json.dumps(r["raw_payload"]) if r.get("raw_payload") is not None else None,
-            ),
-        )
-        scores_recorded += 1
+        for r in records
+    ]
+    conn.executemany(
+        "INSERT INTO scores (model_id, source, category, score, score_type, "
+        "collected_at, raw_payload) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        score_rows,
+    )
+    scores_recorded = len(score_rows)
 
     _update_source(conn, source_key, tier, "ok")
     log_event(conn, "poll_completed", source=source_key,

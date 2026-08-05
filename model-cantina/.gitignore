@@ -3,3 +3,6 @@ data/*.db-*
 logs/*.log
 secrets.json
 .vercel
+
+.vercel
+.env*.local
