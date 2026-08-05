@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+{% set active = 'health' %}
+{% block title %}Health — The Model Cantina{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>Source health</h2>
+  <table class="sortable" id="sources-table">
+    <thead>
+      <tr><th data-type="text">Tier</th><th data-type="text">Source</th><th data-type="text">Feeds</th>
+          <th data-type="text">Status</th><th data-type="date">Last polled</th><th data-type="text">Error</th><th></th></tr>
+    </thead>
+    <tbody>
+    {% for s in sources %}
+    <tr>
+      <td><span class="badge tier-{{ s.tier }}">{{ s.tier }}</span></td>
+      <td>{{ s.name }}</td>
+      <td class="muted">{{ s.categories|join(', ') }}</td>
+      <td><span class="badge status-{{ s.last_status if s.last_status != 'never polled' else 'unpolled' }}">{{ s.last_status }}</span></td>
+      <td class="muted">{{ s.last_polled_at[:16] if s.last_polled_at else '—' }}</td>
+      <td class="muted">{{ s.last_error or '—' }}</td>
+      <td><button class="secondary poll-btn" data-source="{{ s.key }}">Poll now</button></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Recent events</h2>
+  <table class="sortable" id="events-table">
+    <thead>
+      <tr><th data-type="text">Event</th><th data-type="text">Source</th><th data-type="text">Payload</th><th data-type="date">When</th></tr>
+    </thead>
+    <tbody>
+    {% for e in events %}
+    <tr>
+      <td class="muted">{{ e.event_type }}</td>
+      <td class="muted">{{ e.source or '—' }}</td>
+      <td class="muted" style="max-width:400px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ e.payload or '' }}</td>
+      <td class="muted">{{ e.created_at[:19] }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+initDataTable(document.getElementById('sources-table'), {});
+initDataTable(document.getElementById('events-table'), {});
+document.querySelectorAll('.poll-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const source = btn.dataset.source;
+    btn.textContent = 'Polling...';
+    btn.disabled = true;
+    const res = await postJSON(`/api/poll/${source}`, {});
+    toast(res.ok ? `${source} polled OK` : `${source} poll failed`, res.ok);
+    setTimeout(() => location.reload(), 800);
+  });
+});
+</script>
+{% endblock %}

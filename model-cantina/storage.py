@@ -1,0 +1,290 @@
+"""Persistence for The Model Cantina — backend-agnostic (see db.py).
+
+Pattern borrowed from content-radar's storage.py: get_db() applies inline
+idempotent schema creation, an append-only event_log records everything
+(LOG EVERYTHING), and callers get a small set of high-level functions
+rather than writing raw SQL themselves. As of the Vercel deployment work,
+the actual SQLite-vs-Postgres connection handling lives in db.py — this
+module only ever calls conn.execute(sql, params) with `?` placeholders and
+dict-like row access, which works against either backend.
+"""
+
+import json
+from datetime import datetime, timezone
+
+import db
+
+_VALID_EVENT_TYPES = {
+    "poll_started",
+    "poll_completed",
+    "poll_failed",
+    "new_model_found",
+    "score_recorded",
+    "note_added",
+}
+
+
+def now_iso():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def get_db():
+    return db.get_db()
+
+
+def log_event(conn, event_type, source=None, model_id=None, payload=None):
+    if event_type not in _VALID_EVENT_TYPES:
+        raise ValueError(f"invalid event_type: {event_type!r}")
+    conn.execute(
+        "INSERT INTO event_log (event_type, source, model_id, payload, created_at) "
+        "VALUES (?, ?, ?, ?, ?)",
+        (event_type, source, model_id, json.dumps(payload) if payload is not None else None, now_iso()),
+    )
+
+
+def _get_or_create_model(conn, name, org=None, weight_availability=None,
+                          local_runnable=None, modalities=None):
+    # NULL-safe equality on org, done by branching in Python rather than a
+    # SQL operator: "IS NOT DISTINCT FROM" needs SQLite 3.39+ (this box's
+    # bundled sqlite3 is 3.38.4 — checked, not assumed) and plain "IS" with
+    # a bound parameter isn't portable to Postgres either. Two plain queries
+    # sidesteps the whole dialect question.
+    if org is None:
+        row = conn.execute(
+            "SELECT id FROM models WHERE name = ? AND org IS NULL", (name,)
+        ).fetchone()
+    else:
+        row = conn.execute(
+            "SELECT id FROM models WHERE name = ? AND org = ?", (name, org)
+        ).fetchone()
+    if row:
+        model_id = row["id"]
+        # Refresh mutable attributes if the source has an updated view of them.
+        updates, params = [], []
+        if weight_availability is not None:
+            updates.append("weight_availability = ?")
+            params.append(weight_availability)
+        if local_runnable is not None:
+            updates.append("local_runnable = ?")
+            params.append(1 if local_runnable else 0)
+        if modalities is not None:
+            updates.append("modalities = ?")
+            params.append(json.dumps(modalities))
+        if updates:
+            params.append(model_id)
+            conn.execute(f"UPDATE models SET {', '.join(updates)} WHERE id = ?", params)
+        return model_id, False
+
+    cur = conn.execute(
+        "INSERT INTO models (name, org, first_seen_at, weight_availability, "
+        "local_runnable, modalities) VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
+        (
+            name,
+            org,
+            now_iso(),
+            weight_availability,
+            1 if local_runnable else 0,
+            json.dumps(modalities) if modalities is not None else None,
+        ),
+    )
+    return cur.fetchone()["id"], True
+
+
+def _update_source(conn, source_key, tier, status, error=None):
+    conn.execute(
+        "INSERT INTO sources (source_key, tier, last_polled_at, last_status, last_error) "
+        "VALUES (?, ?, ?, ?, ?) "
+        "ON CONFLICT(source_key) DO UPDATE SET "
+        "tier=excluded.tier, last_polled_at=excluded.last_polled_at, "
+        "last_status=excluded.last_status, last_error=excluded.last_error",
+        (source_key, tier, now_iso(), status, error),
+    )
+
+
+def record_poll_results(conn, source_key, tier, records):
+    """records: list of dicts with keys name, org (optional), weight_availability
+    (optional), local_runnable (optional), modalities (optional), category, score,
+    score_type, raw_payload (optional dict).
+    Commits on success. Logs one poll_completed event with summary counts, plus
+    one new_model_found event per newly discovered model.
+    """
+    new_models = 0
+    scores_recorded = 0
+    for r in records:
+        model_id, created = _get_or_create_model(
+            conn,
+            r["name"],
+            org=r.get("org"),
+            weight_availability=r.get("weight_availability"),
+            local_runnable=r.get("local_runnable"),
+            modalities=r.get("modalities"),
+        )
+        if created:
+            new_models += 1
+            log_event(conn, "new_model_found", source=source_key, model_id=model_id,
+                       payload={"name": r["name"], "org": r.get("org")})
+        conn.execute(
+            "INSERT INTO scores (model_id, source, category, score, score_type, "
+            "collected_at, raw_payload) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (
+                model_id,
+                source_key,
+                r["category"],
+                r.get("score"),
+                r.get("score_type"),
+                now_iso(),
+                json.dumps(r["raw_payload"]) if r.get("raw_payload") is not None else None,
+            ),
+        )
+        scores_recorded += 1
+
+    _update_source(conn, source_key, tier, "ok")
+    log_event(conn, "poll_completed", source=source_key,
+               payload={"new_models": new_models, "scores_recorded": scores_recorded})
+    conn.commit()
+    return {"new_models": new_models, "scores_recorded": scores_recorded}
+
+
+def record_poll_failure(conn, source_key, tier, error):
+    _update_source(conn, source_key, tier, "error", error=str(error))
+    log_event(conn, "poll_failed", source=source_key, payload={"error": str(error)})
+    conn.commit()
+
+
+def add_manual_note(conn, model_id, category, rating, note):
+    conn.execute(
+        "INSERT INTO manual_notes (model_id, category, rating, note, created_at) "
+        "VALUES (?, ?, ?, ?, ?)",
+        (model_id, category, rating, note, now_iso()),
+    )
+    log_event(conn, "note_added", model_id=model_id,
+               payload={"category": category, "rating": rating})
+    conn.commit()
+
+
+def find_or_create_model_by_name(conn, name, org=None):
+    """Used by the manual-note form to resolve/create a model by plain name.
+
+    Looks up by name alone first — the note form only has a name field, and
+    requiring an exact org match (like the source-ingestion path does) would
+    silently create a duplicate model row whenever a note is added for a
+    model that a source already recorded with an org attached.
+    """
+    row = conn.execute(
+        "SELECT id FROM models WHERE name = ? ORDER BY id LIMIT 1", (name,)
+    ).fetchone()
+    if row:
+        return row["id"]
+
+    cur = conn.execute(
+        "INSERT INTO models (name, org, first_seen_at) VALUES (?, ?, ?) RETURNING id",
+        (name, org, now_iso()),
+    )
+    model_id = cur.fetchone()["id"]
+    log_event(conn, "new_model_found", source="manual", model_id=model_id,
+               payload={"name": name, "org": org})
+    conn.commit()
+    return model_id
+
+
+# ---------------------------------------------------------------------------
+# Read queries for the CLI and dashboard
+# ---------------------------------------------------------------------------
+
+def list_models(conn, category=None, local_runnable=None, org=None):
+    query = "SELECT DISTINCT models.* FROM models"
+    joins, wheres, params = [], [], []
+    if category:
+        joins.append("JOIN scores ON scores.model_id = models.id")
+        wheres.append("scores.category = ?")
+        params.append(category)
+    if local_runnable is not None:
+        wheres.append("models.local_runnable = ?")
+        params.append(1 if local_runnable else 0)
+    if org:
+        wheres.append("models.org = ?")
+        params.append(org)
+    sql = query + (" " + " ".join(joins) if joins else "")
+    if wheres:
+        sql += " WHERE " + " AND ".join(wheres)
+    sql += " ORDER BY models.name"
+    return conn.execute(sql, params).fetchall()
+
+
+def get_model(conn, model_id):
+    return conn.execute("SELECT * FROM models WHERE id = ?", (model_id,)).fetchone()
+
+
+def get_scores_for_model(conn, model_id):
+    return conn.execute(
+        "SELECT * FROM scores WHERE model_id = ? ORDER BY collected_at DESC", (model_id,)
+    ).fetchall()
+
+
+def get_notes_for_model(conn, model_id):
+    return conn.execute(
+        "SELECT * FROM manual_notes WHERE model_id = ? ORDER BY created_at DESC", (model_id,)
+    ).fetchall()
+
+
+def get_category_leaderboard(conn, category):
+    """Latest score per (model, source) for this category, newest first by score."""
+    return conn.execute(
+        """
+        SELECT s.*, m.name as model_name, m.org as model_org
+        FROM scores s
+        JOIN models m ON m.id = s.model_id
+        WHERE s.category = ?
+        AND s.id IN (
+            SELECT MAX(id) FROM scores
+            WHERE category = ? GROUP BY model_id, source
+        )
+        ORDER BY s.score DESC
+        """,
+        (category, category),
+    ).fetchall()
+
+
+def get_sources_health(conn):
+    return conn.execute("SELECT * FROM sources ORDER BY source_key").fetchall()
+
+
+def get_whats_new(conn, since_iso, limit=50):
+    new_models = conn.execute(
+        "SELECT * FROM models WHERE first_seen_at >= ? ORDER BY first_seen_at DESC LIMIT ?",
+        (since_iso, limit),
+    ).fetchall()
+    recent_scores = conn.execute(
+        """
+        SELECT s.*, m.name as model_name FROM scores s
+        JOIN models m ON m.id = s.model_id
+        WHERE s.collected_at >= ?
+        ORDER BY s.collected_at DESC LIMIT ?
+        """,
+        (since_iso, limit),
+    ).fetchall()
+    return new_models, recent_scores
+
+
+def get_recent_events(conn, event_type=None, limit=50):
+    if event_type:
+        return conn.execute(
+            "SELECT * FROM event_log WHERE event_type = ? ORDER BY created_at DESC LIMIT ?",
+            (event_type, limit),
+        ).fetchall()
+    return conn.execute(
+        "SELECT * FROM event_log ORDER BY created_at DESC LIMIT ?", (limit,)
+    ).fetchall()
+
+
+def get_stats(conn):
+    model_count = conn.execute("SELECT COUNT(*) c FROM models").fetchone()["c"]
+    score_count = conn.execute("SELECT COUNT(*) c FROM scores").fetchone()["c"]
+    note_count = conn.execute("SELECT COUNT(*) c FROM manual_notes").fetchone()["c"]
+    sources = get_sources_health(conn)
+    return {
+        "model_count": model_count,
+        "score_count": score_count,
+        "note_count": note_count,
+        "sources": [dict(s) for s in sources],
+    }

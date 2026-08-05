@@ -1,0 +1,124 @@
+# The Model Cantina — source and category configuration
+
+categories:
+  chat_reasoning:
+    name: "General Chat & Reasoning"
+  coding:
+    name: "Coding"
+  embeddings:
+    name: "Embeddings / Vectorizing"
+  ocr_document:
+    name: "OCR & Document Conversion"
+  local_open_weight:
+    name: "Local / Open-Weight Registry"
+  software_architecture:
+    name: "Software Engineering & Architecture"
+  classification_routing:
+    name: "Classification, Routing & Triage"
+  chunking_index:
+    name: "Chunking & Index Enrichment"
+  privacy_trust:
+    name: "Privacy & Trust-Boundary Enforcement"
+
+# tier: A = structured API/JSON, no scraping. B = scraped/semi-structured, more fragile.
+# categories: which category keys this source feeds (a source can feed more than one).
+# proxy_for: categories where this source is an imperfect stand-in, not a direct measurement
+#   (shown on the category view so proxy scores are never presented as if they were exact).
+sources:
+  swebench:
+    tier: A
+    name: "SWE-bench"
+    url: "https://raw.githubusercontent.com/SWE-bench/swe-bench.github.io/main/data/leaderboards.json"
+    categories: [coding]
+    proxy_for: [software_architecture]
+    poll_cadence_hours: 24
+
+  mteb:
+    tier: A
+    name: "MTEB (Massive Text Embedding Benchmark)"
+    url: "https://api.github.com/repos/embeddings-benchmark/results"
+    categories: [embeddings]
+    proxy_for: [chunking_index]
+    poll_cadence_hours: 24
+
+  hf_hub:
+    tier: A
+    name: "Hugging Face Hub API (new model discovery)"
+    url: "https://huggingface.co/api/models"
+    categories: [local_open_weight, coding, embeddings, ocr_document, chat_reasoning]
+    proxy_for: []
+    poll_cadence_hours: 24
+
+  artificial_analysis:
+    tier: B
+    name: "Artificial Analysis"
+    url: "https://artificialanalysis.ai"
+    categories: [chat_reasoning, coding]
+    proxy_for: [software_architecture]
+    poll_cadence_hours: 24
+
+  arena:
+    tier: B
+    name: "Arena (formerly LMArena/Chatbot Arena)"
+    url: "https://api.wulong.dev/arena-ai-leaderboards/v1/leaderboard"
+    note: "Unofficial community mirror, not the official Arena API."
+    categories: [chat_reasoning]
+    proxy_for: []
+    poll_cadence_hours: 24
+
+  livecodebench:
+    tier: B
+    name: "LiveCodeBench"
+    url: "https://livecodebench.github.io/leaderboard.html"
+    categories: [coding]
+    proxy_for: []
+    poll_cadence_hours: 24
+
+  aider:
+    tier: B
+    name: "Aider Polyglot Leaderboard"
+    url: "https://aider.chat/docs/leaderboards/"
+    categories: [coding]
+    proxy_for: [software_architecture]
+    poll_cadence_hours: 168
+
+  ollama_library:
+    tier: B
+    name: "Ollama Library"
+    url: "https://ollama.com/library"
+    categories: [local_open_weight]
+    proxy_for: []
+    poll_cadence_hours: 24
+
+  ocr_benchmarks:
+    tier: B
+    name: "olmOCR-Bench / IDP Leaderboard"
+    url: "https://idp-leaderboard.org"
+    categories: [ocr_document]
+    proxy_for: []
+    poll_cadence_hours: 168
+
+  safety_benchmarks:
+    tier: B
+    name: "JailbreakBench / HarmBench / AgentDojo"
+    url: "https://jailbreakbench.github.io"
+    categories: [privacy_trust]
+    proxy_for: []
+    poll_cadence_hours: 168
+
+  vals_classification:
+    tier: B
+    name: "Vals.ai (classification-adjacent tasks)"
+    url: "https://vals.ai/benchmarks"
+    categories: [classification_routing]
+    proxy_for: []
+    poll_cadence_hours: 168
+
+# 5-tier rating scale reused from the "AI Benchtests" Lumo benchmark project,
+# for manual_notes.rating — kept consistent across Joe's tools.
+manual_note_ratings:
+  - "Recommended"
+  - "Recommended with safeguards"
+  - "Useful as a secondary tool"
+  - "Experimental only"
+  - "Not recommended"

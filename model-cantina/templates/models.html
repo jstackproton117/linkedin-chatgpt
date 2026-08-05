@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+{% set active = 'models' %}
+{% block title %}The Model Cantina — Models{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>Filter</h2>
+  <div class="chip-list">
+    <a class="chip {{ 'active' if not selected_category }}"
+       href="{{ url_for('models_list', local_runnable=('1' if selected_local_runnable else None)) }}">All</a>
+    {% for key, c in categories.items() %}
+    <a class="chip {{ 'active' if selected_category == key }}"
+       href="{{ url_for('models_list', category=key, local_runnable=('1' if selected_local_runnable else None)) }}">{{ c.name }}</a>
+    {% endfor %}
+  </div>
+  <div class="chip-list">
+    <a class="chip {{ 'active' if selected_local_runnable }}"
+       href="{{ url_for('models_list', category=selected_category, local_runnable=(None if selected_local_runnable else '1')) }}">
+       Local-runnable only
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Models</h2>
+  <div class="table-toolbar">
+    <input type="search" id="models-search" placeholder="Search models or orgs...">
+    <span class="table-count"><span id="models-count">{{ models|length }}</span> models</span>
+  </div>
+  <table class="sortable" id="models-table">
+    <thead>
+      <tr>
+        <th data-type="text">Name</th>
+        <th data-type="text">Org</th>
+        <th data-type="text">Weights</th>
+        <th data-type="text">Local?</th>
+        <th data-type="date">First seen</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for m in models %}
+    <tr>
+      <td><a class="row-link" href="{{ url_for('model_detail', model_id=m.id) }}">{{ m.name }}</a></td>
+      <td class="muted">{{ m.org or '—' }}</td>
+      <td class="muted">{{ m.weight_availability or '—' }}</td>
+      <td class="muted">{{ 'yes' if m.local_runnable else '—' }}</td>
+      <td class="muted">{{ m.first_seen_at[:10] }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="show-more-row"><button class="secondary" id="models-more" style="display:none;">Show more</button></div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+initDataTable(document.getElementById('models-table'), {
+  searchInput: document.getElementById('models-search'),
+  countEl: document.getElementById('models-count'),
+  moreBtn: document.getElementById('models-more'),
+  pageSize: 50,
+});
+</script>
+{% endblock %}

@@ -1,0 +1,176 @@
+"""The Model Cantina — Flask dashboard.
+
+Single-file app, page routes (render templates) + /api/ routes (jsonify),
+same pattern as Rebel Intel's pipeline/app.py. Runs unchanged on both
+deployments: Thornwick (SQLite, always-on, systemd + cron) and Vercel
+(Postgres via DATABASE_URL, serverless — see db.py/poller.py for how the
+backend is selected and polling is made to fit a function time limit).
+"""
+
+import os
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+from flask import Flask, jsonify, render_template, request
+
+import config
+import poller
+import storage
+
+BASE = Path(__file__).parent
+
+app = Flask(__name__)
+
+
+# ── Home ─────────────────────────────────────────────────────────────────
+
+@app.route("/")
+def home():
+    conn = storage.get_db()
+    since = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+    new_models, recent_scores = storage.get_whats_new(conn, since, limit=30)
+    sources = storage.get_sources_health(conn)
+    stats = storage.get_stats(conn)
+    conn.close()
+    return render_template(
+        "home.html",
+        new_models=new_models,
+        recent_scores=recent_scores,
+        sources=sources,
+        stats=stats,
+        categories=config.load_config()["categories"],
+    )
+
+
+# ── Models ───────────────────────────────────────────────────────────────
+
+@app.route("/models")
+def models_list():
+    conn = storage.get_db()
+    category = request.args.get("category") or None
+    local_runnable = request.args.get("local_runnable")
+    if local_runnable == "1":
+        local_runnable = True
+    elif local_runnable == "0":
+        local_runnable = False
+    else:
+        local_runnable = None
+    rows = storage.list_models(conn, category=category, local_runnable=local_runnable)
+    conn.close()
+    return render_template(
+        "models.html",
+        models=rows,
+        categories=config.load_config()["categories"],
+        selected_category=category,
+        selected_local_runnable=local_runnable,
+    )
+
+
+@app.route("/models/<int:model_id>")
+def model_detail(model_id):
+    conn = storage.get_db()
+    model = storage.get_model(conn, model_id)
+    scores = storage.get_scores_for_model(conn, model_id)
+    notes = storage.get_notes_for_model(conn, model_id)
+    conn.close()
+    if model is None:
+        return "Model not found", 404
+    return render_template(
+        "model_detail.html",
+        model=model,
+        scores=scores,
+        notes=notes,
+        categories=config.load_config()["categories"],
+        ratings=config.load_config()["manual_note_ratings"],
+    )
+
+
+# ── Category views ──────────────────────────────────────────────────────
+
+@app.route("/category/<category_key>")
+def category_view(category_key):
+    conn = storage.get_db()
+    rows = storage.get_category_leaderboard(conn, category_key)
+    cfg = config.load_config()
+    sources_feeding = [
+        {"key": k, **v} for k, v in cfg["sources"].items()
+        if category_key in v.get("categories", []) or category_key in v.get("proxy_for", [])
+    ]
+    proxy_source_keys = {
+        k for k, v in cfg["sources"].items() if category_key in v.get("proxy_for", [])
+    }
+    conn.close()
+    return render_template(
+        "category.html",
+        category_key=category_key,
+        category_name=config.category_name(category_key),
+        rows=rows,
+        sources_feeding=sources_feeding,
+        proxy_source_keys=proxy_source_keys,
+        categories=cfg["categories"],
+    )
+
+
+# ── Health ───────────────────────────────────────────────────────────────
+
+@app.route("/health")
+def health():
+    conn = storage.get_db()
+    sources_health = {s["source_key"]: dict(s) for s in storage.get_sources_health(conn)}
+    events = storage.get_recent_events(conn, limit=50)
+    conn.close()
+    cfg = config.load_config()
+    sources = []
+    for key, scfg in cfg["sources"].items():
+        row = sources_health.get(key, {})
+        sources.append({"key": key, "name": scfg["name"], "tier": scfg["tier"],
+                         "categories": scfg.get("categories", []),
+                         "last_polled_at": row.get("last_polled_at"),
+                         "last_status": row.get("last_status", "never polled"),
+                         "last_error": row.get("last_error")})
+    return render_template("health.html", sources=sources, events=events)
+
+
+# ── API ──────────────────────────────────────────────────────────────────
+
+@app.route("/api/notes", methods=["POST"])
+def api_add_note():
+    data = request.get_json()
+    name = (data.get("model_name") or "").strip()
+    category = data.get("category")
+    rating = data.get("rating")
+    note = (data.get("note") or "").strip()
+    valid_ratings = config.load_config()["manual_note_ratings"]
+    if not name or not category or rating not in valid_ratings:
+        return jsonify({"ok": False, "error": "missing or invalid fields"}), 400
+    conn = storage.get_db()
+    model_id = storage.find_or_create_model_by_name(conn, name)
+    storage.add_manual_note(conn, model_id, category, rating, note)
+    conn.close()
+    return jsonify({"ok": True, "model_id": model_id})
+
+
+@app.route("/api/poll/<source_key>", methods=["POST"])
+def api_poll_source(source_key):
+    result = poller.poll_all([source_key])[source_key]
+    return jsonify({"ok": "error" not in result, "result": result})
+
+
+# ── Cron (Vercel) ────────────────────────────────────────────────────────
+# Vercel Cron hits this on a schedule (see vercel.json) with an
+# "Authorization: Bearer <CRON_SECRET>" header it adds automatically once
+# CRON_SECRET is set as an env var — that's what stops anyone else on the
+# public internet from triggering a poll. No CRON_SECRET set (e.g. on
+# Thornwick, which isn't internet-facing) means this is open, same trust
+# boundary as the existing LAN-only "Poll now" buttons on the health page.
+@app.route("/cron/poll", methods=["GET", "POST"])
+def cron_poll():
+    secret = os.environ.get("CRON_SECRET")
+    if secret and request.headers.get("Authorization") != f"Bearer {secret}":
+        return jsonify({"ok": False, "error": "unauthorized"}), 401
+    summary = poller.poll_all()
+    return jsonify({"ok": True, "summary": summary})
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5050)

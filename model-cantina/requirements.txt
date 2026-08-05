@@ -1,0 +1,6 @@
+flask
+requests
+pyyaml
+gunicorn
+beautifulsoup4
+psycopg[binary]

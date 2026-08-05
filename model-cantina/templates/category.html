@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+{% set active = 'models' %}
+{% block title %}{{ category_name }} — The Model Cantina{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>{{ category_name }}</h2>
+  <p class="muted">Fed by:</p>
+  <div class="chip-list">
+    {% for s in sources_feeding %}
+    <span class="badge tier-{{ s.tier }}">{{ s.name }}{% if s.key in proxy_source_keys %} (proxy){% endif %}</span>
+    {% endfor %}
+  </div>
+  {% if proxy_source_keys %}
+  <p class="muted">Scores marked (proxy) are the closest available stand-in, not a direct measurement of this category.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Leaderboard</h2>
+  {% if rows %}
+  <div class="table-toolbar">
+    <input type="search" id="category-search" placeholder="Search models or orgs...">
+    <span class="table-count"><span id="category-count">{{ rows|length }}</span> scores</span>
+  </div>
+  <table class="sortable" id="category-table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th data-type="text">Model</th>
+        <th data-type="text">Org</th>
+        <th data-type="number">Score</th>
+        <th data-type="text">Type</th>
+        <th data-type="text">Source</th>
+        <th data-type="date">Collected</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for r in rows %}
+    <tr>
+      <td class="muted">{{ loop.index }}</td>
+      <td><a class="row-link" href="{{ url_for('model_detail', model_id=r.model_id) }}">{{ r.model_name }}</a></td>
+      <td class="muted">{{ r.model_org or '—' }}</td>
+      <td>{{ r.score if r.score is not none else '—' }}</td>
+      <td class="muted">{{ r.score_type or '—' }}</td>
+      <td class="muted">
+        {{ r.source }}
+        {% if r.source in proxy_source_keys %}
+        <span class="badge proxy">proxy</span>
+        {% endif %}
+      </td>
+      <td class="muted">{{ r.collected_at[:10] }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="show-more-row"><button class="secondary" id="category-more" style="display:none;">Show more</button></div>
+  {% else %}
+  <p class="muted">No scores for this category yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+{% if rows %}
+initDataTable(document.getElementById('category-table'), {
+  searchInput: document.getElementById('category-search'),
+  countEl: document.getElementById('category-count'),
+  moreBtn: document.getElementById('category-more'),
+  pageSize: 50,
+  rankCol: 0,
+});
+{% endif %}
+</script>
+{% endblock %}

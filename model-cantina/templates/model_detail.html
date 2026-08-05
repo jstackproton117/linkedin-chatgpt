@@ -1,0 +1,100 @@
+{% extends 'layout.html' %}
+{% set active = 'models' %}
+{% block title %}{{ model.name }} — The Model Cantina{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>{{ model.name }}</h2>
+  <p class="muted">
+    Org: {{ model.org or '—' }} ·
+    Weights: {{ model.weight_availability or '—' }} ·
+    Local-runnable: {{ 'yes' if model.local_runnable else 'unknown' }} ·
+    First seen: {{ model.first_seen_at[:16] }}
+  </p>
+</div>
+
+<div class="card">
+  <h2>Scores</h2>
+  {% if scores %}
+  <table class="sortable" id="scores-table">
+    <thead>
+      <tr><th data-type="text">Category</th><th data-type="number">Score</th><th data-type="text">Type</th>
+          <th data-type="text">Source</th><th data-type="date">Collected</th></tr>
+    </thead>
+    <tbody>
+    {% for s in scores %}
+    <tr>
+      <td class="muted">{{ categories.get(s.category, {}).get('name', s.category) }}</td>
+      <td>{{ s.score if s.score is not none else '—' }}</td>
+      <td class="muted">{{ s.score_type or '—' }}</td>
+      <td class="muted">{{ s.source }}</td>
+      <td class="muted">{{ s.collected_at[:16] }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No benchmark scores recorded for this model yet.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Your notes</h2>
+  {% if notes %}
+  <table class="sortable" id="notes-table">
+    <thead>
+      <tr><th data-type="text">Category</th><th data-type="text">Rating</th><th>Note</th><th data-type="date">Date</th></tr>
+    </thead>
+    <tbody>
+    {% for n in notes %}
+    <tr>
+      <td class="muted">{{ categories.get(n.category, {}).get('name', n.category) }}</td>
+      <td>{{ n.rating }}</td>
+      <td>{{ n.note }}</td>
+      <td class="muted">{{ n.created_at[:10] }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No notes yet — add one below.</p>
+  {% endif %}
+
+  <h3 style="margin-top:20px;">Add a note</h3>
+  <form class="inline" id="note-form">
+    <input type="hidden" name="model_name" value="{{ model.name }}">
+    <select name="category" required>
+      {% for key, c in categories.items() %}
+      <option value="{{ key }}">{{ c.name }}</option>
+      {% endfor %}
+    </select>
+    <select name="rating" required>
+      {% for r in ratings %}
+      <option value="{{ r }}">{{ r }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Save note</button>
+  </form>
+  <textarea id="note-text" placeholder="What did you observe?" style="margin-top:8px;"></textarea>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+{% if scores %}initDataTable(document.getElementById('scores-table'), {});{% endif %}
+{% if notes %}initDataTable(document.getElementById('notes-table'), {});{% endif %}
+document.getElementById('note-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const body = {
+    model_name: form.model_name.value,
+    category: form.category.value,
+    rating: form.rating.value,
+    note: document.getElementById('note-text').value,
+  };
+  const res = await postJSON('/api/notes', body);
+  if (res.ok) { toast('Note saved'); setTimeout(() => location.reload(), 700); }
+  else { toast(res.error || 'Failed to save note', false); }
+});
+</script>
+{% endblock %}

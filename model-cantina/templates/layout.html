@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}The Model Cantina{% endblock %}</title>
+<style>
+  :root {
+    --bg: #16110c;
+    --panel: #1f1811;
+    --panel-2: #271e14;
+    --border: #3a2c1a;
+    --amber: #d99a3b;
+    --amber-bright: #f0b64f;
+    --text: #ecdfc8;
+    --text-dim: #a89678;
+    --good: #7fae5a;
+    --bad: #c1543f;
+    --warn: #d9a83b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  header .brand { font-size: 1.25rem; font-weight: 700; color: var(--amber-bright); letter-spacing: 0.02em; }
+  header .brand span { color: var(--text-dim); font-weight: 400; font-size: 0.85rem; margin-left: 8px; }
+  nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  nav a {
+    color: var(--text-dim); text-decoration: none; padding: 6px 12px; border-radius: 6px;
+    font-size: 0.88rem;
+  }
+  nav a:hover, nav a.active { background: var(--panel-2); color: var(--amber-bright); }
+  main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 18px; margin-bottom: 18px;
+  }
+  .card h2 { margin-top: 0; font-size: 1.05rem; color: var(--amber-bright); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-dim); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  tr:hover td { background: var(--panel-2); }
+  table.sortable th[data-type] { cursor: pointer; user-select: none; white-space: nowrap; }
+  table.sortable th[data-type]:hover { color: var(--amber-bright); }
+  table.sortable th[data-type]::after { content: ''; display: inline-block; width: 0.7em; opacity: 0.4; }
+  table.sortable th.sort-asc::after { content: '▲'; opacity: 1; color: var(--amber-bright); }
+  table.sortable th.sort-desc::after { content: '▼'; opacity: 1; color: var(--amber-bright); }
+  .table-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .table-toolbar input[type="search"] { min-width: 240px; }
+  .table-count { color: var(--text-dim); font-size: 0.82rem; }
+  .show-more-row { text-align: center; padding-top: 14px; }
+  a.row-link { color: var(--text); text-decoration: none; }
+  a.row-link:hover { color: var(--amber-bright); }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.72rem;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  .badge.tier-A { background: rgba(127,174,90,0.18); color: var(--good); }
+  .badge.tier-B { background: rgba(217,168,59,0.18); color: var(--warn); }
+  .badge.status-ok { background: rgba(127,174,90,0.18); color: var(--good); }
+  .badge.status-error { background: rgba(193,84,63,0.18); color: var(--bad); }
+  .badge.status-unpolled { background: rgba(168,150,120,0.18); color: var(--text-dim); }
+  .badge.proxy { background: rgba(217,168,59,0.15); color: var(--warn); border: 1px solid var(--warn); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .stat-tile { background: var(--panel-2); border-radius: 8px; padding: 14px; text-align: center; }
+  .stat-tile .num { font-size: 1.8rem; font-weight: 700; color: var(--amber-bright); }
+  .stat-tile .label { font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase; }
+  .chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .chip { background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+          text-decoration: none; padding: 6px 12px; border-radius: 999px; font-size: 0.82rem; }
+  .chip:hover { border-color: var(--amber); color: var(--amber-bright); }
+  .chip.active { background: var(--amber); color: #16110c; border-color: var(--amber); }
+  form.inline { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  input, select, textarea, button {
+    background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 7px 10px; font-size: 0.88rem; font-family: inherit;
+  }
+  button { background: var(--amber); color: #16110c; font-weight: 600; cursor: pointer; border: none; }
+  button:hover { background: var(--amber-bright); }
+  button.secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+  textarea { width: 100%; min-height: 60px; resize: vertical; }
+  .muted { color: var(--text-dim); font-size: 0.85rem; }
+  #toast {
+    position: fixed; bottom: 20px; right: 20px; background: var(--panel-2);
+    border: 1px solid var(--amber); color: var(--text); padding: 10px 16px; border-radius: 8px;
+    display: none; z-index: 100;
+  }
+</style>
+{% block extra_style %}{% endblock %}
+</head>
+<body>
+<header>
+  <div class="brand">The Model Cantina <span>AI model watch</span></div>
+  <nav>
+    <a href="{{ url_for('home') }}" class="{{ 'active' if active == 'home' }}">Home</a>
+    <a href="{{ url_for('models_list') }}" class="{{ 'active' if active == 'models' }}">Models</a>
+    <a href="{{ url_for('health') }}" class="{{ 'active' if active == 'health' }}">Health</a>
+  </nav>
+</header>
+<main>
+  {% block content %}{% endblock %}
+</main>
+<div id="toast"></div>
+<script>
+function toast(msg, ok) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = ok === false ? '#c1543f' : '#d99a3b';
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+async function postJSON(url, body) {
+  const resp = await fetch(url, {
+    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
+  });
+  return resp.json();
+}
+
+// Shared sort/search/pagination behavior for any <table class="sortable">.
+// Sortable columns are marked with data-type="text|number|date" on their <th>.
+// opts: { searchInput, pageSize, countEl, rankCol } — all optional.
+//   searchInput: an <input type="search"> that filters rows by substring match.
+//   pageSize: show this many rows initially, with a "Show more" button for the rest.
+//   countEl: an element to show "N of M" row counts in.
+//   rankCol: index of a column to auto-renumber (1, 2, 3...) to reflect current sort/filter order.
+function initDataTable(table, opts) {
+  opts = opts || {};
+  const thead = table.tHead;
+  const tbody = table.tBodies[0];
+  if (!thead || !tbody) return;
+  const headerCells = Array.from(thead.rows[0].cells);
+  const allRows = Array.from(tbody.rows);
+  let sortCol = null, sortDir = 1;
+  let shown = opts.pageSize || Infinity;
+
+  function cellValue(row, colIdx, type) {
+    const cell = row.cells[colIdx];
+    if (!cell) return null;
+    const raw = cell.dataset.sort !== undefined ? cell.dataset.sort : cell.textContent.trim();
+    if (raw === '' || raw === '—') return null;
+    if (type === 'number') {
+      const n = parseFloat(raw);
+      return isNaN(n) ? null : n;
+    }
+    return raw.toLowerCase();
+  }
+
+  function render() {
+    const query = opts.searchInput ? opts.searchInput.value.trim().toLowerCase() : '';
+    let visible = query
+      ? allRows.filter(r => r.textContent.toLowerCase().includes(query))
+      : allRows.slice();
+
+    if (sortCol !== null) {
+      const type = headerCells[sortCol].dataset.type || 'text';
+      visible.sort((a, b) => {
+        const va = cellValue(a, sortCol, type);
+        const vb = cellValue(b, sortCol, type);
+        if (va === null && vb === null) return 0;
+        if (va === null) return 1;   // nulls/— always sort last, regardless of direction
+        if (vb === null) return -1;
+        if (va < vb) return -1 * sortDir;
+        if (va > vb) return 1 * sortDir;
+        return 0;
+      });
+    }
+
+    const toShow = visible.slice(0, shown);
+    tbody.replaceChildren(...toShow);
+    if (opts.rankCol !== undefined) {
+      toShow.forEach((row, i) => {
+        const cell = row.cells[opts.rankCol];
+        if (cell) cell.textContent = i + 1;
+      });
+    }
+    if (opts.countEl) {
+      opts.countEl.textContent = visible.length === allRows.length
+        ? `${allRows.length}`
+        : `${visible.length} of ${allRows.length}`;
+    }
+    if (opts.moreBtn) {
+      opts.moreBtn.style.display = visible.length > shown ? '' : 'none';
+    }
+  }
+
+  headerCells.forEach((th, idx) => {
+    if (!th.dataset.type) return;
+    th.addEventListener('click', () => {
+      if (sortCol === idx) { sortDir *= -1; } else { sortCol = idx; sortDir = 1; }
+      headerCells.forEach(c => c.classList.remove('sort-asc', 'sort-desc'));
+      th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+      render();
+    });
+  });
+
+  if (opts.searchInput) {
+    opts.searchInput.addEventListener('input', () => { shown = opts.pageSize || Infinity; render(); });
+  }
+  if (opts.moreBtn) {
+    opts.moreBtn.addEventListener('click', () => { shown += (opts.pageSize || allRows.length); render(); });
+  }
+
+  render();
+}
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
