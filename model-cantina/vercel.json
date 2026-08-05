@@ -1,7 +1,4 @@
 {
-  "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/api/index" }
-  ],
   "crons": [
     { "path": "/cron/poll", "schedule": "0 11 * * *" }
   ],
