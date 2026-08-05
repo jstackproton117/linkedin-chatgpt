@@ -70,6 +70,11 @@ def normalize(raw):
                 "createdAt": m.get("createdAt"),
                 "tags": m.get("tags"),
             }
+            # createdAt is when this HF repo was created, which is a
+            # reasonable proxy for release date but not exact — a
+            # quantization/mirror repo's createdAt is when THAT repo went
+            # up, not necessarily when the underlying model first shipped.
+            release_date = m.get("createdAt")
             records.append(
                 make_record(
                     name=model_id,
@@ -78,6 +83,7 @@ def normalize(raw):
                     score=None,
                     score_type="hf_new_release",
                     weight_availability="open",
+                    release_date=release_date,
                     raw_payload=payload,
                 )
             )
@@ -89,6 +95,7 @@ def normalize(raw):
                     score=None,
                     score_type="hf_new_release",
                     weight_availability="open",
+                    release_date=release_date,
                     raw_payload=payload,
                 )
             )

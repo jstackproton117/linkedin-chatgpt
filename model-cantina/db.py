@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS models (
     name TEXT NOT NULL,
     org TEXT,
     first_seen_at TEXT NOT NULL,
+    release_date TEXT,
     weight_availability TEXT,
     local_runnable INTEGER DEFAULT 0,
     modalities TEXT,
@@ -162,6 +163,7 @@ _DDL_POSTGRES = [
         name TEXT NOT NULL,
         org TEXT,
         first_seen_at TEXT NOT NULL,
+        release_date TEXT,
         weight_availability TEXT,
         local_runnable INTEGER DEFAULT 0,
         modalities TEXT,
@@ -226,4 +228,24 @@ def _init_tables(wrapper):
             wrapper.execute(stmt)
     else:
         wrapper.executescript(_DDL_SQLITE)
+    wrapper.commit()
+    _run_migrations(wrapper)
+
+
+def _run_migrations(wrapper):
+    """Idempotent ALTER TABLEs for columns added after the initial schema —
+    CREATE TABLE IF NOT EXISTS above only helps on a fresh database, not an
+    existing one that predates the column."""
+    if wrapper.is_postgres:
+        # Postgres supports IF NOT EXISTS on ADD COLUMN natively.
+        wrapper.execute("ALTER TABLE models ADD COLUMN IF NOT EXISTS release_date TEXT")
+    else:
+        # SQLite has no IF NOT EXISTS for ADD COLUMN — try and ignore the
+        # "duplicate column" error if it's already there, same pattern
+        # content-radar uses for its own inline migrations.
+        try:
+            wrapper.execute("ALTER TABLE models ADD COLUMN release_date TEXT")
+        except Exception as e:
+            if "duplicate column" not in str(e).lower():
+                raise
     wrapper.commit()

@@ -32,6 +32,7 @@
         <th data-type="number">Score</th>
         <th data-type="text">Type</th>
         <th data-type="text">Source</th>
+        <th data-type="date">Released</th>
         <th data-type="date">Collected</th>
       </tr>
     </thead>
@@ -49,6 +50,7 @@
         <span class="badge proxy">proxy</span>
         {% endif %}
       </td>
+      <td class="muted">{{ r.model_release_date[:10] if r.model_release_date else '—' }}</td>
       <td class="muted">{{ r.collected_at[:10] }}</td>
     </tr>
     {% endfor %}

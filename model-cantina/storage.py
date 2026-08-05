@@ -43,7 +43,7 @@ def log_event(conn, event_type, source=None, model_id=None, payload=None):
 
 
 def _get_or_create_model(conn, name, org=None, weight_availability=None,
-                          local_runnable=None, modalities=None):
+                          local_runnable=None, modalities=None, release_date=None):
     # NULL-safe equality on org, done by branching in Python rather than a
     # SQL operator: "IS NOT DISTINCT FROM" needs SQLite 3.39+ (this box's
     # bundled sqlite3 is 3.38.4 — checked, not assumed) and plain "IS" with
@@ -70,18 +70,22 @@ def _get_or_create_model(conn, name, org=None, weight_availability=None,
         if modalities is not None:
             updates.append("modalities = ?")
             params.append(json.dumps(modalities))
+        if release_date is not None:
+            updates.append("release_date = ?")
+            params.append(release_date)
         if updates:
             params.append(model_id)
             conn.execute(f"UPDATE models SET {', '.join(updates)} WHERE id = ?", params)
         return model_id, False
 
     cur = conn.execute(
-        "INSERT INTO models (name, org, first_seen_at, weight_availability, "
-        "local_runnable, modalities) VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
+        "INSERT INTO models (name, org, first_seen_at, release_date, weight_availability, "
+        "local_runnable, modalities) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id",
         (
             name,
             org,
             now_iso(),
+            release_date,
             weight_availability,
             1 if local_runnable else 0,
             json.dumps(modalities) if modalities is not None else None,
@@ -151,6 +155,9 @@ def record_poll_results(conn, source_key, tier, records):
             if r.get("modalities") is not None:
                 updates.append("modalities = ?")
                 params.append(json.dumps(r["modalities"]))
+            if r.get("release_date") is not None:
+                updates.append("release_date = ?")
+                params.append(r["release_date"])
             if updates:
                 params.append(model_id)
                 conn.execute(f"UPDATE models SET {', '.join(updates)} WHERE id = ?", params)
@@ -160,6 +167,7 @@ def record_poll_results(conn, source_key, tier, records):
                 weight_availability=r.get("weight_availability"),
                 local_runnable=r.get("local_runnable"),
                 modalities=r.get("modalities"),
+                release_date=r.get("release_date"),
             )
             if created:
                 new_models += 1
@@ -257,7 +265,38 @@ def list_models(conn, category=None, local_runnable=None, org=None):
     if wheres:
         sql += " WHERE " + " AND ".join(wheres)
     sql += " ORDER BY models.name"
-    return conn.execute(sql, params).fetchall()
+    rows = conn.execute(sql, params).fetchall()
+
+    if not category or not rows:
+        return rows
+
+    # Attach one representative score per model for this category — a model
+    # can have scores from several sources in the same category (e.g.
+    # "coding" has SWE-bench, LiveCodeBench, Aider...), so this isn't a
+    # join (that would duplicate rows); take the most recently collected
+    # one per model instead. Not the same "compare everything" view as the
+    # category leaderboard page — this is just "does this model have a
+    # score here at all, and what's the latest one."
+    model_ids = [r["id"] for r in rows]
+    placeholders = ", ".join("?" for _ in model_ids)
+    score_rows = conn.execute(
+        f"SELECT model_id, score, score_type, source, id FROM scores "
+        f"WHERE category = ? AND model_id IN ({placeholders}) ORDER BY id DESC",
+        [category, *model_ids],
+    ).fetchall()
+    latest_by_model = {}
+    for sr in score_rows:
+        latest_by_model.setdefault(sr["model_id"], sr)  # first hit = highest id, since DESC
+
+    enriched = []
+    for r in rows:
+        latest = latest_by_model.get(r["id"])
+        row = dict(r)
+        row["category_score"] = latest["score"] if latest else None
+        row["category_score_type"] = latest["score_type"] if latest else None
+        row["category_score_source"] = latest["source"] if latest else None
+        enriched.append(row)
+    return enriched
 
 
 def get_model(conn, model_id):
@@ -280,7 +319,7 @@ def get_category_leaderboard(conn, category):
     """Latest score per (model, source) for this category, newest first by score."""
     return conn.execute(
         """
-        SELECT s.*, m.name as model_name, m.org as model_org
+        SELECT s.*, m.name as model_name, m.org as model_org, m.release_date as model_release_date
         FROM scores s
         JOIN models m ON m.id = s.model_id
         WHERE s.category = ?

@@ -23,6 +23,9 @@
 
 <div class="card">
   <h2>Models</h2>
+  {% if selected_category %}
+  <p class="muted">Score column shows each model's latest {{ categories.get(selected_category, {}).get('name', selected_category) }} score (one source per model — for a full side-by-side of every source, use the <a class="row-link" href="{{ url_for('category_view', category_key=selected_category) }}">category leaderboard</a>).</p>
+  {% endif %}
   <div class="table-toolbar">
     <input type="search" id="models-search" placeholder="Search models or orgs...">
     <span class="table-count"><span id="models-count">{{ models|length }}</span> models</span>
@@ -32,8 +35,10 @@
       <tr>
         <th data-type="text">Name</th>
         <th data-type="text">Org</th>
+        {% if selected_category %}<th data-type="number">Score</th>{% endif %}
         <th data-type="text">Weights</th>
         <th data-type="text">Local?</th>
+        <th data-type="date">Released</th>
         <th data-type="date">First seen</th>
       </tr>
     </thead>
@@ -42,8 +47,12 @@
     <tr>
       <td><a class="row-link" href="{{ url_for('model_detail', model_id=m.id) }}">{{ m.name }}</a></td>
       <td class="muted">{{ m.org or '—' }}</td>
+      {% if selected_category %}
+      <td>{{ m.category_score if m.category_score is not none else '—' }}</td>
+      {% endif %}
       <td class="muted">{{ m.weight_availability or '—' }}</td>
       <td class="muted">{{ 'yes' if m.local_runnable else '—' }}</td>
+      <td class="muted">{{ m.release_date[:10] if m.release_date else '—' }}</td>
       <td class="muted">{{ m.first_seen_at[:10] }}</td>
     </tr>
     {% endfor %}

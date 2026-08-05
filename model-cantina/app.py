@@ -66,23 +66,40 @@ def models_list():
     )
 
 
-@app.route("/models/<int:model_id>")
-def model_detail(model_id):
+def _load_model_detail(model_id):
     conn = storage.get_db()
     model = storage.get_model(conn, model_id)
     scores = storage.get_scores_for_model(conn, model_id)
     notes = storage.get_notes_for_model(conn, model_id)
     conn.close()
     if model is None:
-        return "Model not found", 404
-    return render_template(
-        "model_detail.html",
+        return None
+    return dict(
         model=model,
         scores=scores,
         notes=notes,
         categories=config.load_config()["categories"],
         ratings=config.load_config()["manual_note_ratings"],
     )
+
+
+@app.route("/models/<int:model_id>")
+def model_detail(model_id):
+    ctx = _load_model_detail(model_id)
+    if ctx is None:
+        return "Model not found", 404
+    return render_template("model_detail.html", **ctx)
+
+
+@app.route("/models/<int:model_id>/modal")
+def model_detail_modal(model_id):
+    """Content-only fragment (no layout chrome) for the in-page modal —
+    same data as model_detail(), just rendered without the surrounding
+    header/nav so it can be dropped straight into the modal body."""
+    ctx = _load_model_detail(model_id)
+    if ctx is None:
+        return "Model not found", 404
+    return render_template("_model_detail_content.html", **ctx)
 
 
 # ── Category views ──────────────────────────────────────────────────────

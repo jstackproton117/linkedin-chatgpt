@@ -90,6 +90,23 @@
     border: 1px solid var(--amber); color: var(--text); padding: 10px 16px; border-radius: 8px;
     display: none; z-index: 100;
   }
+  #modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 200; padding: 40px 20px; overflow-y: auto;
+  }
+  #modal-overlay.open { display: block; }
+  #modal-box {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+    max-width: 800px; margin: 0 auto; position: relative; padding: 8px;
+  }
+  #modal-close {
+    position: absolute; top: 10px; right: 10px; background: var(--panel-2);
+    border: 1px solid var(--border); color: var(--text); width: 32px; height: 32px;
+    border-radius: 999px; cursor: pointer; font-size: 1.1rem; line-height: 1; z-index: 1;
+  }
+  #modal-close:hover { color: var(--amber-bright); border-color: var(--amber); }
+  #modal-body { padding: 10px; }
+  #modal-body .card:first-child { margin-top: 8px; }
 </style>
 {% block extra_style %}{% endblock %}
 </head>
@@ -106,6 +123,12 @@
   {% block content %}{% endblock %}
 </main>
 <div id="toast"></div>
+<div id="modal-overlay">
+  <div id="modal-box">
+    <button id="modal-close" type="button" aria-label="Close">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
 <script>
 function toast(msg, ok) {
   const el = document.getElementById('toast');
@@ -207,6 +230,82 @@ function initDataTable(table, opts) {
 
   render();
 }
+
+// Model-detail modal: any <a href="/models/<id>"> anywhere on the page opens
+// the model's detail in an in-page popup instead of navigating away.
+// Delegated on document.body so it works for links rendered after page
+// load too (e.g. inside modal content itself, or a table re-rendered by
+// initDataTable) without needing per-link wiring.
+const MODAL_LINK_RE = /^\/models\/(\d+)\/?$/;
+
+function openModelModal(modelId) {
+  const overlay = document.getElementById('modal-overlay');
+  const body = document.getElementById('modal-body');
+  body.innerHTML = '<p class="muted">Loading…</p>';
+  overlay.classList.add('open');
+  fetch(`/models/${modelId}/modal`)
+    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+    .then(html => {
+      body.innerHTML = html;
+      initModelDetailContent(body);
+    })
+    .catch(() => { body.innerHTML = '<p class="muted">Could not load this model.</p>'; });
+}
+
+function closeModelModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// Wires up the sortable tables and add-note form inside a model-detail
+// fragment — used both for the full standalone page (container = document)
+// and for modal-injected content (container = #modal-body), so this is the
+// single place that logic lives rather than duplicated per context.
+function initModelDetailContent(container) {
+  const scoresTable = container.querySelector('#scores-table');
+  const notesTable = container.querySelector('#notes-table');
+  if (scoresTable) initDataTable(scoresTable, {});
+  if (notesTable) initDataTable(notesTable, {});
+
+  const form = container.querySelector('#note-form');
+  if (!form) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const wrapper = container.querySelector('.model-detail');
+    const modelId = wrapper ? wrapper.dataset.modelId : null;
+    const body = {
+      model_name: form.model_name.value,
+      category: form.category.value,
+      rating: form.rating.value,
+      note: container.querySelector('#note-text').value,
+    };
+    const res = await postJSON('/api/notes', body);
+    if (!res.ok) { toast(res.error || 'Failed to save note', false); return; }
+    toast('Note saved');
+    if (modelId && container.id === 'modal-body') {
+      // Re-fetch in place rather than a full page reload — keeps the modal open.
+      openModelModal(modelId);
+    } else {
+      setTimeout(() => location.reload(), 700);
+    }
+  });
+}
+
+document.body.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href]');
+  if (!a) return;
+  const path = a.getAttribute('href').split('?')[0];
+  const match = path.match(MODAL_LINK_RE);
+  if (!match) return;
+  e.preventDefault();
+  openModelModal(match[1]);
+});
+document.getElementById('modal-close').addEventListener('click', closeModelModal);
+document.getElementById('modal-overlay').addEventListener('click', (e) => {
+  if (e.target.id === 'modal-overlay') closeModelModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModelModal();
+});
 </script>
 {% block scripts %}{% endblock %}
 </body>

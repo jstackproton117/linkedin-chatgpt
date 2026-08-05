@@ -125,11 +125,11 @@ def normalize(raw):
                     score=overall,
                     score_type=f"idp_leaderboard_{benchmark_key}_overall",
                     weight_availability=weight_availability,
+                    release_date=model.get("release_date"),
                     raw_payload={
                         "slug": model.get("slug"),
                         "benchmark": benchmark_key,
                         "detail": benchmark_scores,
-                        "release_date": model.get("release_date"),
                         "cost_per_1k": model.get("cost_per_1k"),
                     },
                 )

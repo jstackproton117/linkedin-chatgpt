@@ -40,6 +40,7 @@ def normalize(raw):
                 score_type="mteb_eng_v2_mean_task",
                 weight_availability="open" if model.get("openWeights") else "closed",
                 modalities=model.get("modalities"),
+                release_date=model.get("releaseDate"),
                 raw_payload={"scoresByTaskType": row.get("scoresByTaskType")},
             )
         )
