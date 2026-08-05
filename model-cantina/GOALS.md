@@ -139,4 +139,7 @@ framework preset before hand-rolling routing config.
 - [x] Thornwick migrated from scp deploys to git pull (sparse-checkout of
       model-cantina/ from the linkedin-chatgpt repo) — one source of truth,
       daily cron does `git pull --ff-only` before polling
+- [x] Vercel auto-deploys on push to master (Root Directory set to
+      model-cantina via the Vercel API — the CLI has no command for this,
+      only `vercel git connect` for the repo link itself)
 - [ ] OQ1–OQ6 above, as they come up
