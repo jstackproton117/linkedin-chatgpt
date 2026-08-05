@@ -1,0 +1,39 @@
+# Drafting Prompt Pack
+
+## Prompt 1 — Turn raw notes into 3 post options
+I’m drafting a LinkedIn post. Here are my raw notes and sources:
+[PASTE NOTES + SOURCES]
+
+Constraints:
+- Audience: engineering leaders, product leaders, builders
+- Tone: practical, clear, confident
+- No confidential details; anonymize specifics
+- 900–1,500 characters (not words)
+- Include a strong hook and a clean close (no cheesy CTA)
+
+Generate 3 different post drafts:
+1) Story-driven
+2) Framework-driven
+3) Contrarian take
+
+## Prompt 2 — Improve scannability and hook
+Here is the draft:
+[PASTE]
+
+Improve:
+- Hook strength
+- Skimmability (short paragraphs)
+- Clarity and specificity
+- Remove filler and buzzwords
+Keep length within 900–1,500 characters.
+
+## Prompt 3 — Final QA before posting
+Here is the final draft:
+[PASTE]
+
+QA checklist:
+- Any claims that need softening or sourcing?
+- Any confidentiality risk?
+- Any unclear jargon?
+- Any sentence that can be cut?
+Return: (1) revised draft, (2) 5-second summary of what changed.

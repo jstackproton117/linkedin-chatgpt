@@ -1,0 +1,39 @@
+# LinkedIn Post Templates
+
+## Template A — Lesson → Principle → Action
+Hook (1–2 lines)
+What happened (2–4 lines)
+Lesson learned (1–2 lines)
+Principle (1 line)
+Actionable steps (3–5 bullets)
+Soft close (1 line)
+
+## Template B — Contrarian Take
+Common belief (1 line)
+Why it’s incomplete (2–4 lines)
+Better framing (2–4 lines)
+Example (2–4 lines)
+Takeaway (1–2 lines)
+
+## Template C — Framework
+Hook
+Name the framework (1 line)
+Explain each component (3–5 bullets)
+When to use it / when not to (2–3 lines)
+Close
+
+## Template D — Mistake + Fix
+Hook
+Mistake (2–3 lines)
+Impact (1–2 lines)
+Fix (2–4 lines)
+What I do now (3 bullets)
+Close
+
+## Template E — “What I’m building”
+Hook
+What you're building (2–4 lines)
+Why it matters (2–4 lines)
+Constraints/tradeoffs (2–4 lines)
+What you learned (2–3 lines)
+Close

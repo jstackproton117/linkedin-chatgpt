@@ -1,0 +1,23 @@
+# LinkedIn Content Ops (ChatGPT + Native Scheduler)
+
+## Goal
+Batch-create high-quality LinkedIn posts using ChatGPT for drafting and LinkedIn’s native scheduler for publishing.
+
+## Weekly cadence
+- Planning: 30–60 min once per week
+- Output: 3–5 posts scheduled for the week
+
+## Workflow
+1) Capture idea + sources in a new chat (one post per chat)
+2) Generate 2–3 post options (different angles)
+3) Select one and polish (hook, scannability, clarity, tone)
+4) Final QA (claims, confidentiality, length, CTA)
+5) Schedule in LinkedIn (native scheduler)
+6) Log what was posted + performance notes
+
+## Rules
+- No confidential / proprietary information
+- No client names or internal metrics unless public
+- Keep posts skimmable: short paragraphs, simple language
+- Prefer specific lessons + actionable takeaways
+- Be consistent: your “voice” matters more than perfect virality

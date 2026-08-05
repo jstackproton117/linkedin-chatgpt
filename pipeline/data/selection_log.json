@@ -1,0 +1,631 @@
+[
+  {
+    "date": "2026-06-25",
+    "article_title": "OpenAI and Broadcom announce chip designed for LLM inference at scale",
+    "source": "Ars Technica",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 60.0,
+    "keywords_matched": [
+      "LLM",
+      "large language model",
+      "OpenAI"
+    ],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Database vendors pitch themselves as the cure for runaway AI costs",
+    "source": "The Register",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 60.0,
+    "keywords_matched": [
+      "OpenAI",
+      "Anthropic",
+      "AI model"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Three things to watch amid Anthropic\u2019s latest feud with the government",
+    "source": "MIT Technology Review - AI",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "Anthropic",
+      "AI model"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "The $27 million Al proxy war over Alex Bores ends in a draw",
+    "source": "The Verge - AI",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "OpenAI",
+      "Anthropic"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "OpenAI reveals its first AI processor: Jalape\u00f1o",
+    "source": "The Verge - AI",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "large language model",
+      "OpenAI"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "How agents are transforming work",
+    "source": "OpenAI Blog",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "AI agents",
+      "OpenAI"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "OpenAI and Broadcom unveil LLM-optimized inference chip",
+    "source": "OpenAI Blog",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "LLM",
+      "OpenAI"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "OpenAI gets chippy with Broadcom",
+    "source": "The Register",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "OpenAI",
+      "AI model"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "One fake web page can be enough to trick AI shopping recommendations",
+    "source": "Fast Company - Technology",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "LLM",
+      "large language model"
+    ],
+    "action": "hold"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "$500 million AI jobs push launches with bipartisan backing",
+    "source": "Politico - Technology",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "OpenAI",
+      "Anthropic"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "AI coding agents could soon cost more than the developers using them",
+    "source": "The Register",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI coding"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "London cops bring live facial recognition to West End",
+    "source": "The Register",
+    "pillar": "Architecture & Systems Thinking",
+    "score": 20.0,
+    "keywords_matched": [
+      "infrastructure"
+    ],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Microsoft rivals line up to tell UK watchdog where the software behemoth hurt them",
+    "source": "The Register",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "copilot"
+    ],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "OpenAI Codex bombards SSDs with needless write operations, costing millions",
+    "source": "The Register",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "OpenAI"
+    ],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Anthropic reimagines Claude in Slack as nosy, always-on agentic AI coworker",
+    "source": "The Register",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "Anthropic"
+    ],
+    "action": "hold"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "AWS debuts Lambda MicroVMs with up to 8 hours runtime",
+    "source": "The Register",
+    "pillar": "Architecture & Systems Thinking",
+    "score": 20.0,
+    "keywords_matched": [
+      "serverless"
+    ],
+    "action": "hold"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Engineering managers ditch cloud AI for local LLMs",
+    "source": "LeadDev",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "LLM"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "You can vibe code a demo, but what about a product?",
+    "source": "LeadDev",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "generative AI"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Recovery has to keep up with AI",
+    "source": "The Register",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI agents"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Repositioning retail for the AI era",
+    "source": "MIT Technology Review - AI",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "hold"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Netris raises $15M Series A from a16z to help AI neoclouds go live faster",
+    "source": "TechCrunch - AI",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Get Macbooks at a Prime Day discount before Apple\u2019s new price hikes kick in",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Bungie hit with \u2018significant\u2019 layoffs after ending Destiny 2",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Stop Mowing Your Grass Forever With One of These Highly Rated Robot Mowers On Sale",
+    "source": "Wired",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Kobo Libra Colour Sale (2026): The E-Reader Deal Worth Jumping on This Prime Day",
+    "source": "Wired",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Trump admin bars Polestar from selling its new EVs in the US",
+    "source": "TechCrunch",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Apple raises Mac and iPad prices, spares iPhone for now",
+    "source": "TechCrunch",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "hold"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Sony A7R VI review: A huge speed boost makes this a nearly perfect high-resolution camera",
+    "source": "Engadget",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "hold"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "IBM says it has created the world's first sub-1 nanometer chip",
+    "source": "Engadget",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Apple hikes prices for most of its hardware",
+    "source": "Engadget",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "FOSS dev builds a BASIC compiler using LLVM",
+    "source": "The Register",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "hold"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Apple passes RAMpocalypse costs on to consumers",
+    "source": "The Register",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Windows 11 can now turn back the clock when updates go bad",
+    "source": "The Register",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Cloudflare launched self-managed OAuth for all",
+    "source": "Hacker News - Best",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Amazon\u2019s big Prime Day pitch is its AI assistant. Is it working?",
+    "source": "Fast Company - Technology",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "AI tools",
+      "AI assistant"
+    ],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "General Intuition\u2019s $2.3B bet that video games can train AI agents for the real world",
+    "source": "TechCrunch - AI",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI agents"
+    ],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Ford rehires 350 engineers after AI fails to preserve expertise or train juniors",
+    "source": "Hacker News - Best",
+    "pillar": "Engineering Leadership",
+    "score": 20.0,
+    "keywords_matched": [
+      "CTO"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Democracy has a listening problem. These AI tools could actually help",
+    "source": "Fast Company - Technology",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI tools"
+    ],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "NSA lost access to Mythos amid Anthropic dispute",
+    "source": "Hacker News - Best",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "Anthropic"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Databricks\u2019 former AI chief thinks he can cut AI\u2019s power bill by 1,000x",
+    "source": "TechCrunch - AI",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "This year\u2019s Prime Day deals on Apple products are the best I\u2019ve seen",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "54 Prime Day steals under $25 you won\u2019t want to miss",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Prime Day deals under $50 that are really worth it",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Xbox prices spike another $100 or more",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "The Apple Watch Series 11 is $120 off for Prime Day, its all-time low price",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "The Samsung S26 Ultra is already marked down to $920 for Prime Day",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Here are all of the Apple price hikes",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Here are all of the Apple price hikes",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Upgrade your home with Prime Day deals for $40 or less",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "BYOK is my new go-to distraction-free writing tool",
+    "source": "The Verge",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Feds deny Polestar authorization to sell cars in US from model year 2027",
+    "source": "Ars Technica",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "skip"
+  },
+  {
+    "date": "2026-06-25",
+    "article_title": "Apple ratchets up prices, blames the cost of memory",
+    "source": "Ars Technica",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-28",
+    "article_title": "OpenAI Has New AI Models. Here\u2019s Why You Can\u2019t Use Them",
+    "source": "Wired",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 84.5,
+    "keywords_matched": [
+      "AI model",
+      "OpenAI",
+      "Anthropic",
+      "GPT"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-28",
+    "article_title": "[AINews] OpenAI GPT-5.6 Sol / Terra / Luna \u2014 restricted to trusted partners",
+    "source": "Latent Space",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 64.5,
+    "keywords_matched": [
+      "OpenAI",
+      "Anthropic",
+      "GPT"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-28",
+    "article_title": "Google wants AI regulation, but on its own terms",
+    "source": "The Register",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 64.5,
+    "keywords_matched": [
+      "OpenAI",
+      "Anthropic",
+      "AI regulation"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-06-28",
+    "article_title": "Prosecutors used ChatGPT logs as evidence in the Palisades fire trial",
+    "source": "The Verge - AI",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "GPT"
+    ],
+    "action": "skip"
+  },
+  {
+    "date": "2026-08-04",
+    "article_title": "Experiences with local models for coding",
+    "source": "Martin Fowler",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 60.0,
+    "keywords_matched": [
+      "local LLM",
+      "local model",
+      "LLM"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-08-04",
+    "article_title": "Building Reliable Agentic AI Systems",
+    "source": "Martin Fowler",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "agentic AI",
+      "LLM"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-08-04",
+    "article_title": "[AINews] Qwen 3.8 Max(2.4T) and 27B, new open weights models for Coding and Cowork",
+    "source": "Latent Space",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "Qwen",
+      "open weights"
+    ],
+    "action": "draft"
+  },
+  {
+    "date": "2026-08-04",
+    "article_title": "Mistral Is in the Right Place at the Right Time",
+    "source": "Wired",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "AI model",
+      "Mistral"
+    ],
+    "action": "draft"
+  }
+]

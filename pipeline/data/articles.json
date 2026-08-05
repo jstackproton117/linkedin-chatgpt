@@ -1,0 +1,1657 @@
+[
+  {
+    "url": "https://www.theverge.com/ai-artificial-intelligence/974914/openai-blog-response-apple-lawsuit-messages",
+    "title": "OpenAI drags Apple\u2019s lawsuit into the court of public opinion",
+    "source": "The Verge - AI",
+    "published": "2026-08-04T07:27:55-04:00",
+    "snippet": "OpenAI says Apple\u2019s lawsuit is \u201ccareless, aggressive, and oddly personal.\u201d | Image: Cath Virginia / The Verge, Getty Images Apple's legal battle against OpenAI just got messier now that the ChatGPT-maker has publicly aired receipts to counter Apple's version of events. In a blog post published overnight titled \" Apple is getting this wrong ,\" OpenAI said that Apple's lawsuit accusing it of stealin",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 63.8,
+    "keywords_matched": [
+      "RAG",
+      "OpenAI",
+      "GPT"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/articles/exploring-gen-ai/local-models-for-coding-experiences.html",
+    "title": "Experiences with local models for coding",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.857033+00:00",
+    "snippet": "Birgitta B\u00f6ckeler now reports on her recent experiences trying local LLMs for coding. She compares them using two standard tasks, and tries out the most promising model for day-to-day use. more\u2026",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 60.0,
+    "keywords_matched": [
+      "local LLM",
+      "local model",
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/articles/exploring-gen-ai/local-models-for-coding-factors.html",
+    "title": "Viability of local models for coding",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.863540+00:00",
+    "snippet": "Birgitta B\u00f6ckeler recently spent some time trying out running local LLMs for some programming tasks. In this memo she outlines the factors that influence how viable they are for the job. more\u2026",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 60.0,
+    "keywords_matched": [
+      "local LLM",
+      "local model",
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/fragments/2026-05-05.html",
+    "title": "Fragments: May 5",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.924540+00:00",
+    "snippet": "Over the last couple of months Rahul Garg published a series of posts here on how to reduce the friction in AI-assisted programming . To make it easier to put these ideas into practice he\u2019s now built an open-source framework to operationalize these patterns . AI coding assistants jump straight to code, silently make design decisions, forget constraints mid-conversation, and produce output nobody r",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 60.0,
+    "keywords_matched": [
+      "AI coding",
+      "AI coding assistant",
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/08/03/china-turns-up-the-heat-with-open-model-blitz-as-us-model-makers-panic/5282526",
+    "title": "China turns up the heat with open model blitz as US model makers panic",
+    "source": "The Register",
+    "published": "2026-08-04T00:40:00+02:00",
+    "snippet": "The AI arms race reached a fever pitch on Monday after Chinese e-commerce and cloud provider Alibaba called into question America\u2019s technological lead with the launch of Qwen 3.8-Max, a 2.4 trillion-parameter model that goes toe-to-toe with the best models from Anthropic and OpenAI. The new model comes just days after the launch of DeepSeek V4 Flash 0731, which, according to independent benchmarks",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 66.0,
+    "keywords_matched": [
+      "Qwen",
+      "OpenAI",
+      "Anthropic"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/fragments/2026-08-04.html",
+    "title": "Fragments: August 4",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.820028+00:00",
+    "snippet": "There\u2019s been a fair bit of publicity of the Open AI \u201crogue agent\u201d that hacked into Hugging Face . This prompted Anthropic to check what their models were up to and, to my complete lack of surprise, discovered three incidents where models had gained unauthorized access to data in other organizations. Simon Wilison concluded : It\u2019s abundantly clear now that running evals of cyberattack potential in ",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 42.2,
+    "keywords_matched": [
+      "RAG",
+      "Anthropic"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/fragments/2026-07-13.html",
+    "title": "Fragments: July 13",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.851033+00:00",
+    "snippet": "Some more of my notes from Thoughtworks Future of Software Development Retreat . When we had our first retreat in Utah early this year, nobody had heard of Harness Engineering . This time we had a whole session on it. When comes to the guide side of harnesses, most of the discussion is about context management. While context windows have increased is size as models get more sophisticated, that doe",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "context window",
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/articles/reliable-llm-bayer.html",
+    "title": "Building Reliable Agentic AI Systems",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.875539+00:00",
+    "snippet": "One of the most interesting projects my colleagues have done with LLMs has been building a system with Bayer to allow pharmaceutical researchers to query decades of information about studies buried in PDF reports. Sarang Sanjay Kulkarni describes its evolution from keyword-based search to an intelligent research assistant capable of answering complex questions and drafting regulatory documents. mo",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "agentic AI",
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/fragments/2026-05-27.html",
+    "title": "Fragments: May 27",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.893540+00:00",
+    "snippet": "At the GOTO Conference in Copenhagen in 2025, Kent Beck and I spent some time on stage talking and answering questions from the audience - a format I refer to as \u201ctwo old geezers on a park bench\u201d. We talk about our experiences with LLM-augmented programming (at that point - October 2025), we show our frustration that things we\u2019ve been saying for thirty years still need to be said, we say how anyth",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "RAG",
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/articles/vibesec-reckoning.html",
+    "title": "The VibeSec Reckoning",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.899546+00:00",
+    "snippet": "Vibe coding has significantly accelerated software prototyping but AI agents frequently recommend insecure configurations, creating security problems. Gautam Koul, Lucian Moss, Neil Drew-Lopez, and Daberechi Ruth Edeokoh share their experience while building applications for Thoughtworks's global marketing. They learned that to combat this we need to write a security context file to guide the AI, ",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "AI agent",
+      "AI agents"
+    ]
+  },
+  {
+    "url": "https://www.technologyreview.com/2026/08/03/1141009/heres-why-ai-agents-lie-and-cheat-to-reach-their-goals/",
+    "title": "Here\u2019s why AI agents lie and cheat to reach their goals",
+    "source": "MIT Technology Review - AI",
+    "published": "2026-08-03T08:30:05+00:00",
+    "snippet": "MIT Technology Review Explains : Let our writers untangle the complex, messy world of technology to help you understand what\u2019s coming next. You can read more from the series here . When two OpenAI models hacked into the website Hugging Face in July, they weren\u2019t trying to make money or commit sabotage\u2014they were just looking for answers to a test question. According to a postmortem from OpenAI , th",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 83.8,
+    "keywords_matched": [
+      "AI agent",
+      "AI model",
+      "OpenAI",
+      "AI agents"
+    ]
+  },
+  {
+    "url": "https://www.theregister.com/security/2026/08/04/cloudflare-has-mostly-ditched-third-party-security-tools-suggests-not-trying-that-at-home/5282600",
+    "title": "Cloudflare has mostly ditched third party security tools, suggests not trying that at home",
+    "source": "The Register",
+    "published": "2026-08-04T06:50:53+02:00",
+    "snippet": "Cloudflare has used AI to automate processing of incoming reports to its bug bounty program for $58 a month using Anthropic\u2019s Claude Sonnet model and chose it partly because using the AI company\u2019s security-specific Mythos model would burn through around $200,000 a month to do the same job. The company\u2019s chief security officer (CSO) Grant Bourzikas shared those numbers with The Register last week d",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 42.2,
+    "keywords_matched": [
+      "Anthropic",
+      "Claude"
+    ]
+  },
+  {
+    "url": "https://www.latent.space/p/ainews-qwen-38-max24t-and-27b-new",
+    "title": "[AINews] Qwen 3.8 Max(2.4T) and 27B, new open weights models for Coding and Cowork",
+    "source": "Latent Space",
+    "published": "2026-08-04T03:49:14+00:00",
+    "snippet": "After the Qwen Exodus last year and new management took over launching more closed model APIs, there was some real doubt as to whether or not this leading open models lab would continue to release relevant models. That doubt is now gone. Qwen 3.8 Max is a MONSTER 2.4T model that would have been the top open model in the world but for the Kimi K3 release we already covered . Qwen offers them on API",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "Qwen",
+      "open weights"
+    ]
+  },
+  {
+    "url": "https://www.wired.com/story/mistral-is-in-the-right-place-at-the-right-time/",
+    "title": "Mistral Is in the Right Place at the Right Time",
+    "source": "Wired",
+    "published": "2026-08-04T09:21:11+00:00",
+    "snippet": "Open-weight AI models are having a moment in the wake of recent turmoil at US tech giants. For French AI lab Mistral, that\u2019s the the best thing that could have happened.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "AI model",
+      "Mistral"
+    ]
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/03/congresss-favorite-ai-tool-chatgpt/",
+    "title": "Congress\u2019 favorite AI tool? ChatGPT",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-03T16:40:55+00:00",
+    "snippet": "House spending records show OpenAI's ChatGPT dominates paid AI use on Capitol Hill, with congressional offices relying on the chatbot to draft memos, summarize legislation, and assist constituent communications.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 43.8,
+    "keywords_matched": [
+      "OpenAI",
+      "GPT"
+    ]
+  },
+  {
+    "url": "https://www.theverge.com/ai-artificial-intelligence/974342/alibaba-qwen-max-open-weight-ai",
+    "title": "China\u2019s Alibaba takes another swipe at America\u2019s AI supremacy",
+    "source": "The Verge - AI",
+    "published": "2026-08-03T07:01:11-04:00",
+    "snippet": "The Alibaba logo is displayed outside its headquarters in Hangzhou, Zhejiang Province, China. | Image: NurPhoto via Getty Images Chinese tech giant Alibaba released what it says is its largest and \"most capable AI model to date,\" claiming performance rivaling the best systems from US frontier labs Anthropic and OpenAI, as well as domestic rivals like Moonshot AI's Kimi K3. Alibaba said it was maki",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 66.0,
+    "keywords_matched": [
+      "AI model",
+      "OpenAI",
+      "Anthropic"
+    ]
+  },
+  {
+    "url": "https://www.theregister.com/cyber-crime/2026/08/03/police-national-legal-database-confirms-data-theft-after-dark-web-leak/5282332",
+    "title": "Police National Legal Database confirms data theft after dark web leak",
+    "source": "The Register",
+    "published": "2026-08-03T16:13:00+02:00",
+    "snippet": "The Police National Legal Database (PNLD) is the latest UK public sector outfit to admit that cybercriminals made off with its data, including the names and work email addresses of police officers, justice staff, government partners, and customers. The legal lookup service relied upon by police forces and criminal justice agencies across the UK said it discovered the \"data security incident\" on Ju",
+    "pillar": "Enterprise IT & Infrastructure",
+    "score": 40.0,
+    "keywords_matched": [
+      "security",
+      "data security"
+    ]
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/04/is-the-future-of-data-centers-portable-runware-builds-a-pod-to-find-out/",
+    "title": "Is the future of data centers portable? Runware builds a pod to find out",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-04T13:00:00+00:00",
+    "snippet": "On Tuesday, AI infrastructure company Runware announced the launch of its own modular data center called Sonic Inference Pod.",
+    "pillar": "Enterprise IT & Infrastructure",
+    "score": 20.0,
+    "keywords_matched": [
+      "infrastructure"
+    ]
+  },
+  {
+    "url": "https://www.wired.com/story/how-one-startup-built-a-mostly-china-free-robot/",
+    "title": "How One Startup Built a (Mostly) China-Free Robot",
+    "source": "Wired",
+    "published": "2026-08-04T10:45:00+00:00",
+    "snippet": "Ati Robotics assembles its robots in India and uses just a few Chinese parts\u2014a strategy that could pay off as the Trump administration cracks down on Chinese humanoids.",
+    "pillar": "AI Products & Applied AI",
+    "score": 20.0,
+    "keywords_matched": [
+      "startup"
+    ]
+  },
+  {
+    "url": "https://www.theregister.com/security/2026/08/04/us-house-candidate-allegedly-shoots-down-four-flock-cameras/5282696",
+    "title": "Tennessee congressional hopeful accused of shooting license plate cameras",
+    "source": "The Register",
+    "published": "2026-08-04T14:08:00+02:00",
+    "snippet": "An independent congressional candidate in Tennessee faces four felony vandalism charges after allegedly shooting four automated license plate reader (ALPR) cameras between July 14 and 22. According to the Blount County Sheriff's Office (site geo-restricted), Adam Lee Heimerman, 37, is accused of targeting three cameras in Blount County and one in Maryville. Local news reports citing an affidavit s",
+    "pillar": "Career & Remote Work Identity",
+    "score": 20.0,
+    "keywords_matched": [
+      "Tennessee"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/rachels-ramblings/intro.html",
+    "title": "Why I\u2019m Writing Rachel\u2019s Ramblings",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.827029+00:00",
+    "snippet": "TL;DR I have ideas. I haven\u2019t been writing them. That\u2019s about to change. I promise\u2026 myself. I\u2019ve been thinking a lot about talent. Actually, I\u2019ve been thinking a lot about thinking. And writing. Or more specifically, not writing. This really hit me earlier this year at the Future of Software conference. I was surrounded by people sharing their latest ideas and I had a slightly uncomfortable realiz",
+    "pillar": "Career & Remote Work Identity",
+    "score": 20.0,
+    "keywords_matched": [
+      "talent"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/fragments/2026-07-21.html",
+    "title": "Fragments: July 21",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.833030+00:00",
+    "snippet": "With this post, I\u2019ll wrap up my notes from the second Future of Software Development Retreat . But before I do, I should note that the full Thoughtworks report on the retreat is now available . They have five headline findings: Code generation is no longer the bottleneck \u2014 verification is. \u2018Harness engineering\u2019 is emerging as a distinct, ownable discipline. Organizations are colliding with a real ",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/articles/archaeologist-copilot.html",
+    "title": "The Archaeologist\u2019s Copilot",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.840030+00:00",
+    "snippet": "When people think of legacy modernization, most folks aren't imagining the target environment will be Java 8. But this was the challenge facing Nik Malykhin when he needed to run a Java 1.5 codebase on today's hardware. His early use of LLMs gave plausible answers that did not hold up in the codebase. Progress came when he grounded the process in evidence, using AI to support analysis, validation ",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/articles/llm-and-dsls.html",
+    "title": "DSLs Enable Reliable Use of LLMs",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.845033+00:00",
+    "snippet": "LLMs generate code incredibly fast, but to ensure they generate exactly what is intended, they need clear boundaries. Abstractions and Domain-Specific Languages (DSLs) provide a strong harness that guides LLMs right from the start. Unmesh Joshi describes how the example of Tickloom - a domain model and DSL for illustrating distributed system behavior - shows how we can use an LLM as a partner to i",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/fragments/2026-07-06.html",
+    "title": "Fragments: July 6",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.869540+00:00",
+    "snippet": "Last week, Thoughtworks ran a second Future of Software Development Retreat , this time in Europe. As with the previous event, I\u2019ll be sharing some fragmentary thoughts on this. There were five parallel streams, so I could, at best, only attend \u2155 of sessions. This isn\u2019t an event that forms conclusions, rather one that allows those exploring to share what they\u2019ve found, and their visions for the fu",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/fragments/2026-06-16.html",
+    "title": "Fragments: June 16",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.881540+00:00",
+    "snippet": "\u201cPrag Dave\u201d Thomas (co-author of the outstanding \u201cPragmatic Programmer\u201d) has loved programming since he was young. Programming was how I could express myself. I wasn\u2019t an artist. When I sing, dogs howl. When I draw, friends say, \u201cVery nice. What is it?\u201d I didn\u2019t connect particularly well with people, even though I wanted to. And yet, when I wrote my first program, I discovered a medium which let m",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/fragments/2026-06-02.html",
+    "title": "Fragments: June 2",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.887539+00:00",
+    "snippet": "Greg Wilson has noticed that lots of folks are using dodgy metrics to figure out if AI tools are worth their costs. Would you measure lines of code generated, or tickets closed? Or would you send out a survey asking whether developers feel more productive? Each of those approaches is flawed in a different way; He lists lots of common metrics, and why they are flawed. Sadly he doesn\u2019t give any sugg",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/bliki/VibeCoding.html",
+    "title": "Bliki: Vibe Coding",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.905540+00:00",
+    "snippet": "Vibe coding is building a software application by prompting an LLM, telling it what to build, trying it out, prompting for changes - but without looking at any of the code that the LLM generates. This technique can be used by people without any knowledge of programming. However the resulting software often shows problems with maintainability, correctness, and security - so is best used for disposa",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/fragments/2026-05-14.html",
+    "title": "Fragments: May 14",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.911540+00:00",
+    "snippet": "Last week I spent a day at The Orchard Retreat, hosted by Mechanical Orchard . that brought together several people working in software development to talk about the profession\u2019s future with the rise of agentic programming. The event was help under the Chatham House Rule , so I can\u2019t attribute the comments and stories I heard. (If anyone recognizes themselves, and would like attribution, let me kn",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/bliki/InterrogatoryLLM.html",
+    "title": "Bliki: Interrogatory LLM",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.917540+00:00",
+    "snippet": "When we need an LLM to perform a complex task, we often need to feed it a lot of context. Coming up with a design for a new feature requires descriptions of how we want the feature to appear to the user, guidelines on how it should be implemented, information on external systems to consult, and so on. All this can be several pages of markdown. The obvious way to do this is for a human to write thi",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/bliki/MythicalManMonth.html",
+    "title": "Bliki: Mythical Man Month",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.929540+00:00",
+    "snippet": "In the early 1960s, Fred Brooks managed the development of IBM's System/360 computer systems. After it was done he penned his thoughts in the book The Mythical Man-Month which became one of the most influential books on software development after its publication in 1975. Reading it in 2026, we'll find some of it outdated, but it also retains many lessons that are still relevant today. The book con",
+    "pillar": "Enterprise IT & Infrastructure",
+    "score": 20.0,
+    "keywords_matched": [
+      "SSO"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/fragments/2026-04-29.html",
+    "title": "Fragments: April 29",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.935537+00:00",
+    "snippet": "Chris Parsons has updated his guide on using AI to code . This is his third update, what I like about it is that he gives a lot of concrete information about how he uses AI, with sufficient detail that we can learn from him. His advice also resonates with the better advice I\u2019ve seen out there, so the article makes a good overview of the state of using AI for software development. I wrote the previ",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://martinfowler.com/articles/structured-prompt-driven/",
+    "title": "Structured-Prompt-Driven Development (SPDD)",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.942537+00:00",
+    "snippet": "LLM programming assistants have demonstrated considerable value, but mostly with individual developers. The internal IT organization in Thoughtworks has been using them for their teams and have developed a method and workflow called Structured Prompt-Driven Development (SPDD). Wei Zhang and Jessie Jie Xia describe a simple example of this workflow with details in github. This workflow treats the p",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://importai.substack.com/p/import-ai-467-self-sustaining-ai",
+    "title": "Import AI 467: Self-sustaining AI viruses; pacing AI progress; confusion about AI and creativity",
+    "source": "Import AI (Jack Clark)",
+    "published": "2026-08-03T13:31:22+00:00",
+    "snippet": "Welcome to Import AI, a newsletter about AI research. Import AI runs on arXiv, cappuccinos, and feedback from readers. If you\u2019d like to support this, please subscribe. Subscribe now Self-sustaining and self-replicating AI viruses are here: \u2026Open weight LLMs + a well-designed harness = a persistent, self-sufficient virus\u2026 AI researchers have built a prototype computer virus which uses AI models to ",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "AI model",
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/03/a-marc-benioff-backed-startup-thinks-ai-can-solve-the-ai-deployment-problem/",
+    "title": "A Marc Benioff-backed startup thinks AI can solve the AI deployment problem",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-03T10:00:00+00:00",
+    "snippet": "June emerged from stealth today with a $20 million pre-seed round to make AI adoption simpler.",
+    "pillar": "AI Products & Applied AI",
+    "score": 40.0,
+    "keywords_matched": [
+      "AI adoption",
+      "startup"
+    ]
+  },
+  {
+    "url": "https://www.theregister.com/columnists/2026/08/03/claude-code-is-revolutionizing-digital-archaeology-enterprise-better-dig-it/5281676",
+    "title": "Claude Code is revolutionizing digital archaeology. Enterprise better dig it",
+    "source": "The Register",
+    "published": "2026-08-03T10:27:00+02:00",
+    "snippet": "OPINION The UK's National Museum of Computing at Bletchley Park (TNMoC) is a natural center of digital archaeology. It has restored, recreated, and documented landmark machines, from the wartime Colossus computer through to British mainframes of the '60s and '70s. Its collection from the dawn of the microprocessor age also attracts those who live to investigate such things. LLMs, still in their me",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "LLM",
+      "Claude"
+    ]
+  },
+  {
+    "url": "https://www.theregister.com/cyber-crime/2026/08/03/ai-is-both-the-weapon-and-the-target-in-latest-wave-of-cyberattacks/5281534",
+    "title": "AI is 'both the weapon and the target' in latest wave of cyberattacks",
+    "source": "The Register",
+    "published": "2026-08-03T09:01:00+02:00",
+    "snippet": "AI is becoming both an attack tool and a high-value target, with attacks by AI-enabled adversaries rising 89 percent in 2025, according to CrowdStrike. The security firm's annual Threat Hunting Report details criminal gangs and nation states using AI throughout the attack chain. Attackers are also targeting organizations' AI infrastructure and poisoning popular software packages to compromise thei",
+    "pillar": "Enterprise IT & Infrastructure",
+    "score": 40.0,
+    "keywords_matched": [
+      "infrastructure",
+      "security"
+    ]
+  },
+  {
+    "url": "https://www.wired.com/story/nomad-discount-code/",
+    "title": "Nomad Goods Promo Codes: Get 25% Off in August 2026",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Save up to 25% on Nomad Goods accessories such as Nomad phone cases, Nomad wallets, and more in August 2026.",
+    "pillar": "Enterprise IT & Infrastructure",
+    "score": 20.0,
+    "keywords_matched": [
+      "SSO"
+    ]
+  },
+  {
+    "url": "https://www.wired.com/story/uplift-desk-coupon-code/",
+    "title": "Uplift Promo Codes: $570 Off",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Upgrade your home office with the best Uplift Desk discount codes. Save on standing desks, ergonomic chairs, and accessories during the Spring Setup Sale.",
+    "pillar": "Enterprise IT & Infrastructure",
+    "score": 20.0,
+    "keywords_matched": [
+      "SSO"
+    ]
+  },
+  {
+    "url": "https://www.wired.com/story/litter-robot-promo-code/",
+    "title": "Litter-Robot Promo Codes: Up to $150 Off",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Get the latest Litter-Robot Discounts on Litter-Robot self-cleaning litter boxes, accessories, and more.",
+    "pillar": "Enterprise IT & Infrastructure",
+    "score": 20.0,
+    "keywords_matched": [
+      "SSO"
+    ]
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/03/influencers-draw-backlash-for-attending-openais-first-luxury-trip/",
+    "title": "Influencers draw backlash for attending OpenAI\u2019s first luxury trip",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-03T19:09:56+00:00",
+    "snippet": "OpenAI\u2019s first-ever influencer brand trip is sparking online backlash as tensions over the use of AI continue.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 23.8,
+    "keywords_matched": [
+      "OpenAI"
+    ]
+  },
+  {
+    "url": "https://openai.com/index/apple-is-getting-this-wrong",
+    "title": "Apple is getting this wrong",
+    "source": "OpenAI Blog",
+    "published": "2026-08-03T22:00:00+00:00",
+    "snippet": "OpenAI addresses Apple\u2019s baseless lawsuit, corrects claims about its employees, and shares messages documenting what happened.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 23.8,
+    "keywords_matched": [
+      "OpenAI"
+    ]
+  },
+  {
+    "url": "https://www.interconnects.ai/p/introducing-our-artifacts-hub-and",
+    "title": "Introducing our Artifacts Hub and Adoption Dashboard",
+    "source": "Interconnects (Nathan Lambert)",
+    "published": "2026-08-03T14:03:08+00:00",
+    "snippet": "No voiceover for this quick post, but a quick video version is here . We\u2019re expanding our open models coverage into standalone projects that let you go deeper on the state of the open model ecosystem. The new free sources of data are: The Artifacts Hub \u2014 a curated view of the models trending on Hugging Face, highlighting inference tokens via Open Router , model intelligence via Artificial Analysis",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://www.latent.space/p/inference-eng",
+    "title": "The Inference Engineering Masterclass \u2014 Philip Kiely & Ali Taha, Baseten",
+    "source": "Latent Space",
+    "published": "2026-08-03T21:44:03+00:00",
+    "snippet": "We first covered Baseten last year when DeepSeek mania was at peak hype. Now they have raised a monster $13B round and become one of the new cohort of AI Infra decacorns that are (with Nvidia, Intel, and the semis complex) chief beneficiaries of the Inference Inflection . We return to Baseten at the peak of the 2026 edition of Open Weights debate . Ali has published a viral breakdown of Kimi K3 : ",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "open weights"
+    ]
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/03/aws-is-helping-vibe-coding-startup-superblocks-and-the-implications-are-big/",
+    "title": "AWS is helping vibe-coding startup Superblocks, and the implications are big",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-03T20:00:00+00:00",
+    "snippet": "AWS now allows vibe-coding tool Superblocks to be embedded into the private clouds of AWS customers. It's another step toward decoupling apps from models.",
+    "pillar": "AI Products & Applied AI",
+    "score": 20.0,
+    "keywords_matched": [
+      "startup"
+    ]
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/03/designarena-creators-raise-7-9-million-to-bring-taste-to-ai-models/",
+    "title": "Design Arena creators raise $7.9 million to bring taste to AI models",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-03T19:28:57+00:00",
+    "snippet": "Design Arena is used by 5.3 million people around the world, providing critical human evaluations to frontier labs.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI model"
+    ]
+  },
+  {
+    "url": "https://www.theregister.com/security/2026/08/03/google-dev-kit-spurs-first-ever-agent-on-agent-violence/5282496",
+    "title": "Google dev kit spurs first-ever agent-on-agent violence",
+    "source": "The Register",
+    "published": "2026-08-03T22:30:37+02:00",
+    "snippet": "In what they call the first-ever real-world agent-to-agent exploitation method, Pillar Security researchers say they discovered an exploit in the repository behind Google's Agent Development Kit for Python that could allow attackers to compromise supply chains. In other words, now we know that one AI agent can be used to control and compromise another one that has more privileges. The security sna",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI agent"
+    ]
+  },
+  {
+    "url": "https://www.theregister.com/security/2026/08/03/ai-slop-pollutes-the-cve-pipeline-with-fake-vulns/5282462",
+    "title": "AI slop pollutes the CVE pipeline with fake vulns",
+    "source": "The Register",
+    "published": "2026-08-03T19:19:36+02:00",
+    "snippet": "Now AI is making fake vulnerabilities and polluting the ecosystem. A batch of critical- and high-rated SQLite CVEs that appeared in the NVD with CISA-supplied enrichment last week turned out to be technically bogus, according to security researchers, and their path into widely used databases exposes weaknesses in the CVE pipeline. Software supply chain security outfit JFrog reported last week that",
+    "pillar": "Enterprise IT & Infrastructure",
+    "score": 20.0,
+    "keywords_matched": [
+      "security"
+    ]
+  },
+  {
+    "url": "https://www.eff.org/deeplinks/2026/08/eff-joins-18-civil-rights-organizations-calling-governor-hochul-reject-stealth",
+    "title": "EFF Joins 18 Civil Rights Organizations Calling on Governor Hochul to Reject the Stealth Crawler Prohibition Act",
+    "source": "EFF Deeplinks",
+    "published": "2026-08-03T23:25:40+00:00",
+    "snippet": "EFF joined a group of 18 civil society organizations to send a letter encouraging New York Governor Kathy Hochul to Senate Bill 9934A, the New York Stealth Crawler Prohibition Act . The letter states: While framed as a measure to protect local journalism, this legislation harms free expression and establishes a dangerous precedent by effectively deanonymizing and criminalizing automated access to ",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://www.eff.org/deeplinks/2026/08/eff-joins-comments-calling-ftc-drop-its-ai-policy-proposal",
+    "title": "EFF Joins Call for FTC to Drop Its Disastrous AI Policy Proposal",
+    "source": "EFF Deeplinks",
+    "published": "2026-08-03T22:17:56+00:00",
+    "snippet": "The Federal Trade Commission (FTC) in July issued a proposed policy statement \u201cconcerning the suppression of accuracy in artificial intelligence systems. \u201d We urge the FTC to withdraw this misguided proposal and instead focus on its core strengths and mission to protect consumers. The new proposed policy builds on, and directly references, the Trump administration\u2019s \u201cPreventing Woke AI in the Fede",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI policy"
+    ]
+  },
+  {
+    "url": "https://www.eff.org/deeplinks/2026/07/eff-bsideslv-black-hat-and-def-con",
+    "title": "EFF at BSidesLV, Black Hat, and DEF CON \ud83d\udc68\u200d\ud83d\udcbb",
+    "source": "EFF Deeplinks",
+    "published": "2026-08-03T14:45:00+00:00",
+    "snippet": "It's time. Time for tinkerers, security researchers, hackers, and fellow nerds to gather together in signature black hoodies and utilikilts to beat the heat in Las Vegas for the summer security conferences: BSidesLV , Black Hat USA , and DEF CON . EFF's lawyers, activists, and technologists are excited, as always, to support this community of folks that push computer security forward. If you're at",
+    "pillar": "Enterprise IT & Infrastructure",
+    "score": 20.0,
+    "keywords_matched": [
+      "security"
+    ]
+  },
+  {
+    "url": "https://openai.com/index/circles",
+    "title": "Circles powers telco personalization with OpenAI technology",
+    "source": "OpenAI Blog",
+    "published": "2026-08-03T00:00:00+00:00",
+    "snippet": "Circles uses the OpenAI API and Codex to power AI-native telco experiences, increasing ARPU by 22%, reducing churn by 9%, and improving development efficiency.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 23.8,
+    "keywords_matched": [
+      "OpenAI"
+    ]
+  },
+  {
+    "url": "https://www.theverge.com/ai-artificial-intelligence/974265/fender-ceo-bud-cole-ai-music",
+    "title": "Fender\u2019s CEO seems to think your bandmates are just analog AI",
+    "source": "The Verge - AI",
+    "published": "2026-08-02T15:36:08-04:00",
+    "snippet": "Edward \u201cBud\u201d Cole speaks in Japan in 2023. | Image: Jun Sato/WireImage Fender CEO Edward \"Bud\" Cole gave an interview to T3 in May celebrating the 75th anniversary of the Telecaster with comments on AI and music that initially flew under the radar. But it has started making the rounds recently , pouring more fuel on an already raging fire of bad PR following the company pissing off basically the e",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://openai.com/index/continuous-voice-interaction-with-gpt-live",
+    "title": "How we built a realtime system for responsive voice AI in six months",
+    "source": "OpenAI Blog",
+    "published": "2026-08-03T07:00:00+00:00",
+    "snippet": "GPT-Live enables continuous voice interaction with AI, using a turnless speech model and low-latency architecture for faster, more natural conversations.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "GPT"
+    ]
+  },
+  {
+    "url": "https://leaddev.com/ai/ai-governance-is-now-an-engineering-problem?utm_source=leaddev&utm_medium=RSS",
+    "title": "AI governance is now an engineering problem",
+    "source": "LeadDev",
+    "published": "2026-08-03T12:21:50+00:00",
+    "snippet": "Control is the real AI gap. The post AI governance is now an engineering problem appeared first on LeadDev .",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI governance"
+    ]
+  },
+  {
+    "url": "https://arstechnica.com/cars/2026/08/how-headlights-got-brighter-whiter-and-more-blinding-after-dark/",
+    "title": "How headlights got brighter, whiter, and more blinding after dark",
+    "source": "Ars Technica",
+    "published": "2026-08-03T11:00:11+00:00",
+    "snippet": "Every so often, I\u2019ll be piloting some sensor-laden, software-defined press car down a dark stretch of highway when an oncoming driver\u2019s high beams arrive like a targeted retinal strike, an involuntary reminder that modern automotive lighting has entered its own lumen arms race. Anyone who has driven at night in the last few years knows what I'm talking about: A modern crossover crests a hill in th",
+    "pillar": "Enterprise IT & Infrastructure",
+    "score": 20.0,
+    "keywords_matched": [
+      "SSO"
+    ]
+  },
+  {
+    "url": "https://www.wired.com/review/nothing-ear-3a/",
+    "title": "Nothing Ear (3a) Wireless Earbuds Review: Style Meets Value",
+    "source": "Wired",
+    "published": "2026-08-03T09:30:00+00:00",
+    "snippet": "The $100 earbuds look and sound better than earbuds nearly twice the price\u2014as long as you can stomach just average noise canceling.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/08/03/sci-fi-authors-scalzi-and-stross-decry-ais-dystopian-impact-on-their-craft/5282176",
+    "title": "Sci-fi authors Scalzi and Stross decry AI's dystopian impact on their craft",
+    "source": "The Register",
+    "published": "2026-08-03T12:27:00+02:00",
+    "snippet": "Two prominent science fiction authors have decried the impact of AI on their craft. \"I do not want or need a large language model to write my fiction for me. I write fiction compulsively \u2013 before I was published I wrote for many years as a hobbyist \u2013 so why on earth would I pay someone else to take my fun away?\" wrote Charles Stross in a Saturday post. Stross graciously mentioned The Register in h",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "large language model"
+    ]
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/08/03/as-larry-ellison-bets-the-farm-oracle-says-it-loves-ai-written-code-just-not-in-openjdk/5281851",
+    "title": "As Larry Ellison bets the farm, Oracle says it loves AI-written code, just not in OpenJDK",
+    "source": "The Register",
+    "published": "2026-08-03T11:15:00+02:00",
+    "snippet": "Oracle has told contributors to OpenJDK \u2013 the open source Java project it stewards \u2013 not to submit code or other material generated by AI. In a post tagged \"legal,\" Oracle said it was drafting a full policy on generative AI but had set interim ground rules. It cited risks involving review workloads, safety, security, and intellectual property. \"Contributions in the OpenJDK Community must not inclu",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "generative AI"
+    ]
+  },
+  {
+    "url": "https://www.theverge.com/ai-artificial-intelligence/974018/pippa-seedance-artist-royalties",
+    "title": "Is paying artists enough to convince them to embrace AI?",
+    "source": "The Verge - AI",
+    "published": "2026-08-02T09:00:00-04:00",
+    "snippet": "Illustrators have spent years sounding the alarm about generative artificial intelligence startups training their models on artists' work without permission. They've pointed out how the practice is tantamount to theft, and in response, many gen AI boosters have argued that it's necessary for the technology's evolution. This has led to contentious legal battles , but it's also given rise to a new w",
+    "pillar": "AI Products & Applied AI",
+    "score": 20.0,
+    "keywords_matched": [
+      "startup"
+    ]
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/01/youtuber-hank-green-says-his-ai-usage-is-not-healthy/",
+    "title": "YouTuber Hank Green says his AI usage is \u2018not healthy\u2019",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-01T19:45:45+00:00",
+    "snippet": "Green offered a remarkable apology, saying that \"the level of dopamine that I've been getting from interacting with LLMs ... is not healthy for me or good for the world.\"",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "LLM"
+    ]
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/01/sam-altman-is-still-making-the-case-for-parenting-via-chatgpt/",
+    "title": "Sam Altman is still making the case for parenting via ChatGPT",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-01T17:07:34+00:00",
+    "snippet": "This isn\u2019t the first time a tech CEO has promised that AI can shield users \u2014 and specifically users\u2019 morning commutes \u2014 from the messiness and inefficiency of human experience.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "GPT"
+    ]
+  },
+  {
+    "url": "https://arstechnica.com/culture/2026/08/review-yes-were-still-arguing-about-nolans-the-odyssey/",
+    "title": "Review: Yes, we're still arguing about Nolan's The Odyssey",
+    "source": "Ars Technica",
+    "published": "2026-08-01T15:19:04+00:00",
+    "snippet": "Christopher Nolan's The Odyssey has been a lightning rod for controversy ever since the first casting and design reveals, igniting afresh with each new trailer . The film has garnered plenty of well-deserved accolades ( and earnings ) since its release, and yet somehow the debates rage on between classicists and the general public alike\u2014all this over an adaptation of an epic poem that's been aroun",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "RAG"
+    ]
+  },
+  {
+    "url": "https://www.interconnects.ai/p/latest-open-artifacts-23-laguna-s21",
+    "title": "Latest open artifacts (#23): Laguna S2.1, Inkling, & Kimi K3 show the utility of open models on the Pareto frontier",
+    "source": "Interconnects (Nathan Lambert)",
+    "published": "2026-08-02T13:01:40+00:00",
+    "snippet": "Consolidation has been one of the paths that many astute observers predicted for the near-future of labs training models. It was labelled as inevitable, as training costs are increasing by orders of magnitude every year. Yet, as someone who in 2024 would\u2019ve predicted consolidation really picking up come 2026 or 2027, where are we? We\u2019re at a place where more companies are training strong models \u2014 ",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.technologyreview.com/2026/08/03/1141056/trumps-ai-protectionism-has-come-for-robotics/",
+    "title": "Trump\u2019s AI protectionism has come for robotics",
+    "source": "MIT Technology Review - AI",
+    "published": "2026-08-03T18:43:30+00:00",
+    "snippet": "This story originally appeared in The Algorithm, our weekly newsletter on AI. To get stories like this in your inbox first, sign up here . Humanoid robots usually elicit more cringe than awe: They stumble , kick children , and despite advances are still worse at using their hands than my toddler. It\u2019s a nascent industry, and such robots are more commonly seen in viral videos than real workplaces o",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theverge.com/ai-artificial-intelligence/973098/reddit-ai-search-seo-marketing-brands-spam",
+    "title": "Can Reddit fend off a new wave of AI SEO spam?",
+    "source": "The Verge - AI",
+    "published": "2026-08-04T06:00:00-04:00",
+    "snippet": "Earlier this year, a Reddit user had asked members of a skincare-focused subreddit if anyone had tried a specific hypochlorous acid spray, a product often used for acne. There were dozens of responses; one from a user named Primary-Taro4254 seemed innocuous enough, at least at first. \"I haven't personally tried [that brand] so I can't fully compare, sorry,\" they commented. \"But I have been using a",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theverge.com/ai-artificial-intelligence/974571/eu-ai-act-transparency-labels-rules-deepfakes",
+    "title": "Europe\u2019s AI labeling and transparency rules are now in effect",
+    "source": "The Verge - AI",
+    "published": "2026-08-03T13:38:45-04:00",
+    "snippet": "The EU made some AI labels that companies can use instead of designing their own. | Image: The European Commission / The Verge The European Union has ushered in some additional rules that aim to make it easier for people to identify chatbots and AI deepfakes online. The new transparency obligations under the bloc's landmark AI Act came into effect on August 2nd , requiring companies to disclose wh",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theverge.com/ai-artificial-intelligence/974209/fenix-flexin-billboard-hot-100-rubberz-ai-slop",
+    "title": "Is this Billboard Hot 100 hit AI slop?",
+    "source": "The Verge - AI",
+    "published": "2026-08-01T14:20:00-04:00",
+    "snippet": "That cover art is almost certainly AI, too. | Image: Fenix Flexin Fenix Flexin is best known as a member of Shoreline Mafia, a rap duo from Los Angeles. But he's recently found solo success with the track \" Rubberz ,\" which has climbed to number 58 on the Billboard Hot 100 . Almost immediately, though, questions were raised about the song's origins, with many speculating that it was largely, if no",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/04/eon-wants-to-move-the-data-superhighway-from-ocean-fiber-to-space-lasers/",
+    "title": "EON wants to move the data superhighway from ocean fiber to space lasers",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-04T12:00:00+00:00",
+    "snippet": "Endeavour Optical Networks is planning to launch the fastest space laser communications system yet built.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/03/after-killer-quarter-palantir-ceo-alex-karp-calls-ai-industry-marxist/",
+    "title": "After killer quarter, Palantir CEO Alex Karp calls AI industry \u2018Marxist\u2019",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-03T23:19:50+00:00",
+    "snippet": "After a quarter that delivered $1 billion in profit, Palantir CEO Alex Karp on Monday once again warned that AI frontier labs are too untrustworthy for enterprises.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/03/apple-finally-fixed-siri-so-why-does-it-feel-anticlimactic/",
+    "title": "Apple finally fixed Siri. So why does it feel anticlimactic?",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-03T18:43:43+00:00",
+    "snippet": "Apple\u2019s long-awaited AI overhaul finally makes Siri the assistant it was always supposed to be. Yet it arrives at a moment when simply being a capable AI assistant no longer feels revolutionary.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/02/sam-altman-and-ais-decel-debate/",
+    "title": "Sam Altman and AI\u2019s decel debate",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-02T20:54:22+00:00",
+    "snippet": "On the latest episode of Equity, we discuss why Sam Altman is calling on the industry to \"pace the rate of AI development.\"",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/01/judge-denies-xais-request-to-block-minnesota-ban-on-nudify-apps/",
+    "title": "Judge denies xAI\u2019s request to block Minnesota ban on \u2018nudify\u2019 apps",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-01T20:26:04+00:00",
+    "snippet": "Despite a lawsuit from xAI, a Minnesota ban on apps that allow users to \u201cnudify\u201d images can move forward.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/01/this-9-key-physically-locks-your-most-addictive-apps/",
+    "title": "This $9 key physically locks your most addictive apps",
+    "source": "TechCrunch - AI",
+    "published": "2026-08-01T15:58:17+00:00",
+    "snippet": "This $9 NFC key requires you to physically scan it to unlock distracting apps on your phone.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://leaddev.com/ai/your-ai-coding-agents-might-need-an-org-chart?utm_source=leaddev&utm_medium=RSS",
+    "title": "Your AI-coding agents might need an org chart",
+    "source": "LeadDev",
+    "published": "2026-08-04T07:35:56+00:00",
+    "snippet": "The wrong AI reviewer breaks more than it fixes. The post Your AI-coding agents might need an org chart appeared first on LeadDev .",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://leaddev.com/management/your-junior-engineers-dont-need-an-office-they-need-you?utm_source=leaddev&utm_medium=RSS",
+    "title": "Your junior engineers don\u2019t need an office. They need you",
+    "source": "LeadDev",
+    "published": "2026-08-03T07:45:13+00:00",
+    "snippet": "Junior engineers need design, not luck. The post Your junior engineers don\u2019t need an office. They need you appeared first on LeadDev .",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://arstechnica.com/ai/2026/08/ukraines-drones-get-ai-upgrades-for-kamikaze-strikes-future-swarm-attacks/",
+    "title": "US company\u2019s AI lets Ukraine\u2019s cheap kamikaze drones track targets on their own",
+    "source": "Ars Technica",
+    "published": "2026-08-03T22:11:39+00:00",
+    "snippet": "Ukrainian drone operators have destroyed many Russian armored vehicles on the ground and even military helicopters in midair using $400 Shrike drones with explosive payloads. Now thousands of such drones are getting upgraded with an AI system capable of autonomously tracking and homing in on moving targets. In mid-July, the Ukrainian military began receiving Shrike drones made by the Ukrainian com",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://arstechnica.com/science/2026/08/research-roundup-6-cool-science-stories-we-almost-missed-5/",
+    "title": "Research roundup: 6 cool science stories we almost missed",
+    "source": "Ars Technica",
+    "published": "2026-08-03T20:13:37+00:00",
+    "snippet": "It\u2019s a regrettable reality that there is never enough time to cover all the interesting scientific stories we come across. So every month, we highlight a handful of the best stories that nearly slipped through the cracks. July\u2019s list includes outfitting cyborg cockroaches with a tiny diving suit for navigating flooded terrain; confirmation that a Medici duke died of malaria, not poisoning; the bes",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://arstechnica.com/space/2026/08/lego-deploys-hubble-space-telescope-as-detailed-desktop-model/",
+    "title": "Lego deploys Hubble Space Telescope as detailed desktop model",
+    "source": "Ars Technica",
+    "published": "2026-08-03T19:21:16+00:00",
+    "snippet": "For 35 years, the Hubble Space Telescope has looked out into the Universe. Now, Lego is inviting builders to look inward with its latest model of the orbiting observatory. The new Lego Icons Hubble Space Telescope (set no. 11382) was released on August 1 for $140 at the toy company's stores and its online shop. The 1,252-piece kit builds a 15-inch-long (38-cm) desktop model that is about twice as ",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://arstechnica.com/culture/2026/08/an-ai-supervised-remote-exam-went-so-badly-that-58000-students-must-retake-it/",
+    "title": "An AI-supervised remote exam went so badly that 58,000 students must retake it",
+    "source": "Ars Technica",
+    "published": "2026-08-03T19:00:50+00:00",
+    "snippet": "Earlier this summer, nearly 160,000 applicants took the entrance exam for UNAM, Mexico's largest university. For the first time, they did it completely remotely, using a \"lockdown\" browser and AI-powered webcam proctoring software, over several weeks from late May through early June. It was a disaster. When exam results came in, they bore little resemblance to past results, especially at the top. ",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://arstechnica.com/cars/2026/08/2026-volkswagen-jetta-sport-the-cheap-car-isnt-completely-extinct-yet/",
+    "title": "2026 Volkswagen Jetta Sport: The cheap car isn't completely extinct yet",
+    "source": "Ars Technica",
+    "published": "2026-08-03T16:10:22+00:00",
+    "snippet": "As so many career counselors and lifestyle coaches have explained, first impressions matter. A bad one can set the tone for an entire relationship, whether that's with a person, a novel, a restaurant, or a car. And the 2026 Volkswagen Jetta Sport and I did not get off to the best of starts. Picture the scene: You've been at home for a total of one night out of the previous eight, and you've just l",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://arstechnica.com/space/2026/08/spacex-is-set-to-acquire-130000-acres-of-marshland-in-southern-louisiana/",
+    "title": "SpaceX is set to acquire 130,000 acres of marshland in southern Louisiana",
+    "source": "Ars Technica",
+    "published": "2026-08-03T14:41:46+00:00",
+    "snippet": "SpaceX and the state of Louisiana are close to finalizing a deal for the launch company to acquire about 130,000 acres along the northern coast of the Gulf of Mexico. There have been persistent rumors about such an agreement for months, but now The Times-Picayune | The New Orleans Advocate reports that Louisiana Gov. Jeff Landry is expected to announce the agreement later this month. The deal woul",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://arstechnica.com/tech-policy/2026/08/trump-wants-the-power-to-stop-the-public-from-suing-polluters/",
+    "title": "Trump wants the power to stop the public from suing polluters",
+    "source": "Ars Technica",
+    "published": "2026-08-03T13:33:56+00:00",
+    "snippet": "Reducing rampant pollution across the United States was so important that when Congress passed many environmental protection laws, including the Clean Air Act, Clean Water Act, and Safe Drinking Water Act, it didn\u2019t want to leave enforcement only to the executive branch. Congress specifically wrote into those laws ways for citizens to enforce them through the courts when the government does not ac",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://arstechnica.com/space/2026/08/heres-how-engineers-plan-to-save-the-satellite-sent-to-save-nasas-swift-mission/",
+    "title": "Here's how engineers plan to save the satellite sent to save NASA's Swift mission",
+    "source": "Ars Technica",
+    "published": "2026-08-01T18:20:11+00:00",
+    "snippet": "One week ago, more than 200 miles above the Earth, a refrigerator-size satellite making its way toward an attempted rescue of NASA's $500 million Swift gamma-ray observatory suddenly spun out of control . It didn't look good. The spacecraft, named Link, was rotating on multiple axes, rendering it unable to maintain a reliable communications link with the ground and complicating efforts to arrest t",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/gallery/best-gaming-mouse/",
+    "title": "The Best Gaming Mouse You Can Buy After Testing Dozens of Models",
+    "source": "Wired",
+    "published": "2026-08-04T12:00:00+00:00",
+    "snippet": "From wired to wireless to ultralight, we've tested dozens of gaming mice to find the best for work, your next MMO, and everything in between.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/review/purple-carrot-meal-kit-2026/",
+    "title": "Purple Carrot Meal Kit Review: Tastier Than Meal Kits With Meat",
+    "source": "Wired",
+    "published": "2026-08-04T11:34:00+00:00",
+    "snippet": "I\u2019m an omnivore. Purple Carrot\u2019s vegan meal kit offers some of the best cooking I\u2019ve seen from any meal kit, with or without meat.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/gallery/the-best-cordless-vacuum/",
+    "title": "The Best Cordless Vacuums (2026): My Brand-New Top Pick",
+    "source": "Wired",
+    "published": "2026-08-04T11:01:00+00:00",
+    "snippet": "Clean your house without the constraint of a power cord, thanks to these stick vacuums.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/ai-tells-detection-world-series-of-poker-espn/",
+    "title": "Is This Poker Player Bluffing? The AI Thinks So",
+    "source": "Wired",
+    "published": "2026-08-04T11:00:00+00:00",
+    "snippet": "ESPN unveiled an \u201cAI tells detection\u201d tool during broadcasts of the 2026 World Series of Poker. Is it a neat computer-powered party trick, or a real threat to poker\u2019s future?",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/the-big-interview-podcast-matthew-belloni-puck/",
+    "title": "\u2018Everyone Is Doing It\u2019: The Truth About AI in Hollywood",
+    "source": "Wired",
+    "published": "2026-08-04T10:30:00+00:00",
+    "snippet": "Puck\u2019s Matthew Belloni says AI has quietly become part of everyday filmmaking. The battle now isn\u2019t whether Hollywood will use the technology\u2014it\u2019s who controls what\u2019ll come next.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/how-data-centers-broke-american-politics/",
+    "title": "How Data Centers Broke American Politics",
+    "source": "Wired",
+    "published": "2026-08-04T10:00:00+00:00",
+    "snippet": "What the Unabomber, Steve Bannon\u2019s tech guy, and Bernie Sanders taught me about the great data center backlash of 2026.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/2018-google-walkout-dont-be-evil-claire-stapleton/",
+    "title": "The Real Story Behind the 2018 Google Walkout",
+    "source": "Wired",
+    "published": "2026-08-04T09:30:00+00:00",
+    "snippet": "In 2018, more than 20,000 employees walked out to protest how Google handled allegations of sexual harassment. Here\u2019s how they organized it from inside the company.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/lowes-promo-code/",
+    "title": "Lowe\u2019s Promo Codes and Deals: Up to $300 Off Appliances",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Find the latest Lowe\u2019s promo codes and offers, including up to $300 off select major appliances and $5 off $50 with sign-up, here at WIRED.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/loop-earplugs-discount-code/",
+    "title": "Loop Earplugs Discount Codes: 40% Off",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Save on Loop Earplugs, including Quiet 2 and popular gift sets for improved sleep, focus, and comfort.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/instacart-promo/code/",
+    "title": "Instacart Promo Code: $15 Off | August 2026",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Find the best Instacart promo code for massive savings in August 2026.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/lovehoney-discount-code/",
+    "title": "Lovehoney Coupon Offers: Toys, Lingerie, and Gift Set Discounts",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Save on Lovehoney, including bestselling toys, lingerie, and popular gift sets for date nights, self-care, and couples\u2019 play.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/wayfair-promo-code/",
+    "title": "Wayfair Coupons: Up to 80% Off August 2026",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Get 10% off with Wayfair promo code, up to 80% off furniture, and more top coupons.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/expedia-coupon/",
+    "title": "Expedia Coupons: 40% Off",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Book your next getaway with Expedia and get up to 75% off your stay, with or without a promo code.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/best-buy-discount-code/",
+    "title": "Best Buy Discount Codes: Up to 60% Off",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Find the latest Best Buy promo codes and offers, including 10% back in rewards for new cardmembers and free 2-day shipping with My Best Buy Plus, here at WIRED.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/sephora-promo-code/",
+    "title": "20% Off Sephora Promo Code | August 2026",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Earn more points on skincare purchases when you use our Sephora coupon.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/we-vibe-discount-code/",
+    "title": "We-Vibe Discount Codes and Deals: Up to 60% Off",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Save on We-Vibe, including app-controlled bestsellers and popular gift sets designed for couples, connection, and shared pleasure.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/lenovo-coupon-code/",
+    "title": "Lenovo Coupon Codes and Deals in August 2026",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Whether you\u2019re shopping for a ThinkPad, Yoga laptop, or Legion gaming PC, these Lenovo discount codes and promotions can help you save big on your next tech upgrade.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/maytag-promo-code/",
+    "title": "Maytag Promo Codes: 15% Off Appliances",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Upgrade your home for less with these verified Maytag discount codes, military savings, and limited-time closeout offers on washers, dryers, and more.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/target-promo-code/",
+    "title": "Target Promo Code: $50 Off | August 2026",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Get $50 off your next order or up to 50% off site wide with Target coupon codes and Circle deals.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/starz-promo-code/",
+    "title": "Starz Promo Codes: $5 Off for August 2026",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Ready to stream award-winning series, hit movies, and exclusive originals? Our comprehensive guide helps you find every active Starz coupon, free trial, and discount code to save big on your subscription this 2026.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/bartesian-discount-code/",
+    "title": "Bartesian Discount Codes: 35% Off",
+    "source": "Wired",
+    "published": "2026-08-04T05:00:00+00:00",
+    "snippet": "Upgrade your home bar with the latest Bartesian coupon codes and discounts. Save on the Professional Cocktail Maker, enjoy subscription discounts, and get free shipping on your favorite capsules.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/ai-music-app-treblo-just-snitched-on-rubberz-song-of-the-summer/",
+    "title": "Did an AI Music App Just Snitch on the Song of the Summer?",
+    "source": "Wired",
+    "published": "2026-08-03T22:27:46+00:00",
+    "snippet": "Fenix Flexin\u2019s hit song \u201cRubberz\u201d has hip-hop fans arguing over whether it was generated by AI. Some say they have proof it\u2019s machine-made, but will anyone care?",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/spacex-falcon-moon-crash-warning-for-lunar-bases/",
+    "title": "The SpaceX Falcon Lunar Crash Is a Warning for Moon Bases",
+    "source": "Wired",
+    "published": "2026-08-03T19:58:23+00:00",
+    "snippet": "The risk of more debris hitting the moon is on the rise as the space race heats up.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/gallery/best-robot-lawn-mowers/",
+    "title": "Best Robot Lawn Mowers (2026): My Picks After 3 Years of Testing",
+    "source": "Wired",
+    "published": "2026-08-03T11:30:00+00:00",
+    "snippet": "Smart mowers are an expensive alternative to old-fashioned yard work, but they\u2019re finally good enough to consider if you\u2019d rather sip an iced tea and watch a robot tame your lawn.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/review/alienware-27-qd-oled-aw2726dm/",
+    "title": "Alienware 27 QD-OLED (AW2726DM) Review: A $350 Winner",
+    "source": "Wired",
+    "published": "2026-08-03T11:00:00+00:00",
+    "snippet": "We\u2019ve come a long way since exclusively $1,000+ OLED gaming monitors. Alienware\u2019s latest display brings the price down to a shocking $350, though it comes with some important compromises.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/people-are-ghosting-long-term-partners-some-dont-regret-it/",
+    "title": "People Are Ghosting Long-Term Partners. Some Don\u2019t Regret It",
+    "source": "Wired",
+    "published": "2026-08-03T11:00:00+00:00",
+    "snippet": "The communication-free form of breaking up has become ubiquitous. \u201cI no longer had to bear her energy,\u201d a man who ghosted his partner of four years tells WIRED.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/the-best-kids-audio-players-for-screen-free-story-time/",
+    "title": "The Best Audio Players for Kids: Yoto, Toniebox, and More",
+    "source": "Wired",
+    "published": "2026-08-03T10:31:00+00:00",
+    "snippet": "Whether you want an audio player that\u2019ll grow with your kid or one that your toddler can operate independently, I have a recommendation for you.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/smart-tech-for-a-vintage-home/",
+    "title": "The Delicate Art of Making a 1907 House Smarter",
+    "source": "Wired",
+    "published": "2026-08-03T10:09:00+00:00",
+    "snippet": "I tested modern locks, lights, climate controls, and more in a historic home that I very much wanted to keep historic.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/ai-conquered-coding-fast-food-is-next/",
+    "title": "AI Conquered Coding. Fast Food Is Next",
+    "source": "Wired",
+    "published": "2026-08-03T10:00:00+00:00",
+    "snippet": "Your next drive-thru order might be taken by a bot. And you might not even notice.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/ice-dna-collection-fbi-codis/",
+    "title": "ICE Collected Nearly 1 Million People\u2019s DNA Last Year\u2014Including Young Children",
+    "source": "Wired",
+    "published": "2026-08-03T10:00:00+00:00",
+    "snippet": "Internal documents show ICE's DNA collection has skyrocketed in the second Trump administration. Now hundreds of thousands of people never convicted of a crime are in an FBI criminal database forever.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/flock-cameras-guardrail-guy-advocacy-damage-people-dont-like-alprs/",
+    "title": "The \u2018Guardrail Guy\u2019 Went Viral for Posting About Flock Cameras. Then Someone Destroyed Them",
+    "source": "Wired",
+    "published": "2026-08-03T09:30:00+00:00",
+    "snippet": "Steve Eimers, also known as the \u201cGuardrail Guy,\u201d is done calling out license plate readers after two that appeared in his videos were vandalized.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/best-password-managers/",
+    "title": "8 Best Password Managers (2026), Tested and Reviewed",
+    "source": "Wired",
+    "published": "2026-08-02T11:30:00+00:00",
+    "snippet": "Keep your logins locked down with our favorite password management apps for PC, Mac, Android, iPhone, and web browsers.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/james-webb-space-telescope-changing-astronomers-universe/",
+    "title": "The James Webb Telescope Is Changing Astronomers\u2019 Understanding of the Ancient Cosmos",
+    "source": "Wired",
+    "published": "2026-08-02T11:00:00+00:00",
+    "snippet": "From how galaxies form to the beginnings of the universe, the images from the space telescope are giving cosmologists new data to explore\u2014and theories to build out.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/best-car-vacuums/",
+    "title": "Best Car Vacuums (2026): Handheld, Cordless, Shopping Tips",
+    "source": "Wired",
+    "published": "2026-08-02T10:35:00+00:00",
+    "snippet": "These portable vacuums make quick work of snack crumbs, tracked-in dirt, pet hair, and the mysterious debris beneath your seats.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/two-eclipses-august-how-to-see-them/",
+    "title": "There Are 2 Eclipses This August. Here\u2019s How to See Them",
+    "source": "Wired",
+    "published": "2026-08-02T10:30:00+00:00",
+    "snippet": "Everything you need to know about the solar eclipse and lunar eclipse that will occur in August 2026.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/gallery/best-kids-backpacks-2026/",
+    "title": "The Best Kids\u2019 Backpacks for the 2026 School Year",
+    "source": "Wired",
+    "published": "2026-08-02T10:01:00+00:00",
+    "snippet": "Your kid\u2019s little lunch hauler takes a brutal beating every day. These are the backbacks our own kids have tried and loved.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/europeans-are-about-to-find-out-how-entrenched-ai-is-in-their-daily-lives/",
+    "title": "Europeans Are About to Find Out How Entrenched AI Is in Their Daily Lives",
+    "source": "Wired",
+    "published": "2026-08-02T10:00:00+00:00",
+    "snippet": "New EU rules stipulate that people must be told when they\u2019re interacting with AI or looking at AI-generated or -edited content, leading to fear of \u201cdisclosure fatigue.\u201d",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/is-it-possible-to-make-privacy-friendly-smart-glasses/",
+    "title": "Is It Possible to Make Smart Glasses That Aren\u2019t Creepy?",
+    "source": "Wired",
+    "published": "2026-08-02T10:00:00+00:00",
+    "snippet": "As more big companies invest in glasses that record audio and video and pack AI on board, privacy concerns are only getting louder.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.wired.com/story/youtube-star-aboflah-made-streaming-his-life-he-wants-his-kids-to-live-offline/",
+    "title": "YouTube Star AboFlah Made Streaming His Life. He Wants His Kids to Live Offline",
+    "source": "Wired",
+    "published": "2026-08-02T09:00:00+00:00",
+    "snippet": "AboFlah talks about his new goals, streaming for charity, and when it\u2019s time to log off.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/off-prem/2026/08/04/cloud-giants-pour-nearly-600b-into-capex-as-ai-demand-surges/5282679",
+    "title": "Cloud giants pour nearly $600B into capex as AI demand surges",
+    "source": "The Register",
+    "published": "2026-08-04T15:09:00+02:00",
+    "snippet": "AI has turbocharged an already expanding cloud services market as organizations pour billions into online platforms offering the compute needed to train and run models, swelling the coffers of the established giants. Their latest results show revenue surging alongside capital spending as Amazon, Google, and Microsoft race to add capacity \u2013 at least until the AI bubble eventually bursts, of course.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/security/2026/08/04/caf-bank-reopens-online-service-but-warns-of-further-outages/5282668",
+    "title": "CAF Bank reopens online service but warns of further outages",
+    "source": "The Register",
+    "published": "2026-08-04T13:23:36+02:00",
+    "snippet": "CAF Bank has told customers its online banking service is back after being shuttered for more than ten days following what it described as \"attempted fraud.\" In an email update seen by The Reg, the bank warned that access could remain intermittent, and it might \"need to limit the amount of traffic to the website\" at certain times. It admitted: \"There are likely to be periods where online banking i",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/software/2026/08/04/uk-mulls-making-employers-ask-before-installing-bossware/5282440",
+    "title": "UK mulls making employers ask before installing bossware",
+    "source": "The Register",
+    "published": "2026-08-04T09:30:00+02:00",
+    "snippet": "The UK government is considering forcing employers in Great Britain to consult workers before rolling out \"bossware,\" opening the door to new rules covering everything from AI-powered productivity scoring to keystroke logging and biometric surveillance. The Department for Business and Trade wants to know whether the rules governing workplace surveillance still make sense as software increasingly t",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/science/2026/08/04/nasa-puts-astronauts-lives-in-the-hands-of-teslas-flaky-cybertruck/5282628",
+    "title": "NASA puts astronauts\u2019 lives in the hands of Tesla\u2019s flaky Cybertruck",
+    "source": "The Register",
+    "published": "2026-08-04T08:31:24+02:00",
+    "snippet": "Tesla has recalled its Cybertruck 11 times to fix issues such as exterior trim panels falling off and an accelerator pedal that can become stuck, but NASA has nonetheless decided the rust-prone vehicle is up to the job of rescuing astronauts if trouble strikes on the launchpad of a forthcoming crewed mission. Muskmobiles will get the job currently performed by the Mine Resistant Ambush Protected v",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/legal/2026/08/04/china-claims-global-chip-leadership-thanks-to-new-legal-definition-of-integrated-circuits/5282563",
+    "title": "China claims global chip leadership thanks to new legal definition of 'integrated circuits'",
+    "source": "The Register",
+    "published": "2026-08-04T04:05:05+02:00",
+    "snippet": "China has changed its legal definition of semiconductors. The National Intellectual Property Administration yesterday issued an expert opinion on recent changes to the regulations governing intellectual property laws as applied to chips. That document, attributed to Guo He, from the School of Intellectual Property at the Renmin University of China, notes that laws in place around the world define ",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/security/2026/08/03/russias-svr-borks-public-wi-fis-for-digital-surveillance/5282399",
+    "title": "Russian spies turn public Wi-Fi into malware delivery systems",
+    "source": "The Register",
+    "published": "2026-08-03T17:39:05+02:00",
+    "snippet": "Conference-goers may want to think twice about connecting to public Wi-Fi after Microsoft disclosed that Russian foreign intelligence operatives (SVR) are compromising captive portal networks to deliver infostealers, keyloggers, and other malware. With the help of ReliaQuest's earlier work, Redmond fingered Storm-2945, a subdivision of the SVR's Midnight Blizzard (aka Nobellium), in an attack camp",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/08/03/mediatek-lines-up-5b-war-chest-for-ai-datacenter-push/5282304",
+    "title": "MediaTek lines up $5B war chest for AI datacenter push",
+    "source": "The Register",
+    "published": "2026-08-03T16:15:06+02:00",
+    "snippet": "Taiwanese chipmaker MediaTek is lining up $5 billion in financing to expand into AI datacenter silicon, targeting a slice of a market it expects to be worth up to $80 billion next year. The fabless chip producer is perhaps best known for its Arm-based smartphone and Chromebook chipsets, plus wireless silicon for Wi-Fi products. But the firm is the latest to see a \"compelling growth opportunity\" in",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/science/2026/08/03/nasa-boss-balks-at-billion-dollar-estimate-for-recycled-moon-rover/5282355",
+    "title": "NASA boss balks at billion-dollar estimate for recycled Moon rover",
+    "source": "The Register",
+    "published": "2026-08-03T15:47:43+02:00",
+    "snippet": "NASA Administrator Jared Isaacman has stated \"we simply will not fly it\" if claims about the costs of the repurposed Mars rover engineering model prove anywhere near accurate. Isaacman was responding to the Planetary Society's chief of space policy, Casey Dreier, who had run the numbers on his plan to send a robot to the Moon, built from parts of engineering models of the successful Mars rovers Pe",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/security/2026/08/03/georgia-michigan-say-water-systems-hacked-by-iran-tied-crew/5282262",
+    "title": "Water system cyberattacks spread to Georgia, Michigan amid US-Iran conflict",
+    "source": "The Register",
+    "published": "2026-08-03T15:33:00+02:00",
+    "snippet": "Georgia and Michigan are the latest US states to report cyberattacks on water systems, as the FBI investigates incidents across at least seven states. Iran-backed hackers are the leading suspects, although the bureau has not publicly attributed the campaign. Officials in both states told journalists over the weekend that water facilities had detected activity consistent with the attacks on more th",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/08/03/google-earths-ai-makeover-survives-for-just-one-planetary-rotation/5282224",
+    "title": "Google Earth's AI makeover survives for just one planetary rotation",
+    "source": "The Register",
+    "published": "2026-08-03T14:58:00+02:00",
+    "snippet": "Google performed a remarkably brisk reverse ferret last week, launching AI image generation in Google Earth and yanking it the next day after certain sections of the internet did the inevitable. This is how it began: \"Today we're bringing AI image generation with Nano Banana to Google Earth, letting you virtually reimagine anywhere in the real world.\" This is how it's going, less than 48 hours lat",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/08/03/the-ai-bubble-is-already-popping-we-just-dont-know-it-yet/5282004",
+    "title": "The AI bubble is already popping; we just don't know it yet",
+    "source": "The Register",
+    "published": "2026-08-03T13:53:00+02:00",
+    "snippet": "KETTLE Big tech's Q2 earnings have been pouring in over the last two weeks, and it looks like stock market investors are taking a pin to the AI bubble. You can listen to the latest episode of The Kettle right here on this page, as well as on Spotify, Apple Music, or YouTube, where you can subscribe to get notified about the latest episode. Between eye-watering capex expenses, shrinking free cash f",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/security/2026/08/03/uk-government-investment-arm-cops-to-40-hour-leak-of-officials-contact-details/5282213",
+    "title": "UK government investment arm cops to 40-hour leak of officials' contact details",
+    "source": "The Register",
+    "published": "2026-08-03T13:02:00+02:00",
+    "snippet": "The UK government's corporate finance adviser has admitted that an employee left an internal file containing the names and work email addresses of dozens of officials publicly accessible for around 40 hours. The breach, first reported by The Guardian, was disclosed in UK Government Investments' (UKGI) annual report, which says it occurred during the 2025-26 financial year after a member of staff \"",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/os-platforms/2026/08/03/it-boss-left-root-session-open-for-bring-your-kid-to-work-day/5280931",
+    "title": "IT boss left root session open for bring-your-kid-to-work day",
+    "source": "The Register",
+    "published": "2026-08-03T08:30:00+02:00",
+    "snippet": "WHO, ME? Comedian W.C. Fields is credited with the aphorism \"Never work with children or animals,\" which The Register mentions because half of it has some relevance to this week's edition of \"Who, Me?\" \u2013 the reader-contributed column chronicling the ups and downs of working in tech. This week, meet a reader we'll Regomize as \"Stockley\" who shared a horror story that took place in the 1990s. At the",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/os-platforms/2026/08/03/microsoft-says-8-gb-of-ram-should-be-enough-for-anyone-running-windows-11/5282153",
+    "title": "Microsoft says 8 GB of RAM should be enough for anyone running Windows 11",
+    "source": "The Register",
+    "published": "2026-08-03T06:40:05+02:00",
+    "snippet": "Microsoft has added four new items to the to-do list it set itself to improve the quality of Windows 11. Redmond's list landed in March 2026 in response to users' anger at Windows 11 becoming increasingly flaky and needy. Pavan Davuluri, Microsoft's executive VP for Windows and Devices, promised \"improved memory efficiency, lowering the baseline memory footprint for Windows, freeing up more capaci",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/public-sector/2026/08/03/meta-straps-on-a-kick-me-sign-by-mistakenly-taking-down-video-by-indias-prime-minister/5282130",
+    "title": "Meta straps on a \u2018Kick Me\u2019 sign by mistakenly taking down video by India\u2019s prime minister",
+    "source": "The Register",
+    "published": "2026-08-03T03:25:16+02:00",
+    "snippet": "ASIA IN BRIEF Meta last week briefly took down an unremarkable video posted by India\u2019s prime minister Narendra Modi, earning itself days of criticism and regulatory trouble. The video featured Modi announcing a new task force that will reform the exams required to secure places in many Indian universities. Those exams have become a major factor in the sudden development of a major youth protest mo",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.theregister.com/offbeat/2026/08/02/meet-the-internet-radical-who-helped-microsoft-get-email-and-att-get-online/5281281",
+    "title": "Meet the 'internet radical' who helped Microsoft get email and AT&T get online",
+    "source": "The Register",
+    "published": "2026-08-02T09:11:00+02:00",
+    "snippet": "Tom Evslin drove the WorldNet project at AT&T and helped develop what became Microsoft Exchange and Outlook. He was at Microsoft when the company was still working out what to do about this newfangled internet thing. Evslin describes himself as one of Microsoft's \"internet radicals\" in the early 1990s, when the company was developing Exchange Server to fend off the threat from Lotus Notes. \"Bill G",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://martinfowler.com/rachels-ramblings/conductor-developer.html",
+    "title": "The Conductor Developer",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.827029+00:00",
+    "snippet": "TL;DR Why I think software development is starting to feel a little more like conducting an orchestra. There\u2019s a shift happening in software development that I don\u2019t think we\u2019re talking about clearly enough. For the last couple of years we\u2019ve framed AI as a productivity tool. How much faster can it write code? How many more features can we ship? How much cheaper can we build software? I think that",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://martinfowler.com/articles/exploring-gen-ai/refactoring-economic-benefit.html",
+    "title": "The Economic Benefit of Refactoring",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.827029+00:00",
+    "snippet": "Giles Edwards-Alexander does an experiment to see if decomposing a large function helps reduce token costs, suggesting that is may now be possible to measure the economic benefit of refactoring more\u2026",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://martinfowler.com/articles/orchestrator-tax.html",
+    "title": "The Orchestrator's Tax",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.827029+00:00",
+    "snippet": "Subagents get justified by time saved and parallel execution, but Rahul Garg explains that's not what matters most. Every token in the orchestrator's context is competing for its attention, and the real value of a subagent is what it keeps out of that context. Subagents should be treated as a tool for protecting the orchestrator's working memory, offloading reasoning it doesn't need to hold onto. ",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://martinfowler.com/articles/sensors-for-coding-agents.html#TheTestSuiteAsARegressionSensor",
+    "title": "The test suite as a regression sensor",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.899546+00:00",
+    "snippet": "Birgitta B\u00f6ckeler finishes her post on sensors for coding agents by examining the role of a test suite as a regression sensor, focusing on the role mutation testing can play. more\u2026",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://martinfowler.com/articles/sensors-for-coding-agents.html#StaticCodeAnalysisDependencyRules",
+    "title": "Three more static code analysis sensors",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.911540+00:00",
+    "snippet": "Birgitta B\u00f6ckeler adds discussion of three more sensors for static code analysis, focusing on checking and enforcing better modularity. Computational sensors for dependency checks were good at enforcing rules, but the rules were limited. Building a computational sensor for coupling data proved lackluster. Prompting an inferential sensor to review modularity was more effective. more\u2026",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://martinfowler.com/articles/sensors-for-coding-agents.html",
+    "title": "Maintainability sensors for coding agents",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.911540+00:00",
+    "snippet": "In her recent article about harness engineering for coding agent users, Birgitta B\u00f6ckeler laid out a mental model for expanding a coding agent harness: a system of guides and sensors that increase the probability of good agent outputs and enable self-correction before issues reach human eyes. Birgitta has now started publishing an article where she walks though her experiences using sensors to kee",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://martinfowler.com/articles/what-is-code.html",
+    "title": "What is Code",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.923542+00:00",
+    "snippet": "Increasingly humans delegate writing code to agents. Will there even be source code in the future? To wrestle with this question, we have to understand what code is. Unmesh Joshi sees code as having two distinct but intertwined purposes: instructions to a machine and a conceptual model of the problem domain . He explores why it's vital to build a vocabulary to talk to the machine, how programming ",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://martinfowler.com/articles/202604-turing.html",
+    "title": "Alan Turing play in Cambridge MA",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.947540+00:00",
+    "snippet": "Last night I saw Central Square Theater\u2019s excellent production of Breaking the Code . It\u2019s about Alan Turing, who made a monumental contribution to both my profession and the fate of free democracies. Well worth seeing if you\u2019re in the Boston area this month.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://martinfowler.com/articles/reduce-friction-ai/feedback-flywheel.html",
+    "title": "Feedback Flywheel",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.948542+00:00",
+    "snippet": "Rahul Garg finishes his series on reducing the friction in AI-Assisted Development. He proposes a structured feedback practice that harvests learnings from AI sessions and feeds them back into the team's shared artifacts, turning individual experience into collective improvement. more\u2026",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.eff.org/deeplinks/2026/08/senate-should-reject-kosas-privacy-risks",
+    "title": "The Senate Should Reject KOSA's Privacy Risks",
+    "source": "EFF Deeplinks",
+    "published": "2026-08-03T23:47:38+00:00",
+    "snippet": "The Senate Commerce Committee is once again considering legislation that would dramatically expand age verification, and undermine privacy for everyone. Alongside the SCREEN Act , the CHATBOT Act , and the Youth AI Privacy Act, the Kids Online Safety Act (KOSA) would push companies to collect more information about their users while creating new incentives to restrict lawful speech. Take action Te",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  },
+  {
+    "url": "https://www.eff.org/deeplinks/2026/08/youth-ai-privacy-acts-privacy-paradox",
+    "title": "The Youth AI Privacy Act\u2019s Privacy Paradox",
+    "source": "EFF Deeplinks",
+    "published": "2026-08-03T21:08:45+00:00",
+    "snippet": "The Senate Commerce Committee is poised to consider the Youth AI Privacy Act , a bill that would require AI companies to create kids-only privacy rules and implement so-called \u201csafe design features,\u201d which would \u2014 like three other bills under consideration this week\u2014require more data collection and make it harder for people to access lawful speech online. While the bill is narrower than some other",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": []
+  }
+]

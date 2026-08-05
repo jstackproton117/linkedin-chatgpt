@@ -1,0 +1,17 @@
+# Content Strategy
+
+90-Day Focus:
+1) AI-augmented engineering execution
+2) Enterprise architecture tradeoffs
+3) Leadership through system design
+
+Posting Cadence:
+1–2 posts per week.
+Consistency > volume.
+
+Tone Rules:
+- Clear and structured
+- Specific over abstract
+- No confidential information
+- No internal roadmap discussion
+- No naming sensitive details

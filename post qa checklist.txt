@@ -1,0 +1,16 @@
+# Pre-Post QA Checklist
+
+Before scheduling:
+
+☐ No confidential information
+☐ No internal metrics
+☐ No roadmap references
+☐ No vendor contracts mentioned
+☐ No security implementation details
+☐ Clear hook in first 2 lines
+☐ Skimmable formatting
+☐ 900–1,500 characters
+☐ Signals expertise, not ego
+☐ Aligns with one content pillar
+☐ No AI-tell phrases or the "leaders should X to Y" pattern (see brand voice guide)
+☐ Every number/name/claim in the post actually traces back to the source article

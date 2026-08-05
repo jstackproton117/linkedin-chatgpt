@@ -1,0 +1,688 @@
+{% extends 'layout.html' %}
+{% set active = 'review' %}
+{% set step = 2 %}
+{% block title %}REBEL INTEL — REVIEW ARTICLES{% endblock %}
+{% block step_hint %}Click an article · Read the AI angle suggestion · Mark it <strong>Draft</strong>, <strong>Hold</strong>, or <strong>Skip</strong> · Then go to Draft Orders.{% endblock %}
+
+{% block extra_style %}
+body { overflow: hidden; }
+
+.review-layout {
+  display: flex;
+  height: calc(100vh - var(--nav-h) - 36px);
+  overflow: hidden;
+}
+
+/* ── LEFT: Article List ── */
+.list-panel {
+  width: 420px; min-width: 320px;
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--card-border);
+  background: rgba(0,0,0,0.3);
+}
+
+.list-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--card-border);
+  flex-shrink: 0;
+}
+.list-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  color: var(--text-sec); margin-bottom: 10px;
+}
+.next-step-banner {
+  padding: 10px 14px; background: rgba(212,148,30,0.05);
+  border-bottom: 1px solid rgba(212,148,30,0.15);
+  font-size: 11px; color: var(--text-sec); text-align: center;
+  flex-shrink: 0; display: none;
+}
+.next-step-banner a { color: var(--sw-yellow); text-decoration: none; font-weight: bold; }
+.next-step-banner a:hover { text-decoration: underline; }
+.list-stats {
+  display: flex; gap: 16px; font-size: 11px;
+  color: var(--text-sec); margin-bottom: 10px;
+}
+.list-stats span { display: flex; align-items: center; gap: 4px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+
+.search-box {
+  width: 100%; background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-pri); padding: 7px 10px;
+  border-radius: 0; font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+}
+.search-box:focus { outline: none; border-color: var(--sw-yellow); box-shadow: 0 0 6px rgba(212,148,30,0.2); }
+.search-box::placeholder { color: var(--text-dim); }
+
+.article-list {
+  flex: 1; overflow-y: auto;
+  padding: 4px 0;
+}
+.article-list::-webkit-scrollbar { width: 4px; }
+.article-list::-webkit-scrollbar-track { background: transparent; }
+.article-list::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 2px; }
+
+.article-row {
+  padding: 9px 14px; cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  transition: background 0.15s;
+  position: relative;
+}
+.article-row:hover { background: rgba(255,255,255,0.03); }
+.article-row.active { background: rgba(212,148,30,0.04); border-left: 2px solid var(--sw-yellow); padding-left: 12px; }
+.article-row.reviewed { opacity: 0.65; }
+
+.row-top {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 5px;
+}
+.row-num {
+  font-family: 'Orbitron', sans-serif; font-size: 9px;
+  color: var(--text-dim); min-width: 26px;
+}
+.row-score-track {
+  height: 3px; width: 50px; border-radius: 2px;
+  background: rgba(255,255,255,0.06); flex-shrink: 0; overflow: hidden;
+}
+.row-score-fill { height: 100%; border-radius: 2px; }
+.row-age {
+  font-size: 10px; min-width: 46px; text-align: right;
+}
+.row-status { margin-left: auto; }
+
+.row-title {
+  font-size: 12px; color: var(--text-pri);
+  line-height: 1.35; margin-left: 34px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.row-meta {
+  font-size: 10px; color: var(--text-dim);
+  margin-left: 34px; margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.divider-label {
+  padding: 8px 14px 4px;
+  font-family: 'Orbitron', sans-serif; font-size: 9px;
+  color: var(--text-dim); letter-spacing: 2px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+/* ── RIGHT: Detail Panel ── */
+.detail-panel {
+  flex: 1; display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.detail-panel::-webkit-scrollbar { width: 4px; }
+.detail-panel::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 2px; }
+
+.detail-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--text-dim); font-size: 12px; letter-spacing: 1px;
+  gap: 12px;
+}
+.detail-empty .big {
+  font-family: 'Orbitron', sans-serif; font-size: 32px;
+  color: rgba(212,148,30,0.2);
+}
+
+.detail-content { padding: 24px 28px; }
+
+.detail-num {
+  font-family: 'Orbitron', sans-serif; font-size: 11px;
+  color: var(--text-dim); letter-spacing: 2px; margin-bottom: 8px;
+}
+.detail-title {
+  font-family: 'Orbitron', sans-serif; font-size: 16px;
+  font-weight: 700; color: var(--text-pri); line-height: 1.4;
+  margin-bottom: 16px;
+}
+.detail-meta-row {
+  display: flex; gap: 24px; flex-wrap: wrap;
+  margin-bottom: 16px; font-size: 12px;
+}
+.meta-item label {
+  color: var(--text-dim); font-size: 10px; letter-spacing: 1px;
+  display: block; margin-bottom: 2px;
+  font-family: 'Orbitron', sans-serif;
+}
+.meta-item .val { color: var(--text-sec); }
+
+.detail-url {
+  font-size: 11px; color: var(--sw-blue);
+  text-decoration: none; margin-bottom: 16px;
+  display: block; word-break: break-all;
+}
+.detail-url:hover { text-decoration: underline; }
+
+.detail-excerpt {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 4px; padding: 14px 16px;
+  font-size: 12px; color: var(--text-sec); line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.angle-box {
+  background: rgba(46,184,204,0.03);
+  border: 1px solid rgba(46,184,204,0.15);
+  border-radius: 0; padding: 16px 18px; margin-bottom: 24px;
+}
+.angle-label {
+  font-family: 'Orbitron', sans-serif; font-size: 9px;
+  color: var(--sw-blue); letter-spacing: 2px; margin-bottom: 8px;
+}
+.angle-text { font-size: 13px; color: var(--text-pri); line-height: 1.6; margin-bottom: 8px; }
+.hook-text  { font-size: 11px; color: var(--text-sec); font-style: italic; }
+.angle-loading {
+  font-size: 12px; color: var(--text-dim);
+  animation: blink 1s step-start infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.action-bar {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.action-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  padding: 12px 28px; border-radius: 0; border: none;
+  cursor: pointer; transition: all 0.15s;
+}
+.action-btn.draft {
+  background: var(--sw-yellow); color: #000;
+}
+.action-btn.draft:hover { box-shadow: 0 0 20px rgba(212,148,30,0.5); }
+.action-btn.hold {
+  background: transparent; color: var(--sw-blue);
+  border: 1px solid var(--sw-blue);
+}
+.action-btn.hold:hover { background: rgba(46,184,204,0.08); box-shadow: 0 0 12px rgba(46,184,204,0.25); }
+.action-btn.skip {
+  background: transparent; color: var(--text-sec);
+  border: 1px solid var(--card-border);
+}
+.action-btn.skip:hover { color: var(--text-pri); border-color: var(--text-sec); }
+.action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.already-reviewed {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border-radius: 0; font-size: 12px;
+  margin-bottom: 16px; font-family: 'Orbitron', sans-serif;
+  font-weight: 700; letter-spacing: 2px;
+}
+.already-reviewed.draft { background: rgba(212,148,30,0.10); color: var(--sw-yellow); border: 1px solid rgba(212,148,30,0.3); }
+.already-reviewed.hold  { background: rgba(46,184,204,0.08); color: var(--sw-blue);   border: 1px solid rgba(46,184,204,0.3); }
+.already-reviewed.skip  { background: rgba(46,56,64,0.3);    color: var(--text-sec);  border: 1px solid var(--card-border); }
+
+.themes-bar {
+  padding: 8px 16px; background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid var(--card-border);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 10px; flex-shrink: 0;
+}
+.themes-bar-label {
+  font-family: 'Orbitron', sans-serif; font-size: 9px;
+  color: var(--text-dim); letter-spacing: 2px; white-space: nowrap;
+}
+.theme-pill {
+  background: rgba(46,184,204,0.05); border: 1px solid rgba(46,184,204,0.15);
+  border-radius: 0; padding: 2px 10px;
+  font-size: 10px; color: var(--sw-blue);
+  font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.session-bar {
+  padding: 6px 14px; background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid var(--card-border);
+  font-size: 10px; color: var(--text-dim);
+  display: flex; gap: 16px; flex-shrink: 0;
+  font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
+}
+.session-bar .s-val { color: var(--text-sec); }
+
+.archive-divider {
+  padding: 9px 14px; cursor: pointer;
+  font-family: 'Orbitron', sans-serif; font-size: 9px;
+  color: var(--text-dim); letter-spacing: 2px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(0,0,0,0.25); user-select: none;
+}
+.archive-divider:hover { color: var(--text-sec); }
+.archive-row { opacity: 0.4; }
+.archive-row:hover { opacity: 0.65; background: rgba(255,255,255,0.02) !important; }
+.delete-zone {
+  margin-top: 24px; padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  /* Stack panels vertically instead of side-by-side */
+  .review-layout {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* List panel: full width, capped height so detail is reachable */
+  .list-panel {
+    width: 100%;
+    min-width: 0;
+    max-height: 42vh;
+    border-right: none;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  /* Detail panel: full width, natural height */
+  .detail-panel {
+    flex: none;
+    width: 100%;
+    overflow-y: visible;
+  }
+
+  .detail-content { padding: 14px 14px 24px; }
+  .detail-title   { font-size: 14px; }
+
+  /* Action buttons — full width, big tap targets */
+  .action-bar { gap: 8px; }
+  .action-btn {
+    flex: 1; text-align: center; justify-content: center;
+    padding: 14px 8px; font-size: 10px; letter-spacing: 1px;
+  }
+
+  /* Meta row wraps tighter */
+  .detail-meta-row { gap: 12px; }
+
+  /* Themes bar wraps */
+  .themes-bar { padding: 6px 10px; gap: 6px; }
+
+  /* 16px prevents iOS Safari from zooming on input focus */
+  .search-box { font-size: 16px; }
+}
+{% endblock %}
+
+{% block content %}
+{# Embed article data for JS #}
+<script>const ARTICLES = {{ articles | tojson }};</script>
+<script>const RISING = {{ rising | tojson }};</script>
+
+<div class="review-layout">
+
+  <!-- LEFT PANEL -->
+  <div class="list-panel">
+
+    <!-- Rising themes bar -->
+    {% if rising %}
+    <div class="themes-bar">
+      <span class="themes-bar-label">RISING:</span>
+      {% for t in rising[:6] %}
+      <span class="theme-pill">{{ t.keyword }} {{ t.count }}×</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="list-header">
+      <div class="list-title">ARTICLES</div>
+      <div class="list-stats">
+        <span><span class="dot" style="background:var(--sw-yellow)"></span> <span id="stat-total">{{ articles|length }}</span> articles</span>
+        <span><span class="dot" style="background:var(--sw-green)"></span> <span id="stat-draft">0</span> drafted</span>
+        <span><span class="dot" style="background:var(--sw-blue)"></span> <span id="stat-hold">0</span> on hold</span>
+        <span><span class="dot" style="background:var(--text-dim)"></span> <span id="stat-skip">0</span> skipped</span>
+      </div>
+      <input class="search-box" id="search-box" type="text"
+        placeholder="SEARCH TRANSMISSIONS..." oninput="filterList(this.value)">
+    </div>
+
+    <div class="article-list" id="article-list"></div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-empty" id="detail-empty">
+      <div class="big">⚡</div>
+      <div>SELECT AN ARTICLE</div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Click any article on the left to read it and get an AI angle suggestion</div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:2px;">Mark it <strong style="color:var(--sw-yellow)">Draft</strong> to queue for writing · <strong style="color:var(--sw-blue)">Hold</strong> to revisit · <strong style="color:var(--text-sec)">Skip</strong> to discard</div>
+    </div>
+    <div class="detail-content" id="detail-content" style="display:none;"></div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── State ──
+const STATUS = {};
+let currentNum = null;
+let currentAngle = null;
+let angleAbort = null;
+let archiveExpanded = false;
+let delConfirmUrl = null;
+let delConfirmTimer = null;
+
+ARTICLES.forEach(a => { if (a.status) STATUS[a.url] = a.status; });
+
+// ── Helpers ──
+function scoreColor(score, ageH) {
+  if (score <= 0 || ageH > 48) return '#2E3840';
+  if (score >= 60) return '#D4941E';
+  if (score >= 30) return '#2EB8CC';
+  return '#607080';
+}
+function ageColor(ageH) {
+  if (ageH < 4)  return '#28A850';
+  if (ageH < 12) return '#D4941E';
+  if (ageH < 24) return '#2EB8CC';
+  if (ageH < 48) return '#C07820';
+  return '#C43030';
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function activeArticles() {
+  return ARTICLES.filter(a => a.log_status !== 'scheduled' && a.log_status !== 'published');
+}
+function archivedArticles() {
+  return ARTICLES.filter(a => a.log_status === 'scheduled' || a.log_status === 'published');
+}
+
+// ── Render list ──
+function renderList(articles) {
+  const el = document.getElementById('article-list');
+  let html = '';
+  let prevScored = null;
+
+  articles.forEach((a) => {
+    const hasScore = a.score > 0;
+    if (prevScored === true && !hasScore) {
+      html += `<div class="divider-label">─── NO KEYWORD MATCH ───</div>`;
+    }
+    prevScored = hasScore;
+
+    const st = STATUS[a.url];
+    const pct = Math.min(a.score, 100);
+    const sc = scoreColor(a.score, a.age_hours);
+    const ac = ageColor(a.age_hours);
+    const pillar = (a.pillar || '').split(' ').slice(0,2).join(' ').substring(0,18) || '—';
+    const title = esc(a.title.length > 60 ? a.title.substring(0,57)+'...' : a.title);
+
+    let statusBadge = '';
+    if (st === 'draft') statusBadge = '<span class="badge badge-draft">DRAFT</span>';
+    else if (st === 'hold') statusBadge = '<span class="badge badge-hold">HOLD</span>';
+    else if (st === 'skip') statusBadge = '<span class="badge badge-skip">SKIP</span>';
+
+    const reviewedClass = st ? ' reviewed' : '';
+    const activeClass = a.num === currentNum ? ' active' : '';
+
+    html += `
+      <div class="article-row${reviewedClass}${activeClass}" id="row-${a.num}" onclick="openArticle(${a.num})">
+        <div class="row-top">
+          <span class="row-num">${a.num}</span>
+          <div class="row-score-track">
+            <div class="row-score-fill" style="width:${pct}%;background:${sc}"></div>
+          </div>
+          <span class="row-age" style="color:${ac}">${esc(a.age)}</span>
+          <span class="row-status">${statusBadge}</span>
+        </div>
+        <div class="row-title">${title}</div>
+        <div class="row-meta">${esc(a.source)} · ${esc(pillar)}</div>
+      </div>`;
+  });
+
+  // Archive section — always at bottom, collapsed by default
+  const archived = archivedArticles();
+  if (archived.length) {
+    html += `<div class="archive-divider" onclick="toggleArchive()">
+      <span>${archiveExpanded ? '▾' : '▸'}</span>
+      <span>ARCHIVED (${archived.length}) — SCHEDULED &amp; PUBLISHED</span>
+      <span style="margin-left:auto;font-size:10px;">${archiveExpanded ? 'COLLAPSE' : 'EXPAND'}</span>
+    </div>`;
+    if (archiveExpanded) {
+      archived.forEach(a => {
+        const ls = a.log_status;
+        const badge = ls === 'published'
+          ? '<span class="badge badge-pub">PUBLISHED</span>'
+          : '<span class="badge" style="background:rgba(79,195,247,0.1);color:var(--sw-blue);border:1px solid rgba(79,195,247,0.3);">SCHEDULED</span>';
+        const title = esc(a.title.length > 60 ? a.title.substring(0,57)+'...' : a.title);
+        const activeClass = a.num === currentNum ? ' active' : '';
+        html += `
+          <div class="article-row archive-row${activeClass}" id="row-${a.num}" onclick="openArticle(${a.num})">
+            <div class="row-top">
+              <span class="row-num">${a.num}</span>
+              <span style="font-family:'Orbitron',sans-serif;font-size:8px;color:var(--text-dim);letter-spacing:1px;">LIVE</span>
+              <span class="row-status" style="margin-left:auto;">${badge}</span>
+            </div>
+            <div class="row-title">${title}</div>
+            <div class="row-meta">${esc(a.source)}</div>
+          </div>`;
+      });
+    }
+  }
+
+  el.innerHTML = html;
+  updateStats();
+}
+
+function toggleArchive() {
+  archiveExpanded = !archiveExpanded;
+  const q = document.getElementById('search-box').value.toLowerCase();
+  const active = activeArticles();
+  renderList(q ? active.filter(a =>
+    a.title.toLowerCase().includes(q) ||
+    (a.source||'').toLowerCase().includes(q) ||
+    (a.pillar||'').toLowerCase().includes(q) ||
+    (a.keywords_matched||[]).some(k => k.toLowerCase().includes(q))
+  ) : active);
+}
+
+function filterList(q) {
+  q = q.toLowerCase();
+  const active = activeArticles();
+  const filtered = q
+    ? active.filter(a =>
+        a.title.toLowerCase().includes(q) ||
+        (a.source||'').toLowerCase().includes(q) ||
+        (a.pillar||'').toLowerCase().includes(q) ||
+        (a.keywords_matched||[]).some(k => k.toLowerCase().includes(q))
+      )
+    : active;
+  renderList(filtered);
+}
+
+function updateStats() {
+  const vals = Object.values(STATUS);
+  document.getElementById('stat-draft').textContent = vals.filter(v=>v==='draft').length;
+  document.getElementById('stat-hold').textContent  = vals.filter(v=>v==='hold').length;
+  document.getElementById('stat-skip').textContent  = vals.filter(v=>v==='skip').length;
+}
+
+// ── Open article ──
+function openArticle(num) {
+  currentNum = num;
+  currentAngle = null;
+  if (angleAbort) { angleAbort.abort(); angleAbort = null; }
+
+  document.querySelectorAll('.article-row.active').forEach(r => r.classList.remove('active'));
+  const row = document.getElementById(`row-${num}`);
+  if (row) row.classList.add('active');
+
+  const a = ARTICLES[num - 1];
+  if (!a) return;
+
+  document.getElementById('detail-empty').style.display = 'none';
+  const dc = document.getElementById('detail-content');
+  dc.style.display = 'block';
+  dc.innerHTML = buildDetail(a);
+
+  loadAngle(num, a);
+}
+
+function buildDetail(a) {
+  const st = STATUS[a.url];
+  const sc = scoreColor(a.score, a.age_hours);
+  const ac = ageColor(a.age_hours);
+  const pillar = a.pillar || '—';
+  const isArchived = a.log_status === 'scheduled' || a.log_status === 'published';
+
+  let actionHtml = '';
+  if (isArchived) {
+    const color  = a.log_status === 'published' ? 'var(--sw-green)' : 'var(--sw-blue)';
+    const bg     = a.log_status === 'published' ? 'rgba(57,211,83,0.06)'  : 'rgba(79,195,247,0.06)';
+    const border = a.log_status === 'published' ? 'rgba(57,211,83,0.25)'  : 'rgba(79,195,247,0.25)';
+    const label  = a.log_status === 'published' ? 'PUBLISHED — ARCHIVED' : 'SCHEDULED FOR PUBLISHING — ARCHIVED';
+    actionHtml = `<div style="background:${bg};border:1px solid ${border};border-radius:4px;padding:12px 16px;margin-bottom:16px;font-family:'Orbitron',sans-serif;font-size:11px;color:${color};letter-spacing:2px;">${label}</div>`;
+  } else {
+    let statusRow = '';
+    if (st) {
+      const labels = {draft:'DRAFTED', hold:'ON HOLD', skip:'SKIPPED'};
+      const classes = {draft:'draft', hold:'hold', skip:'skip'};
+      statusRow = `<div class="already-reviewed ${classes[st]}">${labels[st]}</div>`;
+    }
+    actionHtml = `
+      ${statusRow}
+      <div class="action-bar" id="action-bar">
+        <button class="action-btn draft" onclick="markAction('draft')" ${st?'disabled':''}>DRAFT</button>
+        <button class="action-btn hold"  onclick="markAction('hold')"  ${st?'disabled':''}>HOLD</button>
+        <button class="action-btn skip"  onclick="markAction('skip')"  ${st?'disabled':''}>SKIP</button>
+        ${st ? `<button class="action-btn skip" onclick="undoAction(${a.num})">UNDO</button>` : ''}
+      </div>
+      <div class="delete-zone">
+        <button id="del-btn-${a.num}" class="btn btn-dim"
+                style="font-size:10px;padding:6px 14px;letter-spacing:1px;color:rgba(255,68,68,0.6);border-color:rgba(255,68,68,0.2);"
+                onclick="confirmDelete(${a.num})">REMOVE FROM PIPELINE</button>
+        <span style="font-size:10px;color:var(--text-dim);">clears review, drafts &amp; post log</span>
+      </div>`;
+  }
+
+  return `
+    <div class="detail-num">ARTICLE #${a.num}</div>
+    <div class="detail-title">${esc(a.title)}</div>
+    <div class="detail-meta-row">
+      <div class="meta-item"><label>SOURCE</label><span class="val">${esc(a.source)}</span></div>
+      <div class="meta-item"><label>AGE</label><span class="val" style="color:${ac}">${esc(a.age)}</span></div>
+      <div class="meta-item"><label>PILLAR</label><span class="val">${esc(pillar)}</span></div>
+      <div class="meta-item"><label>INTEL SCORE</label><span class="val" style="color:${sc}">${a.score}</span></div>
+    </div>
+    <a class="detail-url" href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.url)}</a>
+    ${a.snippet ? `<div class="detail-excerpt">${esc(a.snippet)}</div>` : ''}
+    <div class="angle-box" id="angle-box">
+      <div class="angle-label">AI ANGLE SUGGESTION (local model)</div>
+      <div id="angle-content"><span class="angle-loading">Getting AI angle...</span></div>
+    </div>
+    ${actionHtml}
+    ${a.keywords_matched && a.keywords_matched.length ? `
+    <div style="margin-top:16px;font-size:11px;color:var(--text-dim);">
+      <span style="font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:var(--text-dim);">MATCHED KEYWORDS: </span>
+      ${a.keywords_matched.map(k => `<span style="color:var(--text-sec)">${esc(k)}</span>`).join(' · ')}
+    </div>` : ''}
+  `;
+}
+
+async function loadAngle(num, a) {
+  angleAbort = new AbortController();
+  try {
+    const res = await fetch(`/api/article/${num}/angle`, { signal: angleAbort.signal });
+    const data = await res.json();
+    currentAngle = data;
+    const box = document.getElementById('angle-content');
+    if (box) {
+      box.innerHTML = `
+        <div class="angle-text">${esc(data.angle)}</div>
+        <div class="hook-text">"${esc(data.hook)}"</div>
+      `;
+    }
+  } catch(e) {
+    if (e.name !== 'AbortError') {
+      const box = document.getElementById('angle-content');
+      if (box) box.innerHTML = `<span style="color:var(--text-dim)">Model unavailable — proceed manually</span>`;
+    }
+  }
+}
+
+async function markAction(action) {
+  if (!currentNum) return;
+  const a = ARTICLES[currentNum - 1];
+  const btns = document.querySelectorAll('.action-btn');
+  btns.forEach(b => b.disabled = true);
+
+  try {
+    const res = await postJSON(`/api/article/${currentNum}/action`, {
+      action,
+      angle: currentAngle?.angle || '',
+      hook: currentAngle?.hook || '',
+    });
+    if (res.ok) {
+      STATUS[a.url] = action;
+      const q = document.getElementById('search-box').value.toLowerCase();
+      const active = activeArticles();
+      renderList(q ? active.filter(x => x.title.toLowerCase().includes(q)) : active);
+
+      const labels = {draft:'DRAFTED', hold:'ON HOLD', skip:'SKIPPED'};
+      toast(`${labels[action]} — ${a.title.substring(0,40)}...`);
+
+      const next = active.slice(active.indexOf(a) + 1).find(x => !STATUS[x.url]);
+      if (next) {
+        setTimeout(() => openArticle(next.num), 300);
+      } else {
+        openArticle(currentNum);
+      }
+    }
+  } catch(e) {
+    toast('Action failed', 'err');
+    btns.forEach(b => b.disabled = false);
+  }
+}
+
+async function undoAction(num) {
+  const a = ARTICLES[num - 1];
+  delete STATUS[a.url];
+  openArticle(num);
+  renderList(activeArticles());
+  toast('Status cleared — re-review this article');
+}
+
+async function confirmDelete(num) {
+  const a = ARTICLES[num - 1];
+  const btn = document.getElementById(`del-btn-${num}`);
+  if (!btn) return;
+  if (delConfirmUrl !== a.url) {
+    delConfirmUrl = a.url;
+    btn.textContent = 'CONFIRM? CLEARS ALL STAGES';
+    btn.style.background = 'rgba(255,68,68,0.12)';
+    btn.style.color = 'var(--sw-red)';
+    btn.style.borderColor = 'rgba(255,68,68,0.4)';
+    clearTimeout(delConfirmTimer);
+    delConfirmTimer = setTimeout(() => {
+      delConfirmUrl = null;
+      btn.textContent = 'REMOVE FROM PIPELINE';
+      btn.style.background = '';
+      btn.style.color = 'rgba(255,68,68,0.6)';
+      btn.style.borderColor = 'rgba(255,68,68,0.2)';
+    }, 3000);
+  } else {
+    clearTimeout(delConfirmTimer);
+    delConfirmUrl = null;
+    btn.disabled = true;
+    btn.textContent = 'REMOVING...';
+    const res = await postJSON('/api/story/delete', { article_url: a.url });
+    if (res.ok) {
+      toast('Story removed from all pipeline stages');
+      setTimeout(() => location.reload(), 600);
+    } else {
+      toast(res.error || 'Delete failed', 'err');
+      btn.disabled = false;
+      btn.textContent = 'REMOVE FROM PIPELINE';
+    }
+  }
+}
+
+// ── Init ──
+renderList(activeArticles());
+</script>
+{% endblock %}

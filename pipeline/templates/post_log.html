@@ -1,0 +1,571 @@
+{% extends 'layout.html' %}
+{% set active = 'postlog' %}
+{% set step = 4 %}
+{% block title %}REBEL INTEL — MISSION LOG{% endblock %}
+{% block step_hint %}Schedule posts · Mark published after posting to LinkedIn · Log metrics a week later.{% endblock %}
+
+{% block extra_style %}
+.log-filters {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.filter-btn {
+  font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 1.5px; padding: 6px 14px; border-radius: 3px;
+  border: 1px solid var(--card-border); background: transparent;
+  color: var(--text-sec); cursor: pointer; transition: all 0.15s;
+}
+.filter-btn:hover { color: var(--text-pri); border-color: var(--text-sec); }
+.filter-btn.active { color: var(--sw-blue); border-color: rgba(79,195,247,0.5); background: rgba(79,195,247,0.07); }
+
+.log-table { width: 100%; border-collapse: collapse; }
+.log-table th {
+  font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 1.5px; color: var(--text-dim); text-align: left;
+  padding: 8px 12px; border-bottom: 1px solid var(--card-border);
+  white-space: nowrap;
+}
+.log-table td {
+  padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 12px; color: var(--text-sec); vertical-align: middle;
+}
+.log-table tr:hover td { background: rgba(255,255,255,0.02); }
+.log-table tr.filtered-out { display: none; }
+
+.td-title { color: var(--text-pri); max-width: 280px; }
+.td-title a { color: var(--sw-blue); text-decoration: none; }
+.td-title a:hover { text-decoration: underline; }
+.td-id { font-family: 'Orbitron', sans-serif; font-size: 9px; color: var(--text-dim); white-space: nowrap; }
+.td-status { white-space: nowrap; }
+.td-status .date { font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+
+.metrics-display { font-size: 11px; }
+.metric-chip {
+  display: inline-block; margin: 1px 3px 1px 0;
+  background: rgba(79,195,247,0.08); border: 1px solid rgba(79,195,247,0.2);
+  border-radius: 10px; padding: 1px 8px;
+  font-size: 10px; color: var(--sw-blue);
+}
+
+.action-cell { white-space: nowrap; }
+.action-cell .btn { padding: 5px 10px; font-size: 9px; letter-spacing: 1px; }
+.action-cell .btn + .btn { margin-left: 4px; }
+
+.empty-log {
+  text-align: center; padding: 64px 24px;
+  color: var(--text-dim); font-size: 12px; letter-spacing: 1px;
+}
+.empty-log .big { font-family: 'Orbitron', sans-serif; font-size: 32px; color: rgba(255,255,255,0.06); margin-bottom: 16px; }
+
+.summary-bar {
+  display: flex; gap: 24px; flex-wrap: wrap;
+  padding: 12px 0; margin-bottom: 20px;
+  border-bottom: 1px solid var(--card-border);
+}
+.sum-item label {
+  font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 1.5px;
+  color: var(--text-dim); display: block; margin-bottom: 2px;
+}
+.sum-item .val {
+  font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 700;
+}
+.sum-item.col-white .val { color: var(--text-sec); }
+.sum-item.col-blue .val  { color: var(--sw-blue); }
+.sum-item.col-green .val { color: var(--sw-green); }
+.sum-item.col-red .val   { color: var(--sw-red); }
+
+/* Draft preview modal */
+.draft-modal-body {
+  max-height: 380px; overflow-y: auto;
+  white-space: pre-wrap; font-size: 13px; line-height: 1.8;
+  color: var(--text-pri); font-family: 'Share Tech Mono', monospace;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 4px; padding: 16px; margin-bottom: 12px;
+}
+.draft-modal-body::-webkit-scrollbar { width: 4px; }
+.rewrite-bar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px; flex-wrap: wrap;
+}
+.rewrite-status {
+  font-size: 11px; color: var(--text-dim); letter-spacing: 0.5px;
+  font-family: 'Orbitron', sans-serif;
+}
+.rewrite-count {
+  font-size: 10px; color: var(--text-dim);
+  padding: 2px 8px; border: 1px solid var(--card-border); border-radius: 10px;
+}
+.draft-modal-body::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 2px; }
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div style="margin-bottom: 24px;">
+    <div class="page-title">MISSION LOG</div>
+    <div class="page-subtitle">TRACK SCHEDULED, PUBLISHED POSTS AND ENGAGEMENT METRICS</div>
+  </div>
+
+  {% if overdue_count %}
+  <div style="background:rgba(196,48,48,0.08); border:1px solid rgba(196,48,48,0.3); border-radius:6px; padding:12px 16px; margin-bottom:16px; font-size:12px; color:var(--sw-red);">
+    {{ overdue_count }} scheduled post{{ 's' if overdue_count != 1 else '' }} past due — confirm {{ 'they' if overdue_count != 1 else 'it' }} actually posted, then mark PUBLISHED.
+  </div>
+  {% endif %}
+
+  {% if posts %}
+  {% set published_posts   = posts | selectattr('published_at') | list %}
+  {% set scheduled_posts   = posts | rejectattr('published_at') | selectattr('scheduled_for') | list %}
+  {% set pending_posts     = posts | rejectattr('published_at') | rejectattr('scheduled_for') | list %}
+  {% set tracked_posts     = posts | selectattr('metrics') | list %}
+
+  {% if next_scheduled %}
+  {% set ns = next_scheduled %}
+  <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:6px; padding:12px 18px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+    <div>
+      <div style="font-family:'Orbitron',sans-serif; font-size:9px; letter-spacing:2px; color:var(--text-dim); margin-bottom:4px;">NEXT SCHEDULED POST</div>
+      <div style="font-size:13px; color:var(--text-pri);">{{ ns.title[:60] }}{% if ns.title|length > 60 %}...{% endif %}</div>
+    </div>
+    <div style="text-align:right; flex-shrink:0;">
+      <div style="font-family:'Orbitron',sans-serif; font-size:9px; letter-spacing:2px; color:var(--text-dim); margin-bottom:4px;">{{ ns.date }}</div>
+      {% if ns.days == 0 %}
+        <div style="font-family:'Orbitron',sans-serif; font-size:18px; font-weight:700; color:var(--sw-yellow);">TODAY</div>
+      {% elif ns.days == 1 %}
+        <div style="font-family:'Orbitron',sans-serif; font-size:18px; font-weight:700; color:var(--sw-yellow);">TOMORROW</div>
+      {% elif ns.days <= 3 %}
+        <div style="font-family:'Orbitron',sans-serif; font-size:18px; font-weight:700; color:var(--sw-yellow);">IN {{ ns.days }} DAYS</div>
+      {% else %}
+        <div style="font-family:'Orbitron',sans-serif; font-size:18px; font-weight:700; color:var(--text-sec);">IN {{ ns.days }} DAYS</div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="summary-bar">
+    <div class="sum-item col-white">
+      <label>TOTAL</label>
+      <div class="val">{{ posts | length }}</div>
+    </div>
+    <div class="sum-item col-blue">
+      <label>SCHEDULED</label>
+      <div class="val">{{ scheduled_posts | length }}</div>
+    </div>
+    <div class="sum-item col-green">
+      <label>PUBLISHED</label>
+      <div class="val">{{ published_posts | length }}</div>
+    </div>
+    <div class="sum-item col-red">
+      <label>NEEDS METRICS</label>
+      <div class="val">{{ published_posts | rejectattr('metrics') | list | length }}</div>
+    </div>
+  </div>
+
+  <div class="log-filters">
+    <button class="filter-btn active" onclick="setFilter('all', this)">ALL</button>
+    <button class="filter-btn" onclick="setFilter('pending', this)">PENDING</button>
+    <button class="filter-btn" onclick="setFilter('scheduled', this)">SCHEDULED</button>
+    <button class="filter-btn" onclick="setFilter('published', this)">PUBLISHED</button>
+    <button class="filter-btn" onclick="setFilter('no-metrics', this)">NEEDS METRICS</button>
+  </div>
+
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <table class="log-table" id="log-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>TITLE / SOURCE</th>
+          <th>STATUS</th>
+          <th>METRICS</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in posts %}
+        {% set is_pub  = p.published_at %}
+        {% set is_over = p._overdue %}
+        {% set is_sched = p.scheduled_for and not p.published_at %}
+        {% set is_pend = not p.published_at and not p.scheduled_for %}
+        {% set has_met = p.metrics %}
+        {% set draft_fn = p.draft_file %}
+        <tr class="log-row"
+            data-pub="{{ 'yes' if is_pub else 'no' }}"
+            data-sched="{{ 'yes' if is_sched else 'no' }}"
+            data-metrics="{{ 'yes' if has_met else 'no' }}">
+
+          <td class="td-id">{{ p.id }}</td>
+
+          <td class="td-title">
+            <div>
+              {% if p.linkedin_url %}
+                <a href="{{ p.linkedin_url }}" target="_blank" rel="noopener">{{ p.article_title[:60] }}{% if p.article_title|length > 60 %}...{% endif %}</a>
+              {% else %}
+                {{ p.article_title[:60] }}{% if p.article_title|length > 60 %}...{% endif %}
+              {% endif %}
+            </div>
+            <div style="font-size:10px; color:var(--text-dim); margin-top:2px;">
+              {{ p.source or p.article_source or '—' }}
+            </div>
+          </td>
+
+          <td class="td-status">
+            {% if is_pub %}
+              <span class="badge badge-pub">PUBLISHED</span>
+              <div class="date">{{ p.published_at }}</div>
+            {% elif is_over %}
+              <span class="badge badge-overdue">OVERDUE</span>
+              <div class="date">was {{ p.scheduled_for }}</div>
+            {% elif is_sched %}
+              <span class="badge badge-hold">SCHEDULED</span>
+              <div class="date">{{ p.scheduled_for }}</div>
+            {% else %}
+              <span class="badge badge-skip">PENDING</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if has_met %}
+              <div class="metrics-display">
+                {% for k, v in p.metrics.items() %}
+                  <span class="metric-chip">{{ k }}: {{ v }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              <span style="color:var(--text-dim); font-size:11px;">—</span>
+            {% endif %}
+          </td>
+
+          <td class="action-cell">
+            {% if draft_fn %}
+            <button class="btn btn-dim"
+                onclick="viewDraft('{{ p.id }}', '{{ draft_fn }}', '{{ p.article_title | replace("'", "\\'") | truncate(50, True) }}')">
+              VIEW
+            </button>
+            {% endif %}
+            {% if is_pub %}
+              <button class="btn btn-blue"
+                  onclick="openMetricsModal('{{ p.id }}', '{{ p.article_title | replace("'", "\\'") | truncate(40, True) }}', {{ p.metrics | tojson if p.metrics else '{}' }})">
+                {% if has_met %}METRICS{% else %}ADD METRICS{% endif %}
+              </button>
+            {% else %}
+              {% if is_pend %}
+              <button class="btn btn-dim"
+                  onclick="openScheduleModal('{{ p.id }}', '{{ p.article_title | replace("'", "\\'") | truncate(40, True) }}')">
+                SCHEDULE
+              </button>
+              {% endif %}
+              <button class="btn btn-yellow"
+                  onclick="openPublishModal('{{ p.id }}', '{{ p.article_title | replace("'", "\\'") | truncate(40, True) }}', '{{ p.scheduled_for or "" }}')">
+                PUBLISH
+              </button>
+              {% if is_pend %}
+              <button class="btn btn-dim" id="del-{{ p.id }}"
+                  onclick="confirmDelete('{{ p.id }}', this)"
+                  style="color:var(--sw-red); border-color:rgba(255,68,68,0.3);">
+                DELETE
+              </button>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="empty-log">
+    <div class="big">[ EMPTY ]</div>
+    <div>No posts in the mission log yet.</div>
+    <div style="margin-top: 24px;">
+      <a href="/drafts" class="btn btn-yellow">GO TO DRAFT ORDERS</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- VIEW DRAFT Modal -->
+<div class="modal-overlay" id="draft-modal" onclick="closeDraftModal()">
+  <div class="modal" style="max-width:660px; width:96%;" onclick="event.stopPropagation()">
+    <h3 id="draft-modal-title">DRAFT</h3>
+    <div class="rewrite-bar">
+      <button class="btn btn-blue" id="rewrite-btn" onclick="rewriteDraft()">REWRITE (local AI)</button>
+      <span class="rewrite-status" id="rewrite-status"></span>
+      <span class="rewrite-count" id="rewrite-count" style="display:none"></span>
+    </div>
+    <div id="draft-modal-body" class="draft-modal-body">Loading...</div>
+    <div class="modal-actions">
+      <button class="btn btn-yellow" onclick="copyDraftContent()">COPY TO CLIPBOARD</button>
+      <button class="btn btn-dim" id="save-rewrite-btn" onclick="saveRewrite()" style="display:none">SAVE REWRITE TO FILE</button>
+      <button class="btn btn-dim" onclick="closeDraftModal()">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCHEDULE Modal -->
+<div class="modal-overlay" id="schedule-modal" onclick="closeScheduleModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>SCHEDULE POST</h3>
+    <div style="font-size:12px; color:var(--text-sec); margin-bottom:16px;" id="sched-modal-title"></div>
+    <label style="font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">SCHEDULED DATE</label>
+    <input type="date" id="sched-date" style="margin-bottom:8px;">
+    <div style="font-size:11px; color:var(--text-dim); margin-bottom:16px;">
+      Post will stay in SCHEDULED state until you mark it as published.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-blue" onclick="submitSchedule()">CONFIRM SCHEDULE</button>
+      <button class="btn btn-dim" onclick="closeScheduleModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISH Modal -->
+<div class="modal-overlay" id="publish-modal" onclick="closePublishModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>MARK AS PUBLISHED</h3>
+    <div style="font-size:12px; color:var(--text-sec); margin-bottom:16px;" id="pub-modal-title"></div>
+    <label style="font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">PUBLISH DATE</label>
+    <input type="date" id="pub-date" style="margin-bottom:12px;">
+    <label style="font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">LINKEDIN URL (optional)</label>
+    <input type="url" id="pub-url" placeholder="https://linkedin.com/posts/...">
+    <div class="modal-actions">
+      <button class="btn btn-yellow" onclick="submitPublish()">CONFIRM PUBLISHED</button>
+      <button class="btn btn-dim" onclick="closePublishModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- METRICS Modal -->
+<div class="modal-overlay" id="metrics-modal" onclick="closeMetricsModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>LOG METRICS</h3>
+    <div style="font-size:12px; color:var(--text-sec); margin-bottom:16px;" id="met-modal-title"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div>
+        <label style="font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">IMPRESSIONS</label>
+        <input type="number" id="met-impressions" placeholder="0" min="0">
+      </div>
+      <div>
+        <label style="font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">REACTIONS</label>
+        <input type="number" id="met-reactions" placeholder="0" min="0">
+      </div>
+      <div>
+        <label style="font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">COMMENTS</label>
+        <input type="number" id="met-comments" placeholder="0" min="0">
+      </div>
+      <div>
+        <label style="font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">REPOSTS</label>
+        <input type="number" id="met-reposts" placeholder="0" min="0">
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn btn-blue" onclick="submitMetrics()">SAVE METRICS</button>
+      <button class="btn btn-dim" onclick="closeMetricsModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── Filters ──
+function setFilter(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.log-row').forEach(row => {
+    let show = true;
+    if (type === 'pending')    show = row.dataset.pub === 'no' && row.dataset.sched === 'no';
+    if (type === 'scheduled')  show = row.dataset.sched === 'yes';
+    if (type === 'published')  show = row.dataset.pub === 'yes';
+    if (type === 'no-metrics') show = row.dataset.pub === 'yes' && row.dataset.metrics === 'no';
+    row.classList.toggle('filtered-out', !show);
+  });
+}
+
+// ── VIEW DRAFT ──
+let currentDraftContent = '';
+let currentDraftFilename = '';
+let rewriteCount = 0;
+
+async function viewDraft(id, filename, title) {
+  currentDraftFilename = filename;
+  rewriteCount = 0;
+  document.getElementById('draft-modal-title').textContent = title;
+  document.getElementById('draft-modal-body').textContent = 'Loading...';
+  document.getElementById('rewrite-status').textContent = '';
+  document.getElementById('rewrite-count').style.display = 'none';
+  document.getElementById('save-rewrite-btn').style.display = 'none';
+  document.getElementById('rewrite-btn').disabled = false;
+  document.getElementById('draft-modal').classList.add('open');
+  try {
+    const res = await fetch(`/api/draft-content/${encodeURIComponent(filename)}`);
+    const data = await res.json();
+    // Show the post body only (stripped of headers/metadata)
+    currentDraftContent = (data.body && data.body.trim()) ? data.body : (data.content || '(empty)');
+    document.getElementById('draft-modal-body').textContent = currentDraftContent;
+  } catch(e) {
+    document.getElementById('draft-modal-body').textContent = 'Could not load draft file.';
+  }
+}
+
+function closeDraftModal() {
+  document.getElementById('draft-modal').classList.remove('open');
+}
+
+function copyDraftContent() {
+  copyText(currentDraftContent, 'Draft');
+}
+
+async function rewriteDraft() {
+  const btn = document.getElementById('rewrite-btn');
+  const status = document.getElementById('rewrite-status');
+  const body = document.getElementById('draft-modal-body');
+  btn.disabled = true;
+  status.textContent = 'Rewriting...';
+  body.style.opacity = '0.4';
+  try {
+    const res = await postJSON('/api/rewrite', { content: currentDraftContent });
+    if (res.ok && res.content) {
+      currentDraftContent = res.content;
+      body.textContent = currentDraftContent;
+      rewriteCount++;
+      const countEl = document.getElementById('rewrite-count');
+      countEl.textContent = `rewrite #${rewriteCount}`;
+      countEl.style.display = 'inline';
+      status.textContent = 'Done — copy, rewrite again, or save to file.';
+      document.getElementById('save-rewrite-btn').style.display = 'inline-flex';
+    } else {
+      status.textContent = 'Local model unavailable — is the NUC on?';
+    }
+  } catch(e) {
+    status.textContent = 'Request failed.';
+  }
+  body.style.opacity = '1';
+  btn.disabled = false;
+}
+
+async function saveRewrite() {
+  if (!currentDraftFilename) return;
+  const res = await postJSON('/api/draft/save', {
+    filename: currentDraftFilename,
+    content: currentDraftContent,
+  });
+  if (res.ok) {
+    toast('Rewrite saved to file');
+    document.getElementById('save-rewrite-btn').style.display = 'none';
+    document.getElementById('rewrite-status').textContent = 'Saved.';
+  } else {
+    toast('Save failed', 'err');
+  }
+}
+
+// ── DELETE ──
+let deleteConfirmTimers = {};
+function confirmDelete(id, btn) {
+  if (btn.dataset.confirming === 'yes') {
+    // Second click — do it
+    clearTimeout(deleteConfirmTimers[id]);
+    doDelete(id, btn);
+  } else {
+    // First click — arm it
+    btn.dataset.confirming = 'yes';
+    btn.textContent = 'CONFIRM?';
+    btn.style.background = 'rgba(255,68,68,0.15)';
+    btn.style.borderColor = 'var(--sw-red)';
+    btn.style.color = 'var(--sw-red)';
+    // Auto-disarm after 3s
+    deleteConfirmTimers[id] = setTimeout(() => {
+      btn.dataset.confirming = '';
+      btn.textContent = 'DELETE';
+      btn.style.background = '';
+      btn.style.borderColor = 'rgba(255,68,68,0.3)';
+      btn.style.color = 'var(--sw-red)';
+    }, 3000);
+  }
+}
+async function doDelete(id, btn) {
+  btn.disabled = true;
+  const row = btn.closest('tr');
+  const res = await postJSON(`/api/post-log/${id}/delete`, {});
+  if (res.ok) {
+    row.style.transition = 'opacity 0.3s';
+    row.style.opacity = '0';
+    setTimeout(() => row.remove(), 300);
+    toast('Entry deleted');
+  } else {
+    toast(res.error || 'Delete failed', 'err');
+    btn.disabled = false;
+  }
+}
+
+// ── SCHEDULE ──
+let schedId = null;
+function openScheduleModal(id, title) {
+  schedId = id;
+  document.getElementById('sched-modal-title').textContent = title;
+  // Default to one week from today
+  const d = new Date(); d.setDate(d.getDate() + 7);
+  document.getElementById('sched-date').value = d.toISOString().split('T')[0];
+  document.getElementById('schedule-modal').classList.add('open');
+}
+function closeScheduleModal() {
+  document.getElementById('schedule-modal').classList.remove('open');
+}
+async function submitSchedule() {
+  const date = document.getElementById('sched-date').value;
+  if (!date) { toast('Date required', 'err'); return; }
+  const res = await postJSON(`/api/post-log/${schedId}/schedule`, { scheduled_for: date });
+  if (res.ok) {
+    toast('Post scheduled for ' + date);
+    setTimeout(() => location.reload(), 500);
+  } else { toast('Save failed', 'err'); }
+}
+
+// ── PUBLISH ──
+let pubId = null;
+function openPublishModal(id, title, scheduledDate) {
+  pubId = id;
+  document.getElementById('pub-modal-title').textContent = title;
+  document.getElementById('pub-date').value = scheduledDate || new Date().toISOString().split('T')[0];
+  document.getElementById('pub-url').value = '';
+  document.getElementById('publish-modal').classList.add('open');
+}
+function closePublishModal() {
+  document.getElementById('publish-modal').classList.remove('open');
+}
+async function submitPublish() {
+  const date = document.getElementById('pub-date').value;
+  const url  = document.getElementById('pub-url').value.trim();
+  if (!date) { toast('Date is required', 'err'); return; }
+  const res = await postJSON(`/api/post-log/${pubId}/publish`, { published_at: date, linkedin_url: url });
+  if (res.ok) {
+    toast('Post marked as published');
+    setTimeout(() => location.reload(), 500);
+  } else { toast('Save failed', 'err'); }
+}
+
+// ── METRICS ──
+let metId = null;
+function openMetricsModal(id, title, existing) {
+  metId = id;
+  document.getElementById('met-modal-title').textContent = title;
+  document.getElementById('met-impressions').value = existing.impressions || '';
+  document.getElementById('met-reactions').value   = existing.reactions   || '';
+  document.getElementById('met-comments').value    = existing.comments    || '';
+  document.getElementById('met-reposts').value     = existing.reposts     || '';
+  document.getElementById('metrics-modal').classList.add('open');
+}
+function closeMetricsModal() {
+  document.getElementById('metrics-modal').classList.remove('open');
+}
+async function submitMetrics() {
+  const metrics = {
+    impressions: parseInt(document.getElementById('met-impressions').value) || 0,
+    reactions:   parseInt(document.getElementById('met-reactions').value)   || 0,
+    comments:    parseInt(document.getElementById('met-comments').value)    || 0,
+    reposts:     parseInt(document.getElementById('met-reposts').value)     || 0,
+  };
+  const res = await postJSON(`/api/post-log/${metId}/metrics`, { metrics });
+  if (res.ok) {
+    toast('Metrics saved');
+    setTimeout(() => location.reload(), 500);
+  } else { toast('Save failed', 'err'); }
+}
+</script>
+{% endblock %}

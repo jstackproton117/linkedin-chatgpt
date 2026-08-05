@@ -1,0 +1,201 @@
+{% extends 'layout.html' %}
+{% set active = 'home' %}
+{% block title %}REBEL INTEL — COMMAND CENTER{% endblock %}
+
+{% block extra_style %}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0;
+  padding: 20px 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35), inset 0 0 60px rgba(0,0,0,0.18);
+}
+/* corner brackets */
+.stat-card::before {
+  content: '';
+  position: absolute; top: 5px; left: 5px;
+  width: 14px; height: 14px;
+  border-top: 1px solid currentColor;
+  border-left: 1px solid currentColor;
+  opacity: 0.5;
+}
+.stat-card::after {
+  content: '';
+  position: absolute; bottom: 5px; right: 5px;
+  width: 14px; height: 14px;
+  border-bottom: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  opacity: 0.5;
+}
+.stat-card.yellow { border-color: rgba(212,148,30,0.5);  color: var(--sw-yellow); box-shadow: 0 0 20px rgba(212,148,30,0.12), 0 4px 24px rgba(0,0,0,0.35); }
+.stat-card.blue   { border-color: rgba(46,184,204,0.5);  color: var(--sw-blue);   box-shadow: 0 0 20px rgba(46,184,204,0.12),  0 4px 24px rgba(0,0,0,0.35); }
+.stat-card.red    { border-color: rgba(196,48,48,0.5);   color: var(--sw-red);    box-shadow: 0 0 20px rgba(196,48,48,0.12),   0 4px 24px rgba(0,0,0,0.35); }
+.stat-card.green  { border-color: rgba(40,168,80,0.5);   color: var(--sw-green);  box-shadow: 0 0 20px rgba(40,168,80,0.12),   0 4px 24px rgba(0,0,0,0.35); }
+
+.stat-value {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 36px; font-weight: 900;
+  line-height: 1;
+}
+.stat-card.yellow .stat-value { color: var(--sw-yellow); text-shadow: 0 0 20px rgba(212,148,30,0.5); }
+.stat-card.blue   .stat-value { color: var(--sw-blue);   text-shadow: 0 0 20px rgba(46,184,204,0.5); }
+.stat-card.red    .stat-value { color: var(--sw-red);    text-shadow: 0 0 20px rgba(196,48,48,0.5); }
+.stat-card.green  .stat-value { color: var(--sw-green);  text-shadow: 0 0 20px rgba(40,168,80,0.5); }
+
+.stat-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px; letter-spacing: 2px;
+  color: var(--text-sec); margin-top: 6px;
+  text-transform: uppercase;
+}
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+.theme-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.theme-row:last-child { border-bottom: none; }
+.theme-kw {
+  font-family: 'Orbitron', sans-serif; font-size: 10px;
+  color: var(--text-sec); letter-spacing: 1px;
+  min-width: 160px; text-transform: uppercase;
+}
+.theme-bar-track {
+  flex: 1; height: 6px; background: rgba(255,255,255,0.05);
+  border-radius: 0; overflow: hidden;
+}
+.theme-bar-fill {
+  height: 100%; border-radius: 0;
+  background: linear-gradient(90deg, rgba(46,184,204,0.25), var(--sw-blue));
+}
+.theme-count {
+  font-size: 11px; color: var(--text-sec);
+  min-width: 40px; text-align: right;
+}
+
+.quick-actions {
+  display: flex; gap: 12px; flex-wrap: wrap;
+}
+
+.crawl-box {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0; padding: 20px 24px;
+  font-size: 12px; color: var(--text-sec);
+  line-height: 1.8; letter-spacing: 0.5px;
+}
+.crawl-box strong { color: var(--text-pri); }
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div style="margin-bottom: 28px;">
+    <div class="page-title">COMMAND CENTER</div>
+    <div class="page-subtitle">REBEL INTEL v1.0 — LINKEDIN CONTENT PIPELINE</div>
+  </div>
+
+  <!-- Next scheduled post countdown -->
+  {% if next_scheduled %}
+  {% set ns = next_scheduled %}
+  <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:0; padding:14px 20px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+    <div>
+      <div style="font-family:'Orbitron',sans-serif; font-size:9px; letter-spacing:2px; color:var(--text-dim); margin-bottom:4px;">NEXT SCHEDULED POST</div>
+      <div style="font-size:13px; color:var(--text-pri);">{{ ns.title[:70] }}{% if ns.title|length > 70 %}...{% endif %}</div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:2px;">{{ ns.date }} · <a href="/post-log" style="color:var(--sw-blue); text-decoration:none;">view all scheduled →</a></div>
+    </div>
+    <div style="text-align:right; flex-shrink:0;">
+      {% if ns.overdue %}
+        <div style="font-family:'Orbitron',sans-serif; font-size:22px; font-weight:900; color:var(--sw-red);">OVERDUE</div>
+        <div style="font-size:10px; color:var(--text-dim);">Confirm in Mission Log — did this actually post?</div>
+      {% elif ns.days == 0 %}
+        <div style="font-family:'Orbitron',sans-serif; font-size:22px; font-weight:900; color:var(--sw-yellow);">TODAY</div>
+        <div style="font-size:10px; color:var(--text-dim);">Start working on new posts</div>
+      {% elif ns.days == 1 %}
+        <div style="font-family:'Orbitron',sans-serif; font-size:22px; font-weight:900; color:var(--sw-yellow);">TOMORROW</div>
+        <div style="font-size:10px; color:var(--text-dim);">Fetch and review articles today</div>
+      {% elif ns.days <= 3 %}
+        <div style="font-family:'Orbitron',sans-serif; font-size:22px; font-weight:900; color:var(--sw-yellow);">{{ ns.days }} DAYS</div>
+        <div style="font-size:10px; color:var(--text-dim);">Start building the next batch</div>
+      {% else %}
+        <div style="font-family:'Orbitron',sans-serif; font-size:22px; font-weight:900; color:var(--text-sec);">{{ ns.days }} DAYS</div>
+        <div style="font-size:10px; color:var(--text-dim);">{{ ns.date }}</div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card yellow">
+      <div class="stat-value">{{ article_count }}</div>
+      <div class="stat-label">Articles in database</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-value">{{ to_draft }}</div>
+      <div class="stat-label">Queued for drafting</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-value">{{ unpublished }}</div>
+      <div class="stat-label">Drafts unpublished</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-value">{{ no_metrics }}</div>
+      <div class="stat-label">Posts need metrics</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- Rising Themes -->
+    <div class="card card-yellow">
+      <h2>Rising Themes</h2>
+      {% if rising %}
+        {% set max_count = rising[0].count %}
+        {% for t in rising %}
+        <div class="theme-row">
+          <div class="theme-kw">{{ t.keyword }}</div>
+          <div class="theme-bar-track">
+            <div class="theme-bar-fill" style="width: {{ (t.count / max_count * 100)|int }}%"></div>
+          </div>
+          <div class="theme-count">{{ t.count }}×</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="text-dim" style="font-size:12px; padding: 12px 0;">
+          No rising themes yet. Run a sector scan first.
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Quick Actions + Status -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <div class="card">
+        <h2>Quick Actions</h2>
+        <div class="quick-actions">
+          <a href="/fetch" class="btn btn-yellow">1 · FETCH ARTICLES</a>
+          <a href="/review" class="btn btn-blue">2 · REVIEW ARTICLES</a>
+          <a href="/drafts" class="btn btn-dim">3 · WRITE DRAFTS</a>
+          <a href="/post-log" class="btn btn-dim">4 · MISSION LOG</a>
+        </div>
+      </div>
+
+      <div class="crawl-box">
+        <strong>HOW IT WORKS</strong><br><br>
+        1. <strong>Fetch Articles</strong> — pull up to 200 articles from 26 feeds, ranked by relevance &amp; freshness<br>
+        2. <strong>Review Articles</strong> — read each one, get an AI angle suggestion, mark Draft / Hold / Skip<br>
+        3. <strong>Write Drafts</strong> — build prompt files, copy into Claude.ai, paste the response back<br>
+        4. <strong>Mission Log</strong> — schedule posts, mark published, log impressions and engagement
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+# GetChkd — What it is and what it does
+
+## One-sentence summary
+GetChkd is an enterprise blockchain infrastructure platform that helps organizations connect data, applications, platforms, and devices securely—using permissioned blockchain, role/rule-based access control, and API-first interoperability. :contentReference[oaicite:0]{index=0}
+
+## The problem GetChkd is solving
+Modern businesses are increasingly “hyper-connected” through hundreds (or thousands) of API integrations, which expands the attack surface and creates governance complexity. GetChkd positions itself as a way to enable frictionless connectivity **without** trading away security and accountability. :contentReference[oaicite:1]{index=1}
+
+## What GetChkd provides
+### 1) Interoperability through one integration
+GetChkd offers API-based connectivity designed to bridge:
+- hardware to software  
+- on-chain to off-chain  
+- legacy to modern systems  
+- online to offline environments :contentReference[oaicite:2]{index=2}
+
+### 2) Access control + auditability (Zero Trust-aligned)
+The platform emphasizes customizable **role- and rule-based access** for Zero Trust-style control over:
+- physical locations
+- data
+- devices  
+paired with detailed audit/provenance trails. :contentReference[oaicite:3]{index=3}
+
+### 3) “Permissioned blockchain” foundation (enterprise/private)
+GetChkd advocates for permissioned (private) blockchain to increase privacy/security, improve performance/scalability, and support enterprise governance and customization. :contentReference[oaicite:4]{index=4}
+
+## How it claims to work (high-level architecture)
+GetChkd describes a combination of:
+- microservices architecture
+- a blockchain “core”
+- role/rule-based access control  
+to create an “infinitely scalable” network of locations, facilities, data, and users, with continuous authentication and provenance trails. :contentReference[oaicite:5]{index=5}
+
+## Data storage model (important detail)
+GetChkd says customers do **not** have to move all data on-chain:
+- Data *can* be stored on-chain.
+- Or it can remain in existing systems while smart contracts act as “gatekeepers” controlling access (down to row/column level), enabling phased modernization without full migrations. :contentReference[oaicite:6]{index=6}
+
+## Integration with legacy systems
+GetChkd states it connects legacy, current, and future systems via a REST API and is backward/forward compatible. :contentReference[oaicite:7]{index=7}
+
+## Security posture (as described on the site)
+GetChkd states:
+- On-chain data is stored on a private network not accessible via the public internet.
+- Interaction occurs via a REST API that interfaces with smart contracts.
+- Data cannot be accessed directly—only the output of the smart contract. :contentReference[oaicite:8]{index=8}
+
+## Underlying blockchain technology mentioned
+The site highlights Hyperledger Fabric as the permissioned blockchain platform, emphasizing modularity, privacy/security, scalability, and governance. :contentReference[oaicite:9]{index=9}
+
+## What “fast & easy” means in their messaging
+GetChkd positions itself as reducing time-to-launch for blockchain environments—framing it as “months, not years,” and “one integration unlocks all.” :contentReference[oaicite:10]{index=10}
+
+## Typical sectors mentioned
+The site lists interest/sector options including: Banking/Finance, Defense, Healthcare, Media & Entertainment, Retail/Consumer Goods, Security, and Other. :contentReference[oaicite:11]{index=11}
+
+## Plain-English framing you can reuse (public-safe)
+GetChkd helps organizations securely connect systems and devices—especially across legacy + modern environments—by using a permissioned blockchain backbone plus strong access controls and audit trails, exposed through API-first integrations.
+
+## IP note (from site footer)
+GetChkd indicates it holds U.S. patents and lists specific patent numbers in the site footer. :contentReference[oaicite:12]{index=12}

@@ -1,0 +1,752 @@
+{% extends 'layout.html' %}
+{% set active = 'drafts' %}
+{% set step = 3 %}
+{% block title %}REBEL INTEL — WRITE DRAFTS{% endblock %}
+{% block step_hint %}Build a prompt file · Copy it · Paste into Claude.ai · Paste the response back here · Then schedule in Mission Log.{% endblock %}
+
+{% block extra_style %}
+.drafts-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) { .drafts-layout { grid-template-columns: 1fr; } }
+
+.draft-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px; padding: 18px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s, opacity 0.2s;
+}
+.draft-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.draft-card.unpublished::before { background: linear-gradient(90deg, transparent, var(--sw-yellow), transparent); opacity: 0.6; }
+.draft-card.published::before   { background: linear-gradient(90deg, transparent, var(--sw-green), transparent); opacity: 0.6; }
+.draft-card.empty::before       { background: linear-gradient(90deg, transparent, var(--text-dim), transparent); opacity: 0.3; }
+
+/* ── Merge mode ─────────────────────────────────────── */
+.merge-mode-btn { transition: color 0.15s, border-color 0.15s; }
+.merge-mode-btn.active { color: var(--sw-blue) !important; border-color: var(--sw-blue) !important; }
+
+.merge-chk {
+  display: none;
+  position: absolute; top: 10px; right: 10px; z-index: 10;
+  width: 22px; height: 22px;
+  border: 2px solid var(--card-border); border-radius: 4px;
+  background: var(--panel-bg); cursor: pointer;
+  align-items: center; justify-content: center;
+  transition: all 0.15s; font-size: 13px; color: #000; font-weight: bold;
+}
+.merge-mode .merge-chk   { display: flex; }
+.merge-chk.sel            { background: var(--sw-blue); border-color: var(--sw-blue); }
+.merge-mode .draft-card   { opacity: 0.5; }
+.merge-mode .draft-card.merge-selected { opacity: 1; border-color: var(--sw-blue);
+  box-shadow: 0 0 0 1px var(--sw-blue), 0 0 12px rgba(46,184,204,0.15); }
+.merge-mode .draft-card[data-mergeable="false"] { cursor: not-allowed; }
+.merge-mode .draft-card[data-mergeable="false"] .merge-chk { display: none; }
+.merge-mode .draft-card[data-mergeable="true"]  { cursor: pointer; }
+
+.merge-bar {
+  display: none; position: fixed;
+  bottom: calc(var(--hw-b) + 10px); left: 50%; transform: translateX(-50%);
+  background: var(--panel-bg); border: 1px solid var(--sw-blue);
+  border-radius: 6px; padding: 10px 18px; z-index: 200;
+  align-items: center; gap: 14px;
+  box-shadow: 0 0 24px rgba(46,184,204,0.25), 0 4px 20px rgba(0,0,0,0.8);
+  white-space: nowrap;
+}
+.merge-bar.show { display: flex; }
+.merge-count { font-family: 'Share Tech Mono',monospace; font-size: 11px; color: var(--sw-blue); }
+
+/* ── Merge modal ────────────────────────────────────── */
+.merge-modal-wide { max-width: 860px !important; width: 94vw !important; }
+.merge-panels {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 14px;
+}
+.merge-panel-wrap { display: flex; flex-direction: column; gap: 4px; }
+.merge-panel-label {
+  font-family: 'Orbitron',sans-serif; font-size: 9px;
+  color: var(--sw-blue); letter-spacing: 1.5px;
+}
+.merge-panel-body {
+  background: rgba(0,0,0,0.35); border: 1px solid var(--card-border);
+  border-radius: 4px; padding: 10px; height: 200px; overflow-y: auto;
+  font-size: 11px; color: var(--text-sec); line-height: 1.7;
+  white-space: pre-wrap; word-break: break-word;
+  font-family: 'Share Tech Mono',monospace;
+}
+.merge-editor-label {
+  font-family: 'Orbitron',sans-serif; font-size: 9px;
+  color: var(--sw-yellow); letter-spacing: 1.5px; margin-bottom: 4px;
+}
+.merge-editor {
+  width: 100%; min-height: 180px;
+  background: var(--card-bg); border: 1px solid var(--sw-yellow);
+  color: var(--text-pri); padding: 12px; border-radius: 4px;
+  font-family: 'Share Tech Mono',monospace; font-size: 12px;
+  resize: vertical; line-height: 1.6;
+}
+.merge-editor:focus { outline: none; border-color: var(--sw-yellow); }
+.merge-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.merge-del-label {
+  font-size: 11px; color: var(--text-sec);
+  display: flex; align-items: center; gap: 6px; cursor: pointer;
+  margin-left: auto;
+}
+.merge-del-label input { cursor: pointer; accent-color: var(--sw-red); }
+@media (max-width: 700px) {
+  .merge-panels     { grid-template-columns: 1fr; }
+  .merge-panel-body { height: 120px; }
+  .merge-editor     { font-size: 16px; }
+  .merge-del-label  { margin-left: 0; }
+  .merge-bar        { bottom: calc(var(--hw-b) + 4px); font-size: 10px; padding: 8px 12px; gap: 8px; }
+}
+
+/* ── Existing styles ────────────────────────────────── */
+.draft-filename {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px; color: var(--text-dim); letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.draft-title {
+  font-size: 13px; color: var(--text-pri); line-height: 1.4;
+  margin-bottom: 12px;
+}
+.draft-preview {
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 4px; padding: 12px; font-size: 11px; color: var(--text-sec);
+  line-height: 1.7; max-height: 140px; overflow: hidden; position: relative;
+  margin-bottom: 12px; white-space: pre-wrap; word-break: break-word;
+}
+.draft-preview::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40px;
+  background: linear-gradient(transparent, var(--card-bg));
+}
+.draft-preview.empty-preview { color: var(--text-dim); font-style: italic; }
+.draft-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.paste-area {
+  width: 100%; min-height: 120px;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  color: var(--text-pri); padding: 12px;
+  border-radius: 4px; font-family: 'Share Tech Mono', monospace; font-size: 12px;
+  resize: vertical; line-height: 1.6; display: none;
+}
+.paste-area:focus { outline: none; border-color: var(--sw-yellow); }
+.paste-area.show { display: block; }
+.queue-section { margin-bottom: 24px; }
+.queue-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 14px; background: var(--card-bg);
+  border: 1px solid var(--card-border); border-radius: 4px;
+  margin-bottom: 8px; font-size: 12px;
+}
+.q-num {
+  font-family: 'Orbitron', sans-serif; font-size: 9px;
+  color: var(--sw-yellow); min-width: 26px; padding-top: 2px;
+}
+.q-info { flex: 1; }
+.q-title { color: var(--text-pri); margin-bottom: 2px; }
+.q-meta { color: var(--text-dim); font-size: 10px; }
+.build-box {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 6px; padding: 16px 18px; margin-bottom: 24px;
+}
+.build-output {
+  margin-top: 12px; font-size: 11px; color: var(--sw-green);
+  white-space: pre-wrap; display: none;
+}
+.prompt-modal-content {
+  max-height: 400px; overflow-y: auto;
+  white-space: pre-wrap; font-size: 12px;
+  color: var(--text-sec); line-height: 1.7;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 4px; padding: 14px; margin-bottom: 12px;
+  font-family: 'Share Tech Mono', monospace;
+}
+@media (max-width: 700px) {
+  .drafts-layout { gap: 12px; }
+  .paste-area    { font-size: 16px; }
+  .draft-actions { gap: 6px; }
+  .draft-actions .btn { flex: 1; text-align: center; justify-content: center; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div style="margin-bottom: 24px; display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+    <div>
+      <div class="page-title">WRITE DRAFTS</div>
+      <div class="page-subtitle">STEP 3 OF 4 — BUILD PROMPT · COPY TO CLAUDE.AI · PASTE RESPONSE BACK</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      {% if drafts | selectattr('has_real_content') | list | length >= 2 %}
+      <button class="btn btn-dim merge-mode-btn" id="merge-mode-btn" onclick="toggleMergeMode()">MERGE</button>
+      {% endif %}
+      <a href="/review" class="btn btn-dim">&#8592; BACK TO REVIEW</a>
+    </div>
+  </div>
+
+  <!-- Queued for drafting -->
+  {% if pending_queue %}
+  <div class="queue-section">
+    <div class="build-box">
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <div>
+          <div style="font-family:'Orbitron',sans-serif; font-size:11px; color:var(--text-sec); letter-spacing:2px; margin-bottom:4px;">
+            {{ pending_queue|length }} ARTICLE{{ 's' if pending_queue|length != 1 else '' }} QUEUED FOR DRAFTING
+          </div>
+          <div style="font-size:12px; color:var(--text-dim);">
+            Click <strong style="color:var(--text-sec)">Build Prompt Files</strong> to generate a prompt for each article, then copy each prompt into Claude.ai.
+          </div>
+        </div>
+        <button class="btn btn-yellow" onclick="buildDrafts()">BUILD PROMPT FILES</button>
+      </div>
+      <div id="build-output" class="build-output"></div>
+    </div>
+    <div>
+      {% for item in pending_queue %}
+      <div class="queue-item">
+        <div class="q-num">{{ loop.index }}</div>
+        <div class="q-info">
+          <div class="q-title">{{ item.title[:80] }}{% if item.title|length > 80 %}...{% endif %}</div>
+          <div class="q-meta">{{ item.source }} · {{ item.pillar }} · score {{ item.score }}</div>
+        </div>
+        <span class="badge badge-draft">QUEUED</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Draft files -->
+  {% if drafts %}
+  <h2 style="margin-bottom:16px;">DRAFT FILES — {{ drafts|length }}</h2>
+  <div class="drafts-layout" id="drafts-layout">
+    {% for d in drafts %}
+    <div class="draft-card {{ 'published' if d.published else ('unpublished' if d.has_real_content else 'empty') }}"
+         id="card-{{ loop.index }}"
+         data-filename="{{ d.filename }}"
+         data-title="{{ d.title }}"
+         data-idx="{{ loop.index }}"
+         data-mergeable="{{ 'true' if d.has_real_content else 'false' }}"
+         onclick="cardClickInMergeMode({{ loop.index }}, event)">
+
+      <!-- Merge checkbox (hidden until merge mode) -->
+      <div class="merge-chk" id="mchk-{{ loop.index }}"
+           onclick="toggleMergeSelect({{ loop.index }}, event)"></div>
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+        <div class="draft-filename">{{ d.filename }}</div>
+        {% if d.published %}
+          <span class="badge badge-pub">PUBLISHED</span>
+        {% elif d.has_real_content %}
+          <span class="badge badge-draft">READY</span>
+        {% else %}
+          <span class="badge badge-skip">AWAITING CONTENT</span>
+        {% endif %}
+      </div>
+
+      <div class="draft-title">{{ d.title }}</div>
+
+      {% if d.has_real_content %}
+        <div class="draft-preview">{{ d.content[:400] }}</div>
+        <div class="draft-actions">
+          <button class="btn btn-yellow" onclick="copyDraft('{{ d.filename }}', {{ loop.index }})">COPY DRAFT</button>
+          {% if d.prompt_content %}
+          <button class="btn btn-dim" onclick="showPrompt({{ loop.index }})">VIEW PROMPT</button>
+          {% endif %}
+          <button class="btn btn-green" onclick="togglePaste({{ loop.index }})">UPDATE CONTENT</button>
+          {% if d.article_url %}
+          <button class="btn btn-dim" id="del-draft-{{ loop.index }}"
+                  style="font-size:10px;padding:6px 12px;letter-spacing:1px;color:rgba(255,68,68,0.6);border-color:rgba(255,68,68,0.2);"
+                  onclick="deleteDraft('{{ d.filename }}', '{{ d.article_url }}', {{ loop.index }})">DELETE</button>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="draft-preview empty-preview">No content yet. Generate prompt file then paste Claude.ai response.</div>
+        <div class="draft-actions">
+          {% if d.prompt_content %}
+          <button class="btn btn-yellow" onclick="copyPrompt({{ loop.index }})">COPY PROMPT</button>
+          <button class="btn btn-dim"    onclick="showPrompt({{ loop.index }})">VIEW PROMPT</button>
+          {% else %}
+          <button class="btn btn-dim" disabled>NO PROMPT FILE YET</button>
+          {% endif %}
+          <button class="btn btn-blue" onclick="togglePaste({{ loop.index }})">PASTE RESPONSE</button>
+          {% if d.article_url %}
+          <button class="btn btn-dim" id="del-draft-{{ loop.index }}"
+                  style="font-size:10px;padding:6px 12px;letter-spacing:1px;color:rgba(255,68,68,0.6);border-color:rgba(255,68,68,0.2);"
+                  onclick="deleteDraft('{{ d.filename }}', '{{ d.article_url }}', {{ loop.index }})">DELETE</button>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <textarea class="paste-area" id="paste-{{ loop.index }}"
+        placeholder="Paste the Claude.ai response here, then click SAVE..."></textarea>
+      <div id="paste-actions-{{ loop.index }}" style="display:none; margin-top:8px;">
+        <div class="draft-actions">
+          <button class="btn btn-yellow" onclick="saveDraft('{{ d.filename }}', {{ loop.index }})">SAVE DRAFT</button>
+          <button class="btn btn-dim"    onclick="togglePaste({{ loop.index }})">CANCEL</button>
+        </div>
+      </div>
+
+      <div id="prompt-data-{{ loop.index }}" style="display:none">{{ d.prompt_content or '' }}</div>
+      <div id="draft-data-{{ loop.index }}" style="display:none">{{ d.content or '' }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="card" style="text-align:center; padding:48px;">
+    <div style="font-family:'Orbitron',sans-serif; font-size:28px; color:var(--text-dim); margin-bottom:16px;">[ ]</div>
+    <div style="font-size:13px; color:var(--text-dim); letter-spacing:1px;">No draft files yet.</div>
+    <div style="font-size:12px; color:var(--text-dim); margin-top:8px;">
+      Mark articles as DRAFT in Intel Review, then generate prompt files here.
+    </div>
+    <div style="margin-top:24px;">
+      <a href="/review" class="btn btn-yellow">GO TO INTEL REVIEW</a>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if archived_drafts %}
+  <div style="margin-top:32px;">
+    <div onclick="toggleDraftArchive()"
+         style="display:flex;align-items:center;gap:10px;padding:10px 18px;
+                background:var(--card-bg);border:1px solid var(--card-border);
+                border-radius:6px;cursor:pointer;user-select:none;">
+      <span id="draft-archive-arrow" style="font-family:'Orbitron',sans-serif;font-size:9px;
+            color:var(--text-dim);letter-spacing:2px;">
+        &#9658; ARCHIVE &#8212; {{ archived_drafts|length }} SCHEDULED &amp; PUBLISHED
+      </span>
+      <span id="draft-archive-hint" style="font-size:10px;color:var(--text-dim);margin-left:auto;">EXPAND</span>
+    </div>
+    <div id="draft-archive-body" style="display:none;margin-top:8px;">
+      <div class="drafts-layout">
+        {% for d in archived_drafts %}
+        <div class="draft-card {{ 'published' if d.published else 'unpublished' }}" style="opacity:0.5;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div class="draft-filename">{{ d.filename }}</div>
+            {% if d.published %}
+              <span class="badge badge-pub">PUBLISHED {{ d.published_at }}</span>
+            {% else %}
+              <span class="badge badge-hold">SCHEDULED {{ d.scheduled_for }}</span>
+            {% endif %}
+          </div>
+          <div class="draft-title">{{ d.title }}</div>
+          {% if d.has_real_content %}
+            <div class="draft-preview">{{ d.content[:300] }}</div>
+          {% endif %}
+          <div class="draft-actions" style="margin-top:12px;">
+            {% if d.has_real_content %}
+            <button class="btn btn-dim" onclick="copyDraft('{{ d.filename }}', 'arc{{ loop.index }}')">COPY POST</button>
+            {% endif %}
+            <a href="/post-log" class="btn btn-dim" style="font-size:10px;">VIEW IN LOG &#8594;</a>
+          </div>
+          <div id="draft-data-arc{{ loop.index }}" style="display:none">{{ d.content or '' }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Floating merge action bar -->
+<div class="merge-bar" id="merge-bar">
+  <span class="merge-count" id="merge-count-label">0 / 2 SELECTED</span>
+  <button class="btn btn-blue" id="merge-go-btn" onclick="openMergeModal()" disabled>MERGE DRAFTS &#8594;</button>
+  <button class="btn btn-dim" onclick="exitMergeMode()" style="font-size:10px;padding:6px 10px;">CANCEL</button>
+</div>
+
+<!-- Prompt modal -->
+<div class="modal-overlay" id="prompt-modal" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>PROMPT FILE</h3>
+    <div class="prompt-modal-content" id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-yellow" onclick="copyModalContent()">COPY PROMPT</button>
+      <button class="btn btn-dim"    onclick="closeModal()">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Merge modal -->
+<div class="modal-overlay" id="merge-modal" onclick="closeMergeModal()">
+  <div class="modal merge-modal-wide" onclick="event.stopPropagation()">
+    <h3>MERGE DRAFTS</h3>
+
+    <!-- Two-panel preview -->
+    <div class="merge-panels">
+      <div class="merge-panel-wrap">
+        <div class="merge-panel-label" id="merge-label-a">DRAFT A</div>
+        <div id="merge-url-a" style="font-size:9px;color:var(--text-dim);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+        <div class="merge-panel-body" id="merge-body-a"></div>
+      </div>
+      <div class="merge-panel-wrap">
+        <div class="merge-panel-label" id="merge-label-b">DRAFT B</div>
+        <div id="merge-url-b" style="font-size:9px;color:var(--text-dim);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+        <div class="merge-panel-body" id="merge-body-b"></div>
+      </div>
+    </div>
+
+    <!-- Merge editor -->
+    <div class="merge-editor-label">MERGED RESULT &#8212; EDIT BELOW</div>
+    <textarea class="merge-editor" id="merge-editor"
+      placeholder="Edit the merged post here..."></textarea>
+
+    <!-- Actions -->
+    <div class="merge-footer">
+      <button class="btn btn-yellow" onclick="saveMergedDraft()">SAVE MERGED DRAFT</button>
+      <button class="btn btn-dim"    onclick="copyMergePrompt()">COPY PROMPT</button>
+      <button class="btn btn-blue"   id="ai-merge-btn" onclick="mergeWithAI()">AI MERGE (LOCAL)</button>
+      <button class="btn btn-dim"    onclick="closeMergeModal()">CANCEL</button>
+      <label class="merge-del-label">
+        <input type="checkbox" id="merge-del-check">
+        DELETE ORIGINALS
+      </label>
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:var(--text-dim);">
+      Tip: Click <strong>COPY PROMPT</strong> to paste both drafts into Claude.ai, then paste the result back into the editor above.
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let modalContent = '';
+
+// ── Existing functions ──────────────────────────────────────────────────────
+
+function togglePaste(idx) {
+  const ta = document.getElementById(`paste-${idx}`);
+  const acts = document.getElementById(`paste-actions-${idx}`);
+  const showing = ta.classList.contains('show');
+  ta.classList.toggle('show', !showing);
+  acts.style.display = showing ? 'none' : 'block';
+  if (!showing) ta.focus();
+}
+
+function copyPrompt(idx) {
+  const text = document.getElementById(`prompt-data-${idx}`).textContent;
+  copyText(text, 'Prompt');
+}
+
+function copyDraft(filename, idx) {
+  const text = document.getElementById(`draft-data-${idx}`).textContent;
+  copyText(text, 'Draft');
+}
+
+function showPrompt(idx) {
+  const text = document.getElementById(`prompt-data-${idx}`).textContent;
+  modalContent = text;
+  document.getElementById('modal-body').textContent = text;
+  document.getElementById('prompt-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('prompt-modal').classList.remove('open');
+}
+
+function copyModalContent() {
+  copyText(modalContent, 'Prompt');
+}
+
+async function saveDraft(filename, idx) {
+  const ta = document.getElementById(`paste-${idx}`);
+  const content = ta.value.trim();
+  if (!content) { toast('Nothing to save', 'err'); return; }
+  const res = await postJSON('/api/draft/save', { filename, content });
+  if (res.ok) {
+    toast('Draft saved — reload to see it');
+    setTimeout(() => location.reload(), 800);
+  } else {
+    toast('Save failed', 'err');
+  }
+}
+
+async function buildDrafts() {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'GENERATING...';
+  const out = document.getElementById('build-output');
+  out.style.display = 'block';
+  out.textContent = '// Running 04_draft.py...\n';
+  const res = await postJSON('/api/build-drafts', {});
+  out.textContent = res.output || '(no output)';
+  if (res.ok) {
+    toast('Prompt files generated — reload to see them');
+    btn.textContent = 'DONE — RELOAD PAGE';
+    btn.onclick = () => location.reload();
+    btn.disabled = false;
+  } else {
+    toast('Build failed', 'err');
+    btn.textContent = 'RETRY';
+    btn.disabled = false;
+  }
+}
+
+function toggleDraftArchive() {
+  const body  = document.getElementById('draft-archive-body');
+  const hint  = document.getElementById('draft-archive-hint');
+  const arrow = document.getElementById('draft-archive-arrow');
+  const open  = body.style.display !== 'none';
+  body.style.display  = open ? 'none' : 'block';
+  hint.textContent    = open ? 'EXPAND' : 'COLLAPSE';
+  arrow.textContent   = arrow.textContent.replace(/^[&#9658;&#9660;]/, open ? '►' : '▼');
+}
+
+let draftDelFile  = null;
+let draftDelTimer = null;
+
+async function deleteDraft(filename, articleUrl, idx) {
+  const btn = document.getElementById(`del-draft-${idx}`);
+  if (!btn) return;
+  if (draftDelFile !== filename) {
+    draftDelFile = filename;
+    btn.textContent = 'CONFIRM?';
+    btn.style.background   = 'rgba(255,68,68,0.12)';
+    btn.style.color        = 'var(--sw-red)';
+    btn.style.borderColor  = 'rgba(255,68,68,0.4)';
+    clearTimeout(draftDelTimer);
+    draftDelTimer = setTimeout(() => {
+      draftDelFile = null;
+      btn.textContent = 'DELETE';
+      btn.style.background  = '';
+      btn.style.color       = 'rgba(255,68,68,0.6)';
+      btn.style.borderColor = 'rgba(255,68,68,0.2)';
+    }, 3000);
+  } else {
+    clearTimeout(draftDelTimer);
+    draftDelFile = null;
+    btn.disabled = true;
+    btn.textContent = 'REMOVING...';
+    const res = await postJSON('/api/story/delete', { article_url: articleUrl });
+    if (res.ok) {
+      toast('Story removed from pipeline');
+      const card = document.getElementById(`card-${idx}`);
+      if (card) { card.style.transition = 'opacity 0.3s'; card.style.opacity = '0'; }
+      setTimeout(() => location.reload(), 400);
+    } else {
+      toast(res.error || 'Delete failed', 'err');
+      btn.disabled = false;
+      btn.textContent = 'DELETE';
+    }
+  }
+}
+
+// ── Merge mode ─────────────────────────────────────────────────────────────
+
+let mergeActive   = false;
+let mergeSelected = [];  // array of idx strings
+let mergeFilenameA = '', mergeFilenameB = '';
+let mergeTitleA = '', mergeTitleB = '';
+let mergeBodyA = '', mergeBodyB = '';
+let mergeUrlA = '', mergeUrlB = '';
+let mergeArticleTitleA = '', mergeArticleTitleB = '';
+
+function toggleMergeMode() {
+  mergeActive ? exitMergeMode() : enterMergeMode();
+}
+
+function enterMergeMode() {
+  mergeActive = true;
+  mergeSelected = [];
+  document.getElementById('drafts-layout').classList.add('merge-mode');
+  document.getElementById('merge-mode-btn').classList.add('active');
+  document.getElementById('merge-mode-btn').textContent = 'CANCEL MERGE';
+  updateMergeBar();
+}
+
+function exitMergeMode() {
+  mergeActive = false;
+  mergeSelected = [];
+  const layout = document.getElementById('drafts-layout');
+  if (layout) layout.classList.remove('merge-mode');
+  document.querySelectorAll('.draft-card').forEach(c => c.classList.remove('merge-selected'));
+  document.querySelectorAll('.merge-chk').forEach(c => c.classList.remove('sel'));
+  const btn = document.getElementById('merge-mode-btn');
+  if (btn) { btn.classList.remove('active'); btn.textContent = 'MERGE'; }
+  document.getElementById('merge-bar').classList.remove('show');
+}
+
+function cardClickInMergeMode(idx, e) {
+  if (!mergeActive) return;
+  const card = document.getElementById(`card-${idx}`);
+  if (!card || card.dataset.mergeable !== 'true') return;
+  if (e.target.closest('button, textarea, input, a, .merge-chk')) return;
+  toggleMergeSelect(idx, e);
+}
+
+function toggleMergeSelect(idx, e) {
+  e.stopPropagation();
+  const card = document.getElementById(`card-${idx}`);
+  if (!card || card.dataset.mergeable !== 'true') return;
+
+  const chk = document.getElementById(`mchk-${idx}`);
+  const idxStr = String(idx);
+  const already = mergeSelected.indexOf(idxStr);
+
+  if (already >= 0) {
+    mergeSelected.splice(already, 1);
+    card.classList.remove('merge-selected');
+    chk.classList.remove('sel');
+    chk.textContent = '';
+  } else {
+    if (mergeSelected.length >= 2) {
+      toast('Select exactly 2 drafts to merge', 'err');
+      return;
+    }
+    mergeSelected.push(idxStr);
+    card.classList.add('merge-selected');
+    chk.classList.add('sel');
+    chk.textContent = mergeSelected.length === 1 ? 'A' : 'B';
+  }
+  updateMergeBar();
+}
+
+function updateMergeBar() {
+  const bar = document.getElementById('merge-bar');
+  const label = document.getElementById('merge-count-label');
+  const goBtn = document.getElementById('merge-go-btn');
+  const n = mergeSelected.length;
+  label.textContent = `${n} / 2 SELECTED`;
+  goBtn.disabled = n !== 2;
+  bar.classList.toggle('show', mergeActive);
+}
+
+async function openMergeModal() {
+  if (mergeSelected.length !== 2) return;
+
+  const [idxA, idxB] = mergeSelected;
+  const cardA = document.getElementById(`card-${idxA}`);
+  const cardB = document.getElementById(`card-${idxB}`);
+  mergeFilenameA = cardA.dataset.filename;
+  mergeFilenameB = cardB.dataset.filename;
+  mergeTitleA    = cardA.dataset.title;
+  mergeTitleB    = cardB.dataset.title;
+
+  document.getElementById('merge-label-a').textContent = `A — ${mergeTitleA.substring(0, 50)}`;
+  document.getElementById('merge-label-b').textContent = `B — ${mergeTitleB.substring(0, 50)}`;
+  document.getElementById('merge-body-a').textContent  = 'Loading...';
+  document.getElementById('merge-body-b').textContent  = 'Loading...';
+  document.getElementById('merge-editor').value        = '';
+  document.getElementById('merge-modal').classList.add('open');
+
+  try {
+    const [rA, rB] = await Promise.all([
+      fetch(`/api/draft-content/${encodeURIComponent(mergeFilenameA)}`).then(r => r.json()),
+      fetch(`/api/draft-content/${encodeURIComponent(mergeFilenameB)}`).then(r => r.json()),
+    ]);
+    mergeBodyA = rA.body || rA.content || '';
+    mergeBodyB = rB.body || rB.content || '';
+    mergeUrlA  = rA.article_url   || '';
+    mergeUrlB  = rB.article_url   || '';
+    mergeArticleTitleA = rA.article_title || '';
+    mergeArticleTitleB = rB.article_title || '';
+    document.getElementById('merge-body-a').textContent = mergeBodyA;
+    document.getElementById('merge-body-b').textContent = mergeBodyB;
+    document.getElementById('merge-url-a').textContent = mergeUrlA;
+    document.getElementById('merge-url-b').textContent = mergeUrlB;
+    let sourcesSection = '';
+    if (mergeUrlA || mergeUrlB) {
+      sourcesSection = '\n\nSources:';
+      if (mergeUrlA) sourcesSection += `\n- ${mergeArticleTitleA || 'Source A'}: ${mergeUrlA}`;
+      if (mergeUrlB) sourcesSection += `\n- ${mergeArticleTitleB || 'Source B'}: ${mergeUrlB}`;
+    }
+    document.getElementById('merge-editor').value = mergeBodyA + '\n\n---\n\n' + mergeBodyB + sourcesSection;
+  } catch(e) {
+    toast('Failed to load draft content', 'err');
+  }
+}
+
+function closeMergeModal() {
+  document.getElementById('merge-modal').classList.remove('open');
+}
+
+function copyMergePrompt() {
+  let sourcesInstruction = '';
+  if (mergeUrlA || mergeUrlB) {
+    sourcesInstruction = '\n\nSource articles — include both links at the end of the merged post under "Sources:":\n';
+    if (mergeUrlA) sourcesInstruction += `- ${mergeArticleTitleA || 'Source A'}: ${mergeUrlA}\n`;
+    if (mergeUrlB) sourcesInstruction += `- ${mergeArticleTitleB || 'Source B'}: ${mergeUrlB}\n`;
+  }
+  const prompt =
+    `Merge these two LinkedIn posts into one stronger post.\n\n` +
+    `Rules:\n` +
+    `- Output ONLY the merged post. No intro, no explanation.\n` +
+    `- Keep the best hook from either post.\n` +
+    `- Combine the strongest points without repetition.\n` +
+    `- Target 900–1,200 characters.\n` +
+    `- First person. Short paragraphs. Direct, specific, no fluff.\n` +
+    `- No buzzwords, no hype.\n` +
+    (sourcesInstruction ? `- End with a "Sources:" section listing both article links.\n` : '') +
+    `\nPOST A:\n${mergeBodyA}\n\n` +
+    `POST B:\n${mergeBodyB}\n` +
+    sourcesInstruction +
+    `\nOutput only the merged post.`;
+  copyText(prompt, 'Merge prompt');
+  toast('Prompt copied — paste into Claude.ai, then paste the response into the editor above');
+}
+
+async function mergeWithAI() {
+  const btn = document.getElementById('ai-merge-btn');
+  btn.disabled = true;
+  btn.textContent = 'MERGING...';
+  try {
+    const res = await postJSON('/api/draft/merge-ai', {
+      content_a: mergeBodyA,
+      content_b: mergeBodyB,
+    });
+    if (res.ok && res.content) {
+      document.getElementById('merge-editor').value = res.content;
+      toast('AI merge complete — review the result and save');
+    } else {
+      toast(res.error || 'AI merge failed', 'err');
+    }
+  } catch(e) {
+    toast('AI merge failed', 'err');
+  }
+  btn.disabled = false;
+  btn.textContent = 'AI MERGE (LOCAL)';
+}
+
+async function saveMergedDraft() {
+  const content = document.getElementById('merge-editor').value.trim();
+  if (!content) { toast('Nothing to save', 'err'); return; }
+
+  const deleteOriginals = document.getElementById('merge-del-check').checked;
+  const title = mergeTitleA + ' + ' + mergeTitleB;
+
+  const res = await postJSON('/api/draft/merge', {
+    filename_a: mergeFilenameA,
+    filename_b: mergeFilenameB,
+    merged_content: content,
+    delete_originals: deleteOriginals,
+    title: title,
+  });
+
+  if (res.ok) {
+    toast('Merged draft saved');
+    closeMergeModal();
+    exitMergeMode();
+    setTimeout(() => location.reload(), 700);
+  } else {
+    toast(res.error || 'Save failed', 'err');
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('merge-modal').classList.contains('open')) {
+      closeMergeModal();
+    } else if (mergeActive) {
+      exitMergeMode();
+    }
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{
+  "local_model": {
+    "url": "http://192.168.1.233:11434/api/chat",
+    "model": "qwen2.5:7b",
+    "timeout": 60
+  },
+  "pipeline": {
+    "max_articles": 200,
+    "freshness_hours": 72
+  },
+  "content_radar_config": "C:/Users/Prome/OneDrive/Documents/Joe/content-radar/config.yaml"
+}

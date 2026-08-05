@@ -1,0 +1,184 @@
+{% extends 'layout.html' %}
+{% set active = 'fetch' %}
+{% set step = 1 %}
+{% block title %}REBEL INTEL — FETCH ARTICLES{% endblock %}
+{% block step_hint %}Pull fresh articles from 26 RSS feeds, ranked by keyword relevance and freshness.{% endblock %}
+
+{% block extra_style %}
+.scan-panel { max-width: 760px; margin: 0 auto; }
+.scan-btn-wrap { text-align: center; margin: 32px 0; }
+.scan-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 15px; font-weight: 700; letter-spacing: 4px;
+  padding: 18px 48px; border-radius: 6px; border: none;
+  cursor: pointer; transition: all 0.3s;
+  background: var(--sw-yellow); color: #000;
+}
+.scan-btn:hover:not(:disabled) {
+  box-shadow: 0 0 40px rgba(255,232,26,0.4); transform: scale(1.02);
+}
+.scan-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.scan-btn.scanning {
+  background: var(--card-border); color: var(--sw-yellow);
+  border: 1px solid var(--sw-yellow);
+  animation: pulse-border 1.5s ease-in-out infinite;
+}
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 10px rgba(255,232,26,0.15); }
+  50%       { box-shadow: 0 0 28px rgba(255,232,26,0.4); }
+}
+#output-box {
+  display: none; background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 6px; padding: 20px; font-size: 12px; line-height: 1.8;
+  white-space: pre-wrap; word-break: break-word;
+  color: var(--text-sec); max-height: 360px; overflow-y: auto;
+}
+#output-box .line-ok    { color: var(--sw-green); }
+#output-box .line-warn  { color: var(--sw-orange); }
+#output-box .line-err   { color: var(--sw-red); }
+#output-box .line-theme { color: var(--sw-blue); }
+.result-stat {
+  flex: 1; background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 6px; padding: 16px; text-align: center;
+}
+.result-stat .n {
+  font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900;
+  color: var(--sw-yellow);
+}
+.result-stat .lbl { font-size: 10px; color: var(--text-sec); letter-spacing: 1.5px; margin-top: 4px; }
+.theme-chip {
+  display: inline-block; margin: 4px;
+  background: rgba(79,195,247,0.07); border: 1px solid rgba(79,195,247,0.2);
+  border-radius: 20px; padding: 4px 14px;
+  font-size: 11px; color: var(--sw-blue);
+  font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
+}
+.next-step-box {
+  text-align: center; margin-top: 28px; padding: 20px;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 6px;
+}
+.next-step-box .label {
+  font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 2px;
+  color: var(--text-dim); margin-bottom: 8px;
+}
+.next-step-box .desc {
+  font-size: 12px; color: var(--text-sec); margin-bottom: 16px; line-height: 1.6;
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div style="margin-bottom: 24px;">
+    <div class="page-title">FETCH ARTICLES</div>
+    <div class="page-subtitle">STEP 1 OF 4 — PULL ARTICLES FROM 26 FEEDS</div>
+  </div>
+
+  <div class="scan-panel">
+    <div class="card" style="text-align:center; padding: 40px 24px;">
+      <div style="font-size:13px; color:var(--text-sec); margin-bottom:8px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">
+        26 FEEDS READY
+      </div>
+      <div style="font-size:12px; color:var(--text-dim); margin-bottom: 32px; line-height:1.8;">
+        Pulls from 26 RSS feeds · Scores by keyword relevance · Penalizes articles older than 48h<br>
+        Keeps top 200 articles. Takes about 30–60 seconds.
+      </div>
+      <div class="scan-btn-wrap">
+        <button class="scan-btn" id="scan-btn" onclick="startFetch()">
+          FETCH ARTICLES
+        </button>
+      </div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:4px; letter-spacing:1px;">
+        AI · TECH · LEADERSHIP · ARCHITECTURE · POLICY · EDUCATION
+      </div>
+    </div>
+
+    <div id="output-box" class="mt-16"></div>
+
+    <div class="flex gap-16 mt-16" id="result-summary" style="display:none!important;">
+      <div class="result-stat">
+        <div class="n" id="res-count">—</div>
+        <div class="lbl">ARTICLES SAVED</div>
+      </div>
+    </div>
+
+    <div class="card mt-16" id="themes-result" style="display:none;">
+      <h2>Trending Keywords</h2>
+      <div id="themes-chips"></div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:8px;">
+        Keywords appearing 3+ times in the last 7 days across your feeds.
+      </div>
+    </div>
+
+    <div class="next-step-box" id="goto-review" style="display:none;">
+      <div class="label">NEXT STEP</div>
+      <div class="desc">
+        Articles are saved and ranked. Go to <strong>Review Articles</strong> to read them,
+        get an AI angle suggestion, and mark each one as <em>Draft</em>, <em>Hold</em>, or <em>Skip</em>.
+      </div>
+      <a href="/review" class="btn btn-yellow" style="font-size:13px; padding:14px 36px;">
+        REVIEW ARTICLES →
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function startFetch() {
+  const btn = document.getElementById('scan-btn');
+  const box = document.getElementById('output-box');
+  btn.disabled = true;
+  btn.textContent = 'FETCHING...';
+  btn.classList.add('scanning');
+  box.style.display = 'block';
+  box.innerHTML = '<span class="line-ok">// Starting article fetch...</span>\n';
+
+  try {
+    const res = await fetch('/api/fetch', { method: 'POST' });
+    const data = await res.json();
+
+    const lines = (data.output || '').split('\n');
+    box.innerHTML = lines.map(line => {
+      if (line.includes('WARNING') || line.includes('Warning')) return `<span class="line-warn">${esc(line)}</span>`;
+      if (line.includes('ERROR')   || line.includes('error'))   return `<span class="line-err">${esc(line)}</span>`;
+      if (line.includes('Rising')  || line.startsWith('  *'))   return `<span class="line-theme">${esc(line)}</span>`;
+      if (line.includes('Scanned') || line.includes('saved') || line.includes('Done')) return `<span class="line-ok">${esc(line)}</span>`;
+      return `<span>${esc(line)}</span>`;
+    }).join('\n');
+
+    if (data.ok) {
+      document.getElementById('res-count').textContent = data.article_count;
+      const rs = document.getElementById('result-summary');
+      rs.style.display = 'flex'; rs.style.removeProperty('display'); rs.style.display = 'flex';
+
+      if (data.rising && data.rising.length) {
+        document.getElementById('themes-chips').innerHTML = data.rising.map(t =>
+          `<span class="theme-chip">${esc(t.keyword)} <strong>${t.count}×</strong></span>`
+        ).join('');
+        document.getElementById('themes-result').style.display = 'block';
+      }
+
+      document.getElementById('goto-review').style.display = 'block';
+      btn.textContent = 'FETCH COMPLETE';
+      toast(data.article_count + ' articles fetched and saved');
+    } else {
+      btn.textContent = 'FETCH FAILED — RETRY';
+      btn.disabled = false;
+      toast('Fetch failed — see output above', 'err');
+    }
+  } catch (e) {
+    box.innerHTML += `\n<span class="line-err">// Error: ${esc(String(e))}</span>`;
+    btn.textContent = 'FETCH FAILED — RETRY';
+    btn.disabled = false;
+    toast('Fetch failed', 'err');
+  }
+  btn.classList.remove('scanning');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+{% endblock %}

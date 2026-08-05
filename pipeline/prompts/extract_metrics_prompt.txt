@@ -1,0 +1,13 @@
+Look at this LinkedIn post screenshot. Extract the visible metrics and return JSON only.
+
+Required output:
+{
+  "impressions": <number shown under the post, or null if not visible>,
+  "reactions": <total reaction count (likes, celebrates, etc.), or null>,
+  "comments": <comment count, or null>,
+  "reposts": <repost count, or null>,
+  "post_date": "<YYYY-MM-DD if visible, or null>",
+  "first_line": "<first line of the post text, copied exactly>"
+}
+
+Return the JSON object only. No explanation, no markdown.

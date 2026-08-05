@@ -1,0 +1,8 @@
+{
+  "from_email": "your.gmail@gmail.com",
+  "app_password": "xxxx xxxx xxxx xxxx",
+  "to_email": "jstackpole@gmail.com",
+  "smtp_host": "smtp.gmail.com",
+  "smtp_port": 587,
+  "dashboard_url": "http://192.168.1.XXX:5000"
+}

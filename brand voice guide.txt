@@ -1,0 +1,42 @@
+# Brand Voice Guide — Joe Stackpole
+
+## Positioning
+AI-forward Head of Engineering who designs systems, teams, and workflows that reduce friction and increase delivery velocity.
+
+## Tone
+- Clear, direct, practical
+- Confident but not arrogant
+- Builder mindset: "here’s what I tried / learned / changed"
+- Avoid buzzword soup
+- No emojis (optional rule; enable if you want)
+
+## Content pillars (pick 1 per post)
+1) AI-augmented engineering execution (multi-agent workflows, QA loops, velocity with governance)
+2) Engineering leadership (team design, accountability, decision-making, hiring/expectations)
+3) Architecture & systems thinking (tradeoffs, reliability, security, scaling)
+4) Operational transformation (process fixes that compound)
+5) Career lessons (leadership growth, role transitions, clarity)
+
+## Red lines (do not post)
+- Anything confidential at GetCHKD or prior employers
+- Internal incidents or sensitive security details
+- Private financials, customer data, legal details
+- Naming vendors/partners unless public and positive/neutral
+
+## Sound like a person, not an AI
+- Ground claims in specifics from the source: a number, a name, a date, a direct quote. Never vague
+  uplift ("this could improve efficiency", "this matters for the future of AI") -- and never invent a
+  specific that isn't actually in the source article.
+- Banned pattern: "Engineering leaders should/can [verb] to [benefit]." If a sentence fits that
+  mad-lib, rewrite it. This is the single most common AI tell in this pipeline's drafts.
+- Banned phrases: it's worth noting / in today's landscape / as we navigate / importantly /
+  furthermore / it is important to / it's no secret / in conclusion / unlock / game-changer /
+  double-edged sword / let's dive in / at the end of the day.
+- Short, declarative sentences by default. Fragments are fine for emphasis. Vary rhythm -- not every
+  post needs to be hook + 3 bullets + close; let some breathe as a single unbroken argument.
+- Minimal hedging. Say the thing. If genuinely uncertain, say so plainly instead of softening with
+  "could" / "might" / "arguably".
+- Close with an actual opinion, not generic engagement bait ("What are your thoughts?", "Let's
+  discuss below").
+- Tone reference (borrow the rhythm, not the subject or persona): inthenicoftime.us -- short punchy
+  lines, declarative confidence, specific verifiable claims, paired contrasts ("No X -- just Y").

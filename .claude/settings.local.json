@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/c/Users/Prome/**)",
+      "Read(//c/Users/Prome/Downloads/**)",
+      "Bash(unzip -l content-radar.zip)",
+      "Bash(unzip -p content-radar.zip content-radar/requirements.txt)",
+      "Bash(unzip -p content-radar.zip content-radar/config.yaml)",
+      "Bash(unzip -p content-radar.zip content-radar/CLAUDE.md)",
+      "Bash(unzip -q content-radar.zip -d /c/Users/Prome/OneDrive/Documents/Joe/)",
+      "Read(//c/Users/Prome/OneDrive/Documents/Joe/Linkedin-Chatgpt/**)",
+      "Bash(pip show *)",
+      "Bash(pip3 show *)",
+      "Bash(.venv/Scripts/pip install *)",
+      "Bash(.venv/Scripts/python -c \"import pytest; print\\(pytest.__version__\\)\")",
+      "Bash(.venv/Scripts/python -m pytest tests/test_migration.py -v --tb=short)",
+      "Bash(.venv/Scripts/python -m pytest tests/ -v --tb=short)",
+      "Bash(.venv/Scripts/python -m pytest tests/test_scoring.py -v --tb=short)",
+      "Bash(.venv/Scripts/python -m pytest tests/test_storage.py -v --tb=short)",
+      "Bash(ANTHROPIC_API_KEY=\"sk-ant-test\" .venv/Scripts/python radar.py review)",
+      "Bash(.venv/Scripts/python -m pytest tests/ -v)",
+      "Bash(python -m pytest tests/test_storage.py -v --tb=short)",
+      "Bash(ANTHROPIC_API_KEY=\"sk-ant-test\" python radar.py)",
+      "Bash(python -m pytest tests/test_suggester.py -v --tb=short)",
+      "Bash(python -c ' *)",
+      "Bash(python -W error -c ' *)",
+      "PowerShell(Get-ChildItem -Recurse -Path \"C:\\\\Users\\\\Prome\\\\OneDrive\\\\Documents\\\\Joe\\\\Local DM\\\\ai_dm\" | Where-Object { -not $_.PSIsContainer } | Select-Object -ExpandProperty FullName | ForEach-Object { $_.Replace\\(\"C:\\\\Users\\\\Prome\\\\OneDrive\\\\Documents\\\\Joe\\\\Local DM\\\\ai_dm\\\\\", \"\"\\) } | Sort-Object)",
+      "Bash(pip --version)",
+      "Bash(python -c \"from ai_dm.core.primitives import Actor; print\\('Package import OK'\\)\")",
+      "Bash(python -c \"import ai_dm\")"
+    ]
+  }
+}

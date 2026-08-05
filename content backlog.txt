@@ -1,0 +1,13 @@
+# Content Backlog
+
+## High-priority (next 2 weeks)
+- [ ] Topic:
+  Pillar:
+  Core point:
+  Anecdote/source:
+
+## Later
+- [ ] Topic:
+  Pillar:
+  Core point:
+  Anecdote/source:

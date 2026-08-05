@@ -1,0 +1,120 @@
+headline:
+Joseph Stackpole
+He/Him
+
+Head of Engineering | Enterprise Architecture | AI-Driven Engineering Systems | Cloud-Native Strategy | Operational Transformation
+
+Chattanooga, Tennessee, United States
+
+
+
+About:
+
+
+I’m an engineering leader focused on building resilient, scalable, and intelligent systems that help organizations operate with clarity and confidence.
+
+My background began in IT infrastructure and operations, where I led cloud migrations, enterprise system upgrades, and security modernization efforts. Over time, my focus expanded from keeping systems running to redesigning how they run — improving governance, reducing operational bottlenecks, and building processes that scale.
+
+I’ve led cloud migrations to Microsoft 365, managed multi-million-dollar operational budgets, implemented formal change management programs, authored corporate IT security policies, and modernized ERP and CRM integrations. I specialize in translating business friction into structured, documented, and durable systems.
+
+Today, my work centers on engineering leadership and AI-augmented workflows. I design environments where automation, security, and operational clarity are built into the foundation — not layered on as an afterthought. I believe systems should be centrally designed, transparently documented, and distributed in execution so teams can move quickly without introducing fragility.
+
+Colleagues rely on me to bring order to complexity. I bring a steady hand during incidents, but more importantly, I design environments where fewer incidents occur in the first place.
+
+I’m motivated by building teams, processes, and platforms that reduce chaos and increase leverage. Technology should remove friction — not create it.
+
+Top skills
+
+Engineering Leadership • AI Workflow Design • IT Strategy • Cloud-Native Architecture • Enterprise Architecture
+
+
+Experience(high level):
+
+
+
+Self Employed logo
+AI Product Workflow Architect
+
+Self Employed · Freelance
+
+Dec 2025 - Present · 3 mos
+
+Remote
+
+Designing and operating AI-augmented product development systems that accelerate delivery and reduce operational friction across engineering teams.
+
+Architect and orchestrate multi-agent AI workflows supporting sprint planning, backlog refinement, structured user story generation, repository validation, QA feedback loops, and deployment coordination. Translate stakeholder objectives into systematized execution pipelines that integrate human oversight with AI-assisted implementation.
+
+Focused on bridging product strategy and engineering execution through structured automation, improving velocity while maintaining governance and quality standards.… more
+
+Paslay Group logo
+IT Manager
+
+Paslay Group · Full-time
+
+Apr 2024 - Dec 2025 · 1 yr 9 mos
+
+United States · Remote
+
+I managed IT operations for a rapidly expanding 60-employee distributed workforce, leading technology standardization, infrastructure development, and
+digital transformation with a $150K annual budget.
+
+Built complete IT infrastructure for new office locations, establishing scalable and secure systems supporting organizational growth.
+
+Standardized hardware procurement, reducing support overhead and improving reliability.
+
+Created Power BI dashboards to enhance operational visibility and data-driven decision-making.
+
+Led software selection and implementation planning for Deltek and Greenhouse, modernizing financial and HR workflows.
+
+Developed multi-year IT strategy aligned to business objectives and operational needs. … more
+
+ Information Security, Operations and +12 skills
+
+Xpress Global Systems (XGS) logo
+Business Analyst
+
+Xpress Global Systems (XGS) · Full-time
+
+Nov 2021 - Apr 2024 · 2 yrs 6 mos
+
+Chattanooga, Tennessee, United States
+
+ Digital Transformation, Data Management and +10 skills
+
+IT Project Associate
+
+Lodge Manufacturing · Full-time
+
+Dec 2017 - Nov 2021 · 4 yrs
+
+South Pittsburg
+
+Provide IT and Systems expertise and advice to senior management to support business decision-making.
+•	Research and suggest new technologies to enhance system performance, increase and facilitate communication, and provide cost-saving measures for major IT solutions. 
+•	Serve as a Vendor Liaison, coordinate developers to build and implement the best technological solutions, conduct quality checks and resolve issues throughout the projects. 
+•	Develop project plans and roadmaps, track and review projects to assess progress, and make adjustments to stay within technical deliverables, timelines, and budgets.
+•	Conduct and oversee annual IT security audits; administer additional IT security measures; ensure Racks and Network switches are installed for Security Cameras, Scales, and IoT devices.
+•	Integrate and manage multiple systems to reconcile the needs across different departments and teams to align best practices and processes across the organization.
+•	Oversaw the administration and support of Sage 500 including Windows server upgrade and supported the design, documentation, and integration of CRM solutions.
+•	Led the upgrade of the company’s main phone system from a copper PBX to Sip trunks (allowing VoIP) and reduced costs by $1000 a month.… more
+
+ Operations, Microsoft 365 and +14 skills
+
+IT Consultant
+
+Promethian IT Consulting · Self-employed
+
+Aug 2012 - Aug 2017 · 5 yrs 1 mo
+
+Dallas-Fort Worth Metroplex
+
+Identified innovative solutions to offer the best options and meet the technical requirements of B2B customers.  
+•	Established rapport and develop customer relations to assess technological and business needs and provide appropriate service. 
+•	Procured best practices through consultation across different industries to streamline IT processes and work out feasible solutions. 
+•	Addressed and resolved multiple software issues using analysis and hands-on approach. 
+•	Designed and executed the installation of a trading desk through collaboration with management, traders, and vendors.… more
+
+ Operations, Vendor Management and +3 skills
+
+

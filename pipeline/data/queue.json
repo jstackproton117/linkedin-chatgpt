@@ -1,0 +1,917 @@
+[
+  {
+    "url": "https://arstechnica.com/gadgets/2026/06/openai-and-broadcom-announce-chip-designed-for-llm-inference-at-scale/",
+    "title": "OpenAI and Broadcom announce chip designed for LLM inference at scale",
+    "source": "Ars Technica",
+    "published": "2026-06-24T22:28:18+00:00",
+    "snippet": "OpenAI, the company behind ChatGPT and Codex and the models those tools use, and Broadcom, an established silicon supplier, have announced a new chip, called Jalape\u00f1o, designed specifically for large language model inference in data centers. The companies intend to deploy the chip at large data centers and claim this is just the first generation in a long-term project that will see chips refined o",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 60.0,
+    "keywords_matched": [
+      "LLM",
+      "large language model",
+      "OpenAI"
+    ],
+    "angle": "Engineering Leaders: Join OpenAI and Broadcom in revolutionizing AI with their new Jalape\u00f1o chip designed for Large Language Model inference.",
+    "hook": "OpenAI, Broadcom announce new chip for scaling LLM capabilities",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T10:15:13.773074"
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/06/24/database-vendors-pitch-themselves-as-the-cure-for-runaway-ai-costs/5260126",
+    "title": "Database vendors pitch themselves as the cure for runaway AI costs",
+    "source": "The Register",
+    "published": "2026-06-24T12:15:00+02:00",
+    "snippet": "Irresistible force, meet immovable object. Tech leaders are under pressure to satisfy growing demand for AI while keeping a lid on costs. That is becoming harder as Anthropic, OpenAI, and GitHub shift some services away from flat-rate subscriptions toward usage-based billing. Database vendors claim they can help by cutting the number of calls made to AI models and handling the new workloads genera",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 60.0,
+    "keywords_matched": [
+      "OpenAI",
+      "Anthropic",
+      "AI model"
+    ],
+    "angle": "Engineering leaders should explore new database solutions to mitigate AI costs and ensure sustainable growth in AI applications.",
+    "hook": "Tech leaders face mounting pressure to curb rising AI costs while meeting increasing demand.",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:15:35.224586"
+  },
+  {
+    "url": "https://www.technologyreview.com/2026/06/22/1139424/three-things-to-watch-amid-anthropics-latest-feud-with-the-government/",
+    "title": "Three things to watch amid Anthropic\u2019s latest feud with the government",
+    "source": "MIT Technology Review - AI",
+    "published": "2026-06-22T18:00:00+00:00",
+    "snippet": "This story originally appeared in The Algorithm, our weekly newsletter on AI. To get stories like this in your inbox first, sign up here . For those of you enjoying your summer unaware of Anthropic\u2019s latest feud with the US government, here\u2019s a recap: In April the company said it had built an AI model called Mythos that was so good at working with code it could pose a global cybersecurity threat. ",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "Anthropic",
+      "AI model"
+    ],
+    "angle": "Engineering leaders should stay informed about Anthropic's disputes to better prepare for potential AI governance changes and maintain a strong reputation in the tech community.",
+    "hook": "Anthropic's latest government feud highlights the growing importance of ethical AI development.",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:15:51.944902"
+  },
+  {
+    "url": "https://www.theverge.com/ai-artificial-intelligence/956263/alex-bores-new-york-12th-district-congressional-primary-results",
+    "title": "The $27 million Al proxy war over Alex Bores ends in a draw",
+    "source": "The Verge - AI",
+    "published": "2026-06-24T13:25:00-04:00",
+    "snippet": "Alex Bores (D-NY) enters his watch party at The Freehand Hotel after conceding the congressional race to Micah Lasher who will replace Rep Jerry Nadler (D-NY) in NY's 12th Congressional District on June 23, 2026 in New York City. | Photo by Laura Brett/Getty Images. The expensive, $27 million political proxy war between Anthropic and OpenAI came to a draw last night when Alex Bores, a New York sta",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "OpenAI",
+      "Anthropic"
+    ],
+    "angle": "Engineering leaders can drive innovation and excellence by fostering an inclusive culture that celebrates diverse perspectives in product development.",
+    "hook": "Foster inclusivity for a more innovative and successful team",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:16:10.038169"
+  },
+  {
+    "url": "https://www.theverge.com/ai-artificial-intelligence/955939/openai-reveals-its-first-ai-processor-jalapeno",
+    "title": "OpenAI reveals its first AI processor: Jalape\u00f1o",
+    "source": "The Verge - AI",
+    "published": "2026-06-24T10:36:47-04:00",
+    "snippet": "OpenAI has just revealed a new \"intelligence processor\" chip for AI servers made in partnership with Broadcom. The chip, called Jalape\u00f1o, is designed to power current and future large language models, according to an announcement on Wednesday. Jalape\u00f1o is an ASIC (Application-Specific Integrated Circuit), meaning it's designed for a specific purpose: AI inference. With AI inference, models process",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "large language model",
+      "OpenAI"
+    ],
+    "angle": "Engineering leaders can lead the charge in integrating OpenAI's Jalape\u00f1o processor to enhance AI server performance and efficiency.",
+    "hook": "OpenAI unveils first AI processor: Jalape\u00f1o for language model support",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:16:31.136642"
+  },
+  {
+    "url": "https://openai.com/index/how-agents-are-transforming-work",
+    "title": "How agents are transforming work",
+    "source": "OpenAI Blog",
+    "published": "2026-06-25T02:00:00+00:00",
+    "snippet": "A new OpenAI research paper shows how AI agents are transforming work, enabling longer, more complex tasks and expanding productivity across roles.",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "AI agents",
+      "OpenAI"
+    ],
+    "angle": "Engineering Leaders Can Lead the Way in Harnessing AI to Streamline and Scale Workflows",
+    "hook": "AI agents revolutionize tasks, boosting productivity across all roles",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:16:41.797981"
+  },
+  {
+    "url": "https://openai.com/index/openai-broadcom-jalapeno-inference-chip",
+    "title": "OpenAI and Broadcom unveil LLM-optimized inference chip",
+    "source": "OpenAI Blog",
+    "published": "2026-06-24T06:00:00+00:00",
+    "snippet": "OpenAI and Broadcom introduce Jalape\u00f1o, a custom AI chip built for LLM inference to improve performance, efficiency, and scale across AI systems.",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "LLM",
+      "OpenAI"
+    ],
+    "angle": "Engineering leaders can stay ahead in AI by investing in chips like Jalape\u00f1o, which optimize LLM inference for superior performance and efficiency.",
+    "hook": "OpenAI and Broadcom unveil Jalape\u00f1o, a custom AI chip tailored for LLM inference.",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:16:52.644049"
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/06/24/openai-gets-chippy-with-broadcom/5261697",
+    "title": "OpenAI gets chippy with Broadcom",
+    "source": "The Register",
+    "published": "2026-06-24T20:24:07+02:00",
+    "snippet": "OpenAI and Broadcom have teamed up \u2013 with a little help from some of the former\u2019s AI models \u2013 to develop the frontier model lab\u2019s very first inference chip, dubbed Jalape\u00f1o, the companies announced in a press release on Wednesday. Details of the spicily named silicon are scarce in the announcement, with the company admitting that it\u2019s running engineering samples of Jalape\u00f1o in its lab \u201cat target f",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "OpenAI",
+      "AI model"
+    ],
+    "angle": "Engineering leaders can lead by integrating OpenAI's cutting-edge Jalape\u00f1o inference chip into their teams' projects to stay ahead in AI innovation.",
+    "hook": "OpenAI and Broadcom unveil first-of-its-kind inference chip for frontier model development.",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:17:03.551254"
+  },
+  {
+    "url": "https://www.fastcompany.com/91562049/one-fake-webpage-can-be-enough-to-trick-ai-shopping-recommendations?partner=rss&utm_source=rss&utm_medium=feed&utm_campaign=rss+fastcompany&utm_content=rss",
+    "title": "One fake web page can be enough to trick AI shopping recommendations",
+    "source": "Fast Company - Technology",
+    "published": "2026-06-23T10:00:00+00:00",
+    "snippet": "AI recommender systems are becoming an increasingly important part of how we shop. About 2% of all referrals to major shopping websites like Target and Walmart come from large language models , according to data.ai. But LLMs can be easily swayed, according to a new study by Minghao Luo and Liang Chen, published on the arXiv preprint server, which tested how easily search-augmented AI systems can b",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "LLM",
+      "large language model"
+    ],
+    "angle": "AI-powered shopping recommendations can be easily misled by just one fake web page, highlighting the need for robust security measures in AI systems.",
+    "hook": "AI recommender systems are increasingly influencing online shopping decisions.",
+    "status": "hold",
+    "reviewed_at": "2026-06-25T10:17:16.108652"
+  },
+  {
+    "url": "https://www.politico.com/news/2026/06/25/500-million-ai-jobs-push-launches-with-bipartisan-backing-00975439",
+    "title": "$500 million AI jobs push launches with bipartisan backing",
+    "source": "Politico - Technology",
+    "published": "2026-06-25T04:00:00+00:00",
+    "snippet": "A new bipartisan group will work with corporate donors like Anthropic, OpenAI, Amazon, Microsoft and Bank of America to retrain workers displaced by the AI boom.",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "OpenAI",
+      "Anthropic"
+    ],
+    "angle": "Engineering leaders can take the lead in championing AI job retraining to ensure a smooth transition and maintain industry relevance.",
+    "hook": "Invest in your team's future with targeted AI reskilling programs.",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:17:27.503093"
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/06/24/ai-coding-agents-could-soon-cost-more-than-the-developers-using-them/5260864",
+    "title": "AI coding agents could soon cost more than the developers using them",
+    "source": "The Register",
+    "published": "2026-06-24T15:04:00+02:00",
+    "snippet": "Gartner has slammed AI vendors' lack of transparency, saying developers are facing sharply increased costs from coding agents. Since the main AI coding agent vendors have shifted from seat-based licensing to consumption-based pricing, developer teams now face highly variable cost structures. Developer teams face an emerging problem of escalating costs, said Nitish Tyagi, senior principal analyst a",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI coding"
+    ],
+    "angle": "Engineering leaders should be concerned about rising costs from AI coding agents as developers face steep increases, according to Gartner's warning.",
+    "hook": "Gartner warns of soaring costs for AI coding agents",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:18:36.884291"
+  },
+  {
+    "url": "https://www.theregister.com/security/2026/06/24/london-cops-bring-live-facial-recognition-to-west-end/5261031",
+    "title": "London cops bring live facial recognition to West End",
+    "source": "The Register",
+    "published": "2026-06-24T13:45:00+02:00",
+    "snippet": "The Metropolitan Police Service (MPS) will start using static live facial recognition (LFR) cameras in London's West End and Soho by the end of this year following a six-month pilot in the south London borough of Croydon. Static LFR involves the police temporarily attaching cameras to lampposts or similar infrastructure, with the feeds monitored remotely and officers on the ground stopping people ",
+    "pillar": "Architecture & Systems Thinking",
+    "score": 20.0,
+    "keywords_matched": [
+      "infrastructure"
+    ],
+    "angle": "Leverage your engineering team's expertise to power live facial recognition cameras in London's West End, ensuring security and efficiency with cutting-edge technology.",
+    "hook": "The Metropolitan Police Service will start using static live facial recognition cameras in London\u2019s West End by the end of this year.",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T10:18:50.103549"
+  },
+  {
+    "url": "https://www.theregister.com/saas/2026/06/24/microsoft-rivals-line-up-to-tell-uk-watchdog-where-the-software-behemoth-hurt-them/5260875",
+    "title": "Microsoft rivals line up to tell UK watchdog where the software behemoth hurt them",
+    "source": "The Register",
+    "published": "2026-06-24T13:09:27+02:00",
+    "snippet": "The UK Competition and Markets Authority's (CMA) investigation into Microsoft's business software ecosystem has attracted a full range of comments from the unsurprising to the hyperlocal. The watchdog is looking at whether product bundling, the alleged embedding of in-house AI products like CoPilot, and licensing practices are limiting UK customer choice. Asking for submissions from customers and ",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "copilot"
+    ],
+    "angle": "Engineering leaders can lead by example and demonstrate how Microsoft's practices have negatively impacted their teams and innovation, inspiring change within their own organizations.",
+    "hook": "Microsoft practices hurt engineering teams' productivity and creativity",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T10:19:01.525490"
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/06/23/openai-codex-bombards-ssds-with-needless-write-operations-costing-millions/5260402",
+    "title": "OpenAI Codex bombards SSDs with needless write operations, costing millions",
+    "source": "The Register",
+    "published": "2026-06-23T22:50:00+02:00",
+    "snippet": "Modern SSDs have a limited number of write cycles before they expire. Now, OpenAI is scrambling to fix a flawed logging implementation that has been shortening the lives of Codex users' solid state drives (SSDs) with excessive data writes and lowering the devices' value by a significant amount of money. A bug report opened last week for the company's Codex coding agent warns of the consequences in",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "OpenAI"
+    ],
+    "angle": "Engineering leaders should consider highlighting the importance of data durability and efficiency in their posts to advise other tech professionals on best practices for optimizing SSD performance without compromising reliability.",
+    "hook": "Ensure your systems can handle the high write demands of AI models like Codex without degrading over time.",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T10:19:17.184019"
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/06/23/anthropic-reimagines-claude-in-slack-as-nosy-always-on-agentic-ai-coworker/5260422",
+    "title": "Anthropic reimagines Claude in Slack as nosy, always-on agentic AI coworker",
+    "source": "The Register",
+    "published": "2026-06-23T22:16:34+02:00",
+    "snippet": "Anthropic is killing off its existing Claude in Slack app in favor of an always-on agentic alternative dubbed Claude Tag that will listen and learn from everything it\u2019s given access to. Claude Tag can now join organizational Slack instances \u201cas a team member,\u201d according to Anthropic\u2019s announcement, where it will have access to whatever channels domain administrators decide upon, as well as the too",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "Anthropic"
+    ],
+    "angle": "Engineering leaders should be aware that Anthropic's new Claude Tag AI in Slack is designed to be always-on and nosy, potentially disrupting traditional work communication.",
+    "hook": "Claude Tag now listens and learns from everything",
+    "status": "hold",
+    "reviewed_at": "2026-06-25T10:19:40.102221"
+  },
+  {
+    "url": "https://www.theregister.com/devops/2026/06/23/aws-debuts-lambda-microvms-with-up-to-8-hours-runtime/5260035",
+    "title": "AWS debuts Lambda MicroVMs with up to 8 hours runtime",
+    "source": "The Register",
+    "published": "2026-06-23T13:37:00+02:00",
+    "snippet": "AWS has introduced Lambda MicroVMs, built on its Firecracker virtual machine monitor, which can run isolated Linux containers with runtimes of up to eight hours, in contrast to the 15-minute limit on containers in Lambda functions. MicroVMs form a new core feature of Lambda, the AWS serverless platform. Developers provide a Dockerfile defining a container along with application artifacts, and uplo",
+    "pillar": "Architecture & Systems Thinking",
+    "score": 20.0,
+    "keywords_matched": [
+      "serverless"
+    ],
+    "angle": "Engineering leaders can leverage AWS Lambda MicroVMs to enhance application performance and reduce costs by offloading resource-intensive tasks with up to eight hours runtime.",
+    "hook": "Leverage AWS Lambda MicroVMs for enhanced app perf and cost savings",
+    "status": "hold",
+    "reviewed_at": "2026-06-25T10:19:58.977567"
+  },
+  {
+    "url": "https://leaddev.com/ai/engineering-managers-ditch-cloud-ai-for-local-llms?utm_source=leaddev&utm_medium=RSS",
+    "title": "Engineering managers ditch cloud AI for local LLMs",
+    "source": "LeadDev",
+    "published": "2026-06-23T09:48:20+00:00",
+    "snippet": "Are local LLMs a third way forward? The post Engineering managers ditch cloud AI for local LLMs appeared first on LeadDev .",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "LLM"
+    ],
+    "angle": "Engineering leaders should consider adopting local large language models as an alternative to cloud-based AI solutions, given their potential for improved performance and reduced latency.",
+    "hook": "Local LLMs offer a viable path forward in the era of increasing data privacy concerns.",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:20:10.023778"
+  },
+  {
+    "url": "https://leaddev.com/ai/you-can-vibe-code-a-demo-you-cant-vibe-code-a-product?utm_source=leaddev&utm_medium=RSS",
+    "title": "You can vibe code a demo, but what about a product?",
+    "source": "LeadDev",
+    "published": "2026-06-23T07:00:14+00:00",
+    "snippet": "Lessons from shipping generative AI products to production. The post You can vibe code a demo, but what about a product? appeared first on LeadDev .",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "generative AI"
+    ],
+    "angle": "Engineering leaders, consider how you can help your teams navigate the complexities of bringing prototypes to full-scale production with practical tips from shipping generative AI products.",
+    "hook": "Shift from demos to sustainable product development for your team.",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T10:20:30.048162"
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/06/25/recovery-has-to-keep-up-with-ai/5260452",
+    "title": "Recovery has to keep up with AI",
+    "source": "The Register",
+    "published": "2026-06-25T17:00:00+02:00",
+    "snippet": "AI agents now write code and run tasks at machine speed, and sometimes those same agents delete the wrong thing. AI-enabled attackers can also use AI to find zero-day vulnerabilities more easily. Most recovery systems still run at human speed, which widens the gap between how fast data can be lost and how fast it can be restored. Eon was built to close that gap. In our latest Hot Seat, Tim Phillip",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI agents"
+    ],
+    "angle": "Engineering leaders should lead by example in prioritizing security and responsible AI use to counteract growing threats from AI-enabled attacks.",
+    "hook": "AI-driven attackers pose new risks, pushing engineering teams to prioritize security and ethical AI development.",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T11:53:13.040366"
+  },
+  {
+    "url": "https://www.technologyreview.com/2026/06/25/1137848/repositioning-retail-for-the-ai-era/",
+    "title": "Repositioning retail for the AI era",
+    "source": "MIT Technology Review - AI",
+    "published": "2026-06-25T14:22:59+00:00",
+    "snippet": "Artificial intelligence is rapidly reshaping retail, but not in the ways consumers might immediately notice. The biggest transformation may not be flashy virtual try-ons or chatbot shopping assistants, but in how decisions are made behind the scenes: how products surface in search results, how inventory moves through supply chains, how engineers ship code faster, and how retailers respond to custo",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "hold",
+    "reviewed_at": "2026-06-25T11:53:20.506153"
+  },
+  {
+    "url": "https://techcrunch.com/2026/06/25/netris-raises-15m-series-a-from-a16z-to-help-ai-neoclouds-go-live-faster/",
+    "title": "Netris raises $15M Series A from a16z to help AI neoclouds go live faster",
+    "source": "TechCrunch - AI",
+    "published": "2026-06-25T14:55:38+00:00",
+    "snippet": "Netris provides software that runs on network switches, and offers a platform that helps neocloud operators reduce the time it takes to go live.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T11:53:25.703122"
+  },
+  {
+    "url": "https://www.theverge.com/gadgets/956830/prime-day-macbook-deals-apple-price-hikes",
+    "title": "Get Macbooks at a Prime Day discount before Apple\u2019s new price hikes kick in",
+    "source": "The Verge",
+    "published": "2026-06-25T11:16:28-04:00",
+    "snippet": "Apple just raised the prices on Macs and iPads in response to the rising costs of memory chips , right in the middle of Amazon Prime Day . That means existing discounts (even small ones) on Apple laptops like the MacBook Neo, MacBook Air, and MacBook Pro just became significantly better deals. As an example, the 13-inch MacBook Air M5 that used to start at $1,099 and is currently on sale for $949 ",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T11:53:29.141673"
+  },
+  {
+    "url": "https://www.theverge.com/entertainment/956880/bungie-layoffs-destiny-2",
+    "title": "Bungie hit with \u2018significant\u2019 layoffs after ending Destiny 2",
+    "source": "The Verge",
+    "published": "2026-06-25T10:49:15-04:00",
+    "snippet": "Now that Bungie has moved on from Destiny 2 , the game studio is being hit with its latest round of layoffs. In a statement posted on X , the studio said that \"we are announcing a reduction in force as we reorganize Bungie.\" No specific numbers were revealed. But in a separate statement , Hermen Hulst, CEO of Sony Interactive Entertainment's Studio Business Group, said that the layoffs would inclu",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T11:53:33.825862"
+  },
+  {
+    "url": "https://www.wired.com/story/amazon-prime-day-robot-mower-deals-june-2026/",
+    "title": "Stop Mowing Your Grass Forever With One of These Highly Rated Robot Mowers On Sale",
+    "source": "Wired",
+    "published": "2026-06-25T15:22:36+00:00",
+    "snippet": "You don't need to cut your own grass anymore. Most of the best robot mowers I've tested are on sale for Prime Day.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T11:53:39.450434"
+  },
+  {
+    "url": "https://www.wired.com/story/amazon-prime-day-kobo-deal-2026/",
+    "title": "Kobo Libra Colour Sale (2026): The E-Reader Deal Worth Jumping on This Prime Day",
+    "source": "Wired",
+    "published": "2026-06-25T14:24:57+00:00",
+    "snippet": "The color e-reader that\u2019s most worth your money this Prime Day isn't from Amazon.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T11:53:42.076530"
+  },
+  {
+    "url": "https://techcrunch.com/2026/06/25/trump-admin-bars-polestar-from-selling-its-new-evs-in-the-us/",
+    "title": "Trump admin bars Polestar from selling its new EVs in the US",
+    "source": "TechCrunch",
+    "published": "2026-06-25T14:55:25+00:00",
+    "snippet": "The Department of Commerce declined to give the Chinese-owned automaker a special authorization to keep selling EVs in the U.S.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T11:53:47.636141"
+  },
+  {
+    "url": "https://techcrunch.com/2026/06/25/apple-raises-mac-and-ipad-prices-spares-iphone-for-now/",
+    "title": "Apple raises Mac and iPad prices, spares iPhone for now",
+    "source": "TechCrunch",
+    "published": "2026-06-25T14:52:35+00:00",
+    "snippet": "Apple raises prices of MacBook Air and Pro along with iPad Air and Pro",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "hold",
+    "reviewed_at": "2026-06-25T11:53:53.706663"
+  },
+  {
+    "url": "https://www.engadget.com/2201555/sony-a7r-vi-review/",
+    "title": "Sony A7R VI review: A huge speed boost makes this a nearly perfect high-resolution camera",
+    "source": "Engadget",
+    "published": "2026-06-25T15:07:54+00:00",
+    "snippet": "Sony's A7R VI finally serves up speed and resolution together thanks to the new 67MP stacked sensor.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "hold",
+    "reviewed_at": "2026-06-25T11:53:59.286771"
+  },
+  {
+    "url": "https://www.engadget.com/2201541/ibm-says-it-has-created-the-worlds-first-sub-1-nanometer-chip/",
+    "title": "IBM says it has created the world's first sub-1 nanometer chip",
+    "source": "Engadget",
+    "published": "2026-06-25T14:59:10+00:00",
+    "snippet": "IBM says it has created the world's first sub-1 nanometer chip",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T11:54:05.042696"
+  },
+  {
+    "url": "https://www.engadget.com/2201524/apple-hikes-prices-for-most-of-its-hardware/",
+    "title": "Apple hikes prices for most of its hardware",
+    "source": "Engadget",
+    "published": "2026-06-25T14:49:43+00:00",
+    "snippet": "Macs, MacBooks, iPads and other Apple products just got more expensive.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T11:54:09.705246"
+  },
+  {
+    "url": "https://www.theregister.com/personal-tech/2026/06/25/foss-dev-builds-a-basic-compiler-using-llvm/5262171",
+    "title": "FOSS dev builds a BASIC compiler using LLVM",
+    "source": "The Register",
+    "published": "2026-06-25T17:10:00+02:00",
+    "snippet": "Neither LLVM nor GCC directly support the BASIC programming language \u2013 but a former Microware boffin proposes fixing that. An interesting new proposal on the Discourse forum of the LLVM compiler suite has turned into a new standalone BASIC compiler. The original RFC was Adding BASIC09 frontend tool to LLVM. Author Boisy Petre proposed adding a front-end to enable LLVM to compile BASIC source code,",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "hold",
+    "reviewed_at": "2026-06-25T11:54:22.006588"
+  },
+  {
+    "url": "https://www.theregister.com/personal-tech/2026/06/25/apple-passes-rampocalypse-costs-on-to-consumers/5262266",
+    "title": "Apple passes RAMpocalypse costs on to consumers",
+    "source": "The Register",
+    "published": "2026-06-25T16:48:00+02:00",
+    "snippet": "The online Apple Store went offline Thursday morning, but instead of such a move marking the launch of upgraded products, it came back online with nothing new to offer but higher prices. The budget-priced MacBook Neo wasn\u2019t even spared from the spike, with its entry-level price climbing from $599 to $699. Along with the Neo, entry-level MacBook Air prices rose by $200 and base MacBook Pro machines",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T11:54:34.603453"
+  },
+  {
+    "url": "https://www.theregister.com/personal-tech/2026/06/25/windows-11-can-now-turn-back-the-clock-when-updates-go-bad/5262226",
+    "title": "Windows 11 can now turn back the clock when updates go bad",
+    "source": "The Register",
+    "published": "2026-06-25T16:29:00+02:00",
+    "snippet": "Users with hopelessly borked Windows devices have a new avenue of recovery in the form of point-in-time restore for Windows 11. The service is designed to restore a Windows 11 PC to its exact state at an earlier point in time and is accessed through the Troubleshoot menu in the Windows Recovery Environment. According to Microsoft, each restore point covers the operating system, apps, settings, and",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T11:54:39.570011"
+  },
+  {
+    "url": "https://blog.cloudflare.com/oauth-for-all/",
+    "title": "Cloudflare launched self-managed OAuth for all",
+    "source": "Hacker News - Best",
+    "published": "2026-06-25T02:18:10+00:00",
+    "snippet": "Article URL: https://blog.cloudflare.com/oauth-for-all/ Comments URL: https://news.ycombinator.com/item?id=48668033 Points: 261 # Comments: 113",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T11:54:42.380602"
+  },
+  {
+    "url": "https://www.fastcompany.com/91563947/amazons-big-prime-day-pitch-is-its-ai-assistant-is-it-working?partner=rss&utm_source=rss&utm_medium=feed&utm_campaign=rss+fastcompany&utm_content=rss",
+    "title": "Amazon\u2019s big Prime Day pitch is its AI assistant. Is it working?",
+    "source": "Fast Company - Technology",
+    "published": "2026-06-25T15:17:28+00:00",
+    "snippet": "It\u2019s a big moment for Amazon. The online retail giant\u2019s misnamed Prime Day, which actually stretches across half a week and ends June 26, is in full swing, with blockbuster discounts on a vast swathe of products. But rather than leaving shoppers to click, compare, and hunt for deals on their own, Amazon is pushing its AI tools hard. Videos touting the ability to integrate Alexa, or Rufus, Amazon\u2019s",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 40.0,
+    "keywords_matched": [
+      "AI tools",
+      "AI assistant"
+    ],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:16:35.503204"
+  },
+  {
+    "url": "https://techcrunch.com/2026/06/25/general-intuitions-2-3b-bet-that-video-games-can-train-ai-agents-for-the-real-world/",
+    "title": "General Intuition\u2019s $2.3B bet that video games can train AI agents for the real world",
+    "source": "TechCrunch - AI",
+    "published": "2026-06-25T16:55:00+00:00",
+    "snippet": "General Intuition has raised $320 million to scale AI trained on millions of hours of gameplay, betting action data can help AI develop something closer to human intuition.",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI agents"
+    ],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:16:45.178445"
+  },
+  {
+    "url": "https://www.bloomberg.com/news/articles/2026-06-25/ford-has-been-rehiring-quality-inspectors-after-ai-fell-short",
+    "title": "Ford rehires 350 engineers after AI fails to preserve expertise or train juniors",
+    "source": "Hacker News - Best",
+    "published": "2026-06-25T14:58:50+00:00",
+    "snippet": "Article URL: https://www.bloomberg.com/news/articles/2026-06-25/ford-has-been-rehiring-quality-inspectors-after-ai-fell-short Comments URL: https://news.ycombinator.com/item?id=48674446 Points: 334 # Comments: 153",
+    "pillar": "Engineering Leadership",
+    "score": 20.0,
+    "keywords_matched": [
+      "CTO"
+    ],
+    "angle": "Engineering leaders can share how rehiring skilled engineers helps maintain company expertise and fosters a robust team environment.",
+    "hook": "Ford's experience highlights importance of retaining top talent after AI deployment failures.",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T13:17:05.857199"
+  },
+  {
+    "url": "https://www.fastcompany.com/91563889/democracy-has-a-listening-problem-these-ai-tools-could-actually-help?partner=rss&utm_source=rss&utm_medium=feed&utm_campaign=rss+fastcompany&utm_content=rss",
+    "title": "Democracy has a listening problem. These AI tools could actually help",
+    "source": "Fast Company - Technology",
+    "published": "2026-06-25T11:00:00+00:00",
+    "snippet": "When four-year-old Joca, a golden retriever with dark soulful eyes, died on a scorching Brazilian tarmac after an airline\u2019s tragic mistake, the nation\u2019s outrage could have remained just another trending hashtag. But Fernando, a young man in S\u00e3o Paulo, submitted an online legislative proposal for \u201cJoca\u2019s law.\u201d Senators held a hearing, and eventually the Senate and the House passed legislation. Whil",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "AI tools"
+    ],
+    "angle": "Empowering our engineering teams with cutting-edge AI tools to improve communication and efficiency can bridge the listening problem in tech development.",
+    "hook": "AI-driven solutions for better team collaboration and project outcomes.",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:17:36.256052"
+  },
+  {
+    "url": "https://www.nytimes.com/2026/06/23/us/politics/nsa-lost-access-anthropic-tool.html",
+    "title": "NSA lost access to Mythos amid Anthropic dispute",
+    "source": "Hacker News - Best",
+    "published": "2026-06-24T11:45:47+00:00",
+    "snippet": "Unlocked: https://www.nytimes.com/2026/06/23/us/politics/nsa-lost-acce... Comments URL: https://news.ycombinator.com/item?id=48658300 Points: 258 # Comments: 273",
+    "pillar": "AI-Augmented Engineering Execution",
+    "score": 20.0,
+    "keywords_matched": [
+      "Anthropic"
+    ],
+    "angle": "Engineering Leaders: Navigating complex security issues like NSA's access loss can be a significant challenge for your teams, and sharing insights on maintaining robust cybersecurity is key to leading them effectively.",
+    "hook": "NSA faced critical cyber-security challenges that impacted their operations...",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T13:18:49.059344"
+  },
+  {
+    "url": "https://techcrunch.com/2026/06/25/databricks-former-ai-chief-thinks-he-can-cut-ais-power-bill-by-1000x/",
+    "title": "Databricks\u2019 former AI chief thinks he can cut AI\u2019s power bill by 1,000x",
+    "source": "TechCrunch - AI",
+    "published": "2026-06-25T16:48:11+00:00",
+    "snippet": "Un0 is an image-generation system tool that shows for the first time how the company's technology can replicate conventional AI systems.",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:18:58.928543"
+  },
+  {
+    "url": "https://www.theverge.com/gadgets/949350/amazon-prime-day-sale-best-apple-deals-2026",
+    "title": "This year\u2019s Prime Day deals on Apple products are the best I\u2019ve seen",
+    "source": "The Verge",
+    "published": "2026-06-25T13:12:48-04:00",
+    "snippet": "The latest iPad Air is still available at its pre-price hike discount. | Photo by Amelia Holowaty Krales / The Verge Amazon\u2019s Prime Day is now in its third day, and whether you\u2019re looking for a new pair of wireless earbuds or a smartwatch, there\u2019s a good chance you\u2019ll find a discount. The Apple Watch Series 11 has already dropped to a new low price, while the AirPods Pro 3 are discounted to $179 .",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:19:04.785049"
+  },
+  {
+    "url": "https://www.theverge.com/gadgets/951852/prime-day-deals-cheap-stuff-under-25-sale",
+    "title": "54 Prime Day steals under $25 you won\u2019t want to miss",
+    "source": "The Verge",
+    "published": "2026-06-25T13:09:43-04:00",
+    "snippet": "We at The Verge love a good gadget or tchotchke, especially when it\u2019s not too expensive. But with the rising cost of just about everything these days , many once-cheap gadgets aren\u2019t so affordable anymore. Amazon and other retailers sell all sorts of products from word salad brand names, but only some of it is handy and affordable enough to be worth telling you about. We\u2019re highlighting some of ou",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:19:09.388597"
+  },
+  {
+    "url": "https://www.theverge.com/gadgets/951543/best-prime-day-deals-under-50",
+    "title": "Prime Day deals under $50 that are really worth it",
+    "source": "The Verge",
+    "published": "2026-06-25T13:00:26-04:00",
+    "snippet": "If you\u2019re looking for a good deal without spending hundreds, Prime Day discounts have pushed some of our favorite products under $50. You can pick up everything from Nintendo Switch games to Bluetooth speakers while sticking to your budget. We\u2019ll keep this post updated throughout the sale as we find new deals and low prices, and make sure to check out our other coverage of Prime Day for deals that",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:19:12.205153"
+  },
+  {
+    "url": "https://www.theverge.com/games/957042/xbox-price-increase-memory-shortage",
+    "title": "Xbox prices spike another $100 or more",
+    "source": "The Verge",
+    "published": "2026-06-25T12:49:17-04:00",
+    "snippet": "Microsoft is increasing the prices of Xbox consoles again. Starting August 1st, 512GB models will be $100 more expensive, while 1TB models will be $150 more expensive. This means that the Xbox Series S will start at $499.99, the Xbox Series X without a disc drive will start at $749.99, and the Series X with a disc drive will start at $799.99. Microsoft also says it will be \"sunsetting\" its 2TB Xbo",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:19:15.574213"
+  },
+  {
+    "url": "https://www.theverge.com/gadgets/956635/apple-watch-series-11-amazon-prime-day-2026-deal-sale",
+    "title": "The Apple Watch Series 11 is $120 off for Prime Day, its all-time low price",
+    "source": "The Verge",
+    "published": "2026-06-25T12:38:39-04:00",
+    "snippet": "We\u2019ve seen a lot of great Prime Day deals on wearables this year, from the Fitbit Charge 6 to the latest Apple Watch SE . But if you\u2019re looking for advanced health features, the Apple Watch Series 11 is the one to check out, and it\u2019s now down to its best price ever: $279 ($120 off) at Amazon and Walmart for the 42mm model. If you want a larger watch, the 46mm option is also down to a new low price",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:19:19.177830"
+  },
+  {
+    "url": "https://www.theverge.com/gadgets/956600/samsung-galaxy-s26-ultra-prime-day-deal-sale",
+    "title": "The Samsung S26 Ultra is already marked down to $920 for Prime Day",
+    "source": "The Verge",
+    "published": "2026-06-25T12:38:02-04:00",
+    "snippet": "Amazon has the 256GB Samsung Galaxy S26 Ultra on sale for $919.99 (usually $1,099.99) for Prime Day, a significant discount for a phone that released just a few months ago in March. The S26 Ultra has a set of four rear cameras for excellent photos, a refined design that\u2019s comfortable to use, and a built-in privacy screen you can customize and toggle. Samsung Galaxy S26 Ultra Samsung\u2019s 6.9-inch S26",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:19:21.134674"
+  },
+  {
+    "url": "https://www.theverge.com/tech/956903/apple-price-increase-2026-macbook-ipad-mac-home-vision-pro",
+    "title": "Here are all of the Apple price hikes",
+    "source": "The Verge",
+    "published": "2026-06-25T12:31:12-04:00",
+    "snippet": "Following an interview with The Wall Street Journal earlier this month where Tim Cook hinted at upcoming price changes , Apple officially raised the prices on many of its hardware offerings today. They include iPads, Macs, smart speakers, and even the affordable MacBook Neo. While Cook said the company has tried to \"shield\" customers from price increases as the cost of memory and storage has recen",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T13:28:43.070085"
+  },
+  {
+    "url": "https://www.theverge.com/gadgets/956340/smart-home-under-40-prime-day-deal-sale",
+    "title": "Upgrade your home with Prime Day deals for $40 or less",
+    "source": "The Verge",
+    "published": "2026-06-25T12:00:00-04:00",
+    "snippet": "The Hoto 3.6V electric screwdriver kit makes even the smallest home project easier. | Image: Hoto Speaking as someone who just had to buy a new garbage disposal on his lunch break, I know firsthand how much home maintenance can cost, so I\u2019m always excited to find inexpensive home tech that feels like an upgrade. Prime Day is a great time to score deals on video doorbells and cameras, novel methods",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:28:47.110989"
+  },
+  {
+    "url": "https://www.theverge.com/tech/956473/byok-distraction-free-writing-review",
+    "title": "BYOK is my new go-to distraction-free writing tool",
+    "source": "The Verge",
+    "published": "2026-06-25T12:00:00-04:00",
+    "snippet": "Proof that I wrote this review on the BYOK. | Photo: Terrence O\u2019Brien / The Verge I have long been on the hunt for the perfect distraction-free writing setup. The latest contender is BYOK , which stands for Bring Your Own Keyboard. It's a simple $199 black plastic rectangle with a low-resolution LCD screen that lets you edit text and does almost nothing else. I've tried dedicated apps. I've even c",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:28:52.298425"
+  },
+  {
+    "url": "https://arstechnica.com/cars/2026/06/feds-deny-polestar-authorization-to-sell-cars-in-us-from-model-year-2027/",
+    "title": "Feds deny Polestar authorization to sell cars in US from model year 2027",
+    "source": "Ars Technica",
+    "published": "2026-06-25T14:40:23+00:00",
+    "snippet": "The electric car brand Polestar's days in the US are seriously numbered. Today, the company revealed that the US Commerce Department has declined to authorize imports of new Polestars from model year 2027 onward as part of a rule banning connected cars from automakers with Chinese links. Polestar says it will continue to sell its existing stock of Polestar 3 and Polestar 4 SUVs and \"will continue ",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "skip",
+    "reviewed_at": "2026-06-25T13:28:56.752635"
+  },
+  {
+    "url": "https://arstechnica.com/apple/2026/06/apple-ratchets-up-prices-blames-the-cost-of-memory/",
+    "title": "Apple ratchets up prices, blames the cost of memory",
+    "source": "Ars Technica",
+    "published": "2026-06-25T14:14:37+00:00",
+    "snippet": "Apple bumped its prices across much of its product lineup today, in some cases adding hundreds of dollars to the cost of a new Macintosh. An entry-level MacBook Neo that cost $599 is now $699. The formerly $1,299 iMac will now be a $1,499 iMac. An M5 MacBook Pro that was $1,699 is now $1,999. And at the very high end, an M3 Ultra Mac Studio\u2014which features 96GB of memory\u2014sees a $1,300 price increas",
+    "pillar": "",
+    "score": 0.0,
+    "keywords_matched": [],
+    "angle": "",
+    "hook": "",
+    "status": "draft",
+    "reviewed_at": "2026-06-25T13:29:01.058034"
+  },
+  {
+    "url": "https://www.wired.com/story/openai-gpt-56-model-release-trump-admin-approval/",
+    "title": "OpenAI Has New AI Models. Here\u2019s Why You Can\u2019t Use Them",
+    "source": "Wired",
+    "published": "2026-06-26T17:05:40+00:00",
+    "snippet": "The White House asked OpenAI to delay the rollout of its GPT-5.6 AI models, two weeks after Anthropic had to take its most advanced AI models offline.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 84.5,
+    "keywords_matched": [
+      "AI model",
+      "OpenAI",
+      "Anthropic",
+      "GPT"
+    ],
+    "angle": "Engineering leaders should be vigilant about the rapid advancements and potential misuse of AI models like GPT-5.6, especially with recent regulatory pressures from the White House.",
+    "hook": "OpenAI's new AI models face delays due to regulatory concerns.",
+    "status": "draft",
+    "reviewed_at": "2026-06-28T12:32:19.173469"
+  },
+  {
+    "url": "https://www.latent.space/p/ainews-openai-gpt-56-sol-terra-luna",
+    "title": "[AINews] OpenAI GPT-5.6 Sol / Terra / Luna \u2014 restricted to trusted partners",
+    "source": "Latent Space",
+    "published": "2026-06-27T05:23:22+00:00",
+    "snippet": "Against the backdrop of ongoing Anthropic-Fable negotiations and a relaxation of Mythos controls, GPT-5.6 was announced today, but with limited access to trusted partners. It is Mythos-beating at a subset of coding agent tasks: But OpenAI took strong pains to explain that this model both Mythos-beating and also not as capable at Cyber as Mythos: GPT\u20115.6 Sol does not cross the Cyber Critical thresh",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 64.5,
+    "keywords_matched": [
+      "OpenAI",
+      "Anthropic",
+      "GPT"
+    ],
+    "angle": "",
+    "hook": "",
+    "status": "draft",
+    "reviewed_at": "2026-06-28T12:32:28.709647"
+  },
+  {
+    "url": "https://www.theregister.com/ai-and-ml/2026/06/26/google-wants-ai-regulation-but-on-its-own-terms/5263276",
+    "title": "Google wants AI regulation, but on its own terms",
+    "source": "The Register",
+    "published": "2026-06-26T21:50:06+02:00",
+    "snippet": "For more than three years now, we've been hearing from AI execs who insist that the government regulate their industries \u2026 until there's a chance such oversight could hurt business. OpenAI and Anthropic have led the way with the latter's CEO, Dario Amodei, calling for \"binding regulations\" in June 2026, only to push back when his latest models were suspended. Now Google, which has also called for ",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 64.5,
+    "keywords_matched": [
+      "OpenAI",
+      "Anthropic",
+      "AI regulation"
+    ],
+    "angle": "Engineering leaders should advocate for balanced AI regulation that protects innovation while ensuring ethical use, to maintain their industry's competitive edge in the eyes of potential investors and customers alike.",
+    "hook": "Protecting Innovation & Ethics: Why Regulating AI is Vital for Engineering Leaders",
+    "status": "draft",
+    "reviewed_at": "2026-06-28T12:32:48.111681"
+  },
+  {
+    "url": "https://www.theverge.com/ai-artificial-intelligence/958751/prosecutors-chatgpt-palisades-wildfire-arson-mistrial",
+    "title": "Prosecutors used ChatGPT logs as evidence in the Palisades fire trial",
+    "source": "The Verge - AI",
+    "published": "2026-06-28T10:12:06-04:00",
+    "snippet": "Jonathan Rinderknecht was facing arson charges for setting a fire on New Year's Day in 2025, which became one of the deadliest wildfires in LA history . To make their case, prosecutors turned to location data from his iPhone, security camera footage, and witness testimony. But they also turned to his ChatGPT logs. Prosecutors said that Rinderknecht had ChatGPT generate images of fire, asked the ch",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 20.0,
+    "keywords_matched": [
+      "GPT"
+    ],
+    "angle": "Engineering leaders can lead by example and encourage open communication within their teams to foster a culture of innovation and trust.",
+    "hook": "Empowering employees leads to more impactful tech solutions and stronger company culture.",
+    "status": "skip",
+    "reviewed_at": "2026-06-28T12:33:18.436819"
+  },
+  {
+    "url": "https://martinfowler.com/articles/exploring-gen-ai/local-models-for-coding-experiences.html",
+    "title": "Experiences with local models for coding",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.857033+00:00",
+    "snippet": "Birgitta B\u00f6ckeler now reports on her recent experiences trying local LLMs for coding. She compares them using two standard tasks, and tries out the most promising model for day-to-day use. more\u2026",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 60.0,
+    "keywords_matched": [
+      "local LLM",
+      "local model",
+      "LLM"
+    ],
+    "angle": "Explore local LLMs for efficient coding solutions.",
+    "hook": "Birgitta B\u00f6ckeler shares insights on local LLM usage.",
+    "status": "draft",
+    "reviewed_at": "2026-08-04T09:51:13.521886"
+  },
+  {
+    "url": "https://martinfowler.com/articles/reliable-llm-bayer.html",
+    "title": "Building Reliable Agentic AI Systems",
+    "source": "Martin Fowler",
+    "published": "2026-08-04T13:50:29.875539+00:00",
+    "snippet": "One of the most interesting projects my colleagues have done with LLMs has been building a system with Bayer to allow pharmaceutical researchers to query decades of information about studies buried in PDF reports. Sarang Sanjay Kulkarni describes its evolution from keyword-based search to an intelligent research assistant capable of answering complex questions and drafting regulatory documents. mo",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "agentic AI",
+      "LLM"
+    ],
+    "angle": "Explore AI's Role in Pharmaceutical Research",
+    "hook": "Building Reliable Agentic AI Systems",
+    "status": "draft",
+    "reviewed_at": "2026-08-04T09:52:08.335108"
+  },
+  {
+    "url": "https://www.latent.space/p/ainews-qwen-38-max24t-and-27b-new",
+    "title": "[AINews] Qwen 3.8 Max(2.4T) and 27B, new open weights models for Coding and Cowork",
+    "source": "Latent Space",
+    "published": "2026-08-04T03:49:14+00:00",
+    "snippet": "After the Qwen Exodus last year and new management took over launching more closed model APIs, there was some real doubt as to whether or not this leading open models lab would continue to release relevant models. That doubt is now gone. Qwen 3.8 Max is a MONSTER 2.4T model that would have been the top open model in the world but for the Kimi K3 release we already covered . Qwen offers them on API",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "Qwen",
+      "open weights"
+    ],
+    "angle": "Discover Qwen's Latest Coding Models",
+    "hook": "New open weights models for engineering",
+    "status": "draft",
+    "reviewed_at": "2026-08-04T09:53:03.469705"
+  },
+  {
+    "url": "https://www.wired.com/story/mistral-is-in-the-right-place-at-the-right-time/",
+    "title": "Mistral Is in the Right Place at the Right Time",
+    "source": "Wired",
+    "published": "2026-08-04T09:21:11+00:00",
+    "snippet": "Open-weight AI models are having a moment in the wake of recent turmoil at US tech giants. For French AI lab Mistral, that\u2019s the the best thing that could have happened.",
+    "pillar": "Agentic AI & Local Inference",
+    "score": 40.0,
+    "keywords_matched": [
+      "AI model",
+      "Mistral"
+    ],
+    "angle": "Explore how Mistral navigates AI model success.",
+    "hook": "Mistral's timing in AI couldn't be better.",
+    "status": "draft",
+    "reviewed_at": "2026-08-04T09:53:20.721946"
+  }
+]

@@ -1,0 +1,147 @@
+You are drafting LinkedIn posts for Joe Stackpole.
+
+## Who Joe is
+# Long-Term Positioning
+
+Primary Identity:
+AI-Forward Engineering Leader designing systems that reduce friction and increase delivery velocity.
+
+Near-Term Goal:
+Build credibility as a modern Head of Engineering at GetChkd.
+
+Long-Term Goal:
+Be recognized as a leader in AI-augmented engineering organizations.
+
+Audience Targets:
+- Recruiters (VP Eng / CTO track)
+- Engineering Leaders
+- Product Leaders
+- Builders experimenting with AI workflows
+
+Reputation Goal:
+Serious. Practical. Builder. Systems thinker. Not hype-driven.
+
+## Joe's voice and brand
+# Brand Voice Guide — Joe Stackpole
+
+## Positioning
+AI-forward Head of Engineering who designs systems, teams, and workflows that reduce friction and increase delivery velocity.
+
+## Tone
+- Clear, direct, practical
+- Confident but not arrogant
+- Builder mindset: "here’s what I tried / learned / changed"
+- Avoid buzzword soup
+- No emojis (optional rule; enable if you want)
+
+## Content pillars (pick 1 per post)
+1) AI-augmented engineering execution (multi-agent workflows, QA loops, velocity with governance)
+2) Engineering leadership (team design, accountability, decision-making, hiring/expectations)
+3) Architecture & systems thinking (tradeoffs, reliability, security, scaling)
+4) Operational transformation (process fixes that compound)
+5) Career lessons (leadership growth, role transitions, clarity)
+
+## Red lines (do not post)
+- Anything confidential at GetCHKD or prior employers
+- Internal incidents or sensitive security details
+- Private financials, customer data, legal details
+- Naming vendors/partners unless public and positive/neutral
+
+## Post format templates (pick two different ones)
+# LinkedIn Post Templates
+
+## Template A — Lesson → Principle → Action
+Hook (1–2 lines)
+What happened (2–4 lines)
+Lesson learned (1–2 lines)
+Principle (1 line)
+Actionable steps (3–5 bullets)
+Soft close (1 line)
+
+## Template B — Contrarian Take
+Common belief (1 line)
+Why it’s incomplete (2–4 lines)
+Better framing (2–4 lines)
+Example (2–4 lines)
+Takeaway (1–2 lines)
+
+## Template C — Framework
+Hook
+Name the framework (1 line)
+Explain each component (3–5 bullets)
+When to use it / when not to (2–3 lines)
+Close
+
+## Template D — Mistake + Fix
+Hook
+Mistake (2–3 lines)
+Impact (1–2 lines)
+Fix (2–4 lines)
+What I do now (3 bullets)
+Close
+
+## Template E — “What I’m building”
+Hook
+What you're building (2–4 lines)
+Why it matters (2–4 lines)
+Constraints/tradeoffs (2–4 lines)
+What you learned (2–3 lines)
+Close
+
+## Pre-post QA checklist
+# Pre-Post QA Checklist
+
+Before scheduling:
+
+☐ No confidential information
+☐ No internal metrics
+☐ No roadmap references
+☐ No vendor contracts mentioned
+☐ No security implementation details
+☐ Clear hook in first 2 lines
+☐ Skimmable formatting
+☐ 900–1,500 characters
+☐ Signals expertise, not ego
+☐ Aligns with one content pillar
+
+
+---
+
+## Your task
+
+Write 2 LinkedIn post drafts based on this news item.
+
+**Source:** LeadDev
+**Title:** Engineering managers ditch cloud AI for local LLMs
+**URL:** https://leaddev.com/ai/engineering-managers-ditch-cloud-ai-for-local-llms?utm_source=leaddev&utm_medium=RSS
+**Summary:** Are local LLMs a third way forward? The post Engineering managers ditch cloud AI for local LLMs appeared first on LeadDev .
+**Angle:** Engineering leaders should consider adopting local large language models as an alternative to cloud-based AI solutions, given their potential for improved performance and reduced latency.
+**Hook starter:** Local LLMs offer a viable path forward in the era of increasing data privacy concerns.
+**Content pillar:** AI-Augmented Engineering Execution
+
+Rules:
+- Joe adds personal experience himself. Where an anecdote belongs, write: [Joe's experience here]
+- Each draft must be 900-1,500 characters total.
+- Use a different template for Draft 1 vs Draft 2.
+- No emojis. No cheesy CTA. Strong hook in the first 2 lines.
+- No confidential information about GetChkd or prior employers.
+- Clear and specific -- no buzzword soup.
+- NEVER use relative time references like "this week", "recently", "today", "last week", or "this month".
+  Posts may be scheduled days or weeks after drafting. Instead use specific dates:
+  "On June 25, 2026..." or "A June 2026 study found..." or "As of June 2026..."
+
+Format your response exactly like this:
+
+## Draft 1 -- [Template Name]
+
+[post content]
+
+Character count: [N]
+
+---
+
+## Draft 2 -- [Template Name]
+
+[post content]
+
+Character count: [N]

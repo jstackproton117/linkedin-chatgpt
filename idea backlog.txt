@@ -1,0 +1,13 @@
+# Idea Backlog
+
+## Observations from the Week
+- Friction point noticed:
+- Decision made:
+- Tradeoff considered:
+- AI workflow insight:
+- Architecture lesson:
+
+## Draft Candidates
+- Topic:
+- Pillar:
+- Angle:
