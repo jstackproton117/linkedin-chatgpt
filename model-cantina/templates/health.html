@@ -8,7 +8,8 @@
   <table class="sortable" id="sources-table">
     <thead>
       <tr><th data-type="text">Tier</th><th data-type="text">Source</th><th data-type="text">Feeds</th>
-          <th data-type="text">Status</th><th data-type="date">Last polled</th><th data-type="text">Error</th><th></th></tr>
+          <th data-type="text">Status</th><th data-type="date">Last polled</th><th data-type="text">Error</th>
+          {% if show_poll_buttons %}<th></th>{% endif %}</tr>
     </thead>
     <tbody>
     {% for s in sources %}
@@ -19,7 +20,7 @@
       <td><span class="badge status-{{ s.last_status if s.last_status != 'never polled' else 'unpolled' }}">{{ s.last_status }}</span></td>
       <td class="muted">{{ s.last_polled_at[:16] if s.last_polled_at else '—' }}</td>
       <td class="muted">{{ s.last_error or '—' }}</td>
-      <td><button class="secondary poll-btn" data-source="{{ s.key }}">Poll now</button></td>
+      {% if show_poll_buttons %}<td><button class="secondary poll-btn" data-source="{{ s.key }}">Poll now</button></td>{% endif %}
     </tr>
     {% endfor %}
     </tbody>
@@ -50,6 +51,7 @@
 <script>
 initDataTable(document.getElementById('sources-table'), {});
 initDataTable(document.getElementById('events-table'), {});
+{% if show_poll_buttons %}
 document.querySelectorAll('.poll-btn').forEach(btn => {
   btn.addEventListener('click', async () => {
     const source = btn.dataset.source;
@@ -60,5 +62,6 @@ document.querySelectorAll('.poll-btn').forEach(btn => {
     setTimeout(() => location.reload(), 800);
   });
 });
+{% endif %}
 </script>
 {% endblock %}

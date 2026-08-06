@@ -21,6 +21,16 @@ BASE = Path(__file__).parent
 
 app = Flask(__name__)
 
+# True on Vercel (Postgres via DATABASE_URL), False on Thornwick/local dev
+# (SQLite). Used to gate the manual per-source "Poll now" button — it's a
+# same-LAN admin convenience on Thornwick, but Vercel is public, and a
+# button-triggered POST has no sensible way to carry the CRON_SECRET the
+# scheduled /cron/poll route uses (embedding a secret in client-side JS
+# would defeat the point of it). Simplest correct answer: that feature just
+# doesn't exist on the public deployment, which relies on the daily cron
+# instead.
+IS_HOSTED_PUBLICLY = bool(os.environ.get("DATABASE_URL"))
+
 
 # ── Home ─────────────────────────────────────────────────────────────────
 
@@ -145,7 +155,8 @@ def health():
                          "last_polled_at": row.get("last_polled_at"),
                          "last_status": row.get("last_status", "never polled"),
                          "last_error": row.get("last_error")})
-    return render_template("health.html", sources=sources, events=events)
+    return render_template("health.html", sources=sources, events=events,
+                            show_poll_buttons=not IS_HOSTED_PUBLICLY)
 
 
 # ── API ──────────────────────────────────────────────────────────────────
@@ -169,6 +180,10 @@ def api_add_note():
 
 @app.route("/api/poll/<source_key>", methods=["POST"])
 def api_poll_source(source_key):
+    if IS_HOSTED_PUBLICLY:
+        return jsonify({"ok": False, "error": "manual per-source polling is disabled on the "
+                                               "public deployment — it runs on the daily cron "
+                                               "schedule instead"}), 403
     result = poller.poll_all([source_key])[source_key]
     return jsonify({"ok": "error" not in result, "result": result})
 
