@@ -112,6 +112,18 @@ path. Removing the custom rewrite entirely and letting Vercel's zero-config
 Flask detection handle routing fixed it immediately. Lesson: check for a
 framework preset before hand-rolling routing config.
 
+**D10 — Admin-only actions get disabled on the public deployment, not
+retrofitted with auth that doesn't fit the UI.** `/api/poll/<source>` (the
+health page's per-source "Poll now" button) had no auth at all — fine on
+Thornwick (LAN-only, same trust boundary as clicking a button on your own
+machine) but publicly POST-able once the same code runs on Vercel. A
+bearer-token check (like `/cron/poll`'s `CRON_SECRET`) doesn't fit a
+button a person clicks in their browser — embedding the secret in
+client-side JS would defeat the point of having one. Rather than build
+session auth for a one-button admin feature, `IS_HOSTED_PUBLICLY` (true
+when `DATABASE_URL` is set) just disables the endpoint and hides the
+button entirely on Vercel; the daily cron is the only poll trigger there.
+
 ## Open Questions
 
 | # | Question | Resolution trigger |
