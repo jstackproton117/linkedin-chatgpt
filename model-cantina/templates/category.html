@@ -11,11 +11,13 @@
     <span class="badge tier-{{ s.tier }}">{{ s.name }}{% if s.key in proxy_source_keys %} (proxy){% endif %}</span>
     {% endfor %}
   </div>
+  {% if metric_groups %}
   <p class="muted">
     Each source below reports scores on its own scale (Elo, resolve-rate percentage, composite
     index...) — they're shown as separate leaderboards rather than blended into one ranked list,
     since a higher Elo number isn't "better" than a higher percentage, they're not the same unit.
   </p>
+  {% endif %}
 </div>
 
 {% if metric_groups %}
@@ -59,7 +61,17 @@
 {% endfor %}
 {% else %}
 <div class="card">
+  {% if model_count %}
+  <p class="muted">
+    This category isn't fed by anything that produces a numeric score to rank — its sources
+    (registry/discovery feeds) just report which models exist, not how good they are. There
+    {{ 'is' if model_count == 1 else 'are' }} still <strong>{{ model_count }}</strong>
+    model{{ '' if model_count == 1 else 's' }} tracked here.
+  </p>
+  <p><a class="row-link" href="{{ url_for('models_list', category=category_key) }}">Browse the model list →</a></p>
+  {% else %}
   <p class="muted">No scores for this category yet.</p>
+  {% endif %}
 </div>
 {% endif %}
 

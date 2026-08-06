@@ -126,7 +126,6 @@ def category_view(category_key):
     proxy_source_keys = {
         k for k, v in cfg["sources"].items() if category_key in v.get("proxy_for", [])
     }
-    conn.close()
     metric_groups = [
         {
             "score_type": score_type,
@@ -138,6 +137,15 @@ def category_view(category_key):
         }
         for score_type, group_rows in groups
     ]
+    # Some categories (local_open_weight) are fed only by discovery/registry
+    # sources that never carry a numeric score by design — a leaderboard
+    # format doesn't fit them at all, but there can still be real models to
+    # look at. Only bother with this count when there's no leaderboard to
+    # show, since it's otherwise unused.
+    model_count = None
+    if not metric_groups:
+        model_count = len(storage.list_models(conn, category=category_key))
+    conn.close()
     return render_template(
         "category.html",
         category_key=category_key,
@@ -146,6 +154,7 @@ def category_view(category_key):
         sources_feeding=sources_feeding,
         proxy_source_keys=proxy_source_keys,
         categories=cfg["categories"],
+        model_count=model_count,
     )
 
 
