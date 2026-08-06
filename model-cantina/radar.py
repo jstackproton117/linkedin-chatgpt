@@ -41,10 +41,11 @@ def cmd_report(args):
         if not rows:
             print("  (no scores yet)")
             continue
-        for r in rows[:15]:
-            score_str = f"{r['score']:>8}" if r["score"] is not None else " " * 7 + "—"
-            print(f"  {score_str} {r['score_type'] or '—':<18} {r['model_name']:<35} "
-                  f"[{r['source']}]")
+        for score_type, group_rows in rows:
+            print(f"  -- {config.score_type_label(score_type)} --")
+            for r in group_rows[:10]:
+                score_str = f"{r['score']:>8}" if r["score"] is not None else " " * 7 + "—"
+                print(f"  {score_str}  {r['model_name']:<35} [{r['source']}]")
     conn.close()
 
 

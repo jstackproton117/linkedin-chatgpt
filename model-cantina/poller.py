@@ -42,6 +42,25 @@ def _fetch_and_normalize(source_key):
     return module.normalize(raw)
 
 
+def _expand_proxy_records(source_key, records):
+    """config.yaml's proxy_for documents that a source's scores also stand
+    in for another category (e.g. SWE-bench's coding scores as a proxy for
+    software_architecture) — but normalize() only ever tags a record with
+    the source's real category, nothing actually duplicates it into the
+    proxy category. Without this, a proxy category with real sources
+    configured just silently shows zero scores forever (found 2026-08-06:
+    software_architecture and chunking_index had been empty since launch).
+    Duplicates every record from this source into each of its proxy
+    categories, unchanged except the category field."""
+    proxy_for = config.source_config(source_key).get("proxy_for") or []
+    if not proxy_for:
+        return records
+    expanded = list(records)
+    for category in proxy_for:
+        expanded.extend({**r, "category": category} for r in records)
+    return expanded
+
+
 def poll_all(source_keys=None, max_workers=8):
     """Concurrently fetch+normalize every requested source, then write
     results to the DB sequentially. Returns {source_key: result_dict} where
@@ -69,7 +88,8 @@ def poll_all(source_keys=None, max_workers=8):
         tier = config.source_config(key)["tier"]
         ok, payload = fetch_results[key]
         if ok:
-            summary[key] = storage.record_poll_results(conn, key, tier, payload)
+            records = _expand_proxy_records(key, payload)
+            summary[key] = storage.record_poll_results(conn, key, tier, records)
         else:
             storage.record_poll_failure(conn, key, tier, payload)
             summary[key] = {"error": str(payload)}

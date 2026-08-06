@@ -316,8 +316,27 @@ def get_notes_for_model(conn, model_id):
 
 
 def get_category_leaderboard(conn, category):
-    """Latest score per (model, source) for this category, newest first by score."""
-    return conn.execute(
+    """Latest score per (model, source, score_type) for this category,
+    grouped by score_type — a category is often fed by several sources
+    reporting completely different scales (Elo vs. a 0-100 percentage), so
+    ranking them together in one blended list isn't a real comparison.
+    Returns an ordered dict-like list of (score_type, rows) tuples, each
+    `rows` sorted DESC by score, nulls last. score_types where every row is
+    null (pure discovery feeds like hf_hub's "new release" markers, which
+    carry no actual benchmark score) are dropped entirely — nothing useful
+    to rank.
+
+    Grouping must include score_type, not just (model, source): a single
+    source can report more than one distinct metric (e.g. Artificial
+    Analysis produces both an Intelligence Index score for chat_reasoning
+    and a separate Terminal-Bench score for coding) — after the proxy_for
+    expansion (poller.py) both can land in the same category for the same
+    model, and grouping by (model, source) alone would silently keep only
+    one of the two rows (whichever has the higher id), dropping the other
+    metric entirely. Found 2026-08-06 via the proxy-category fix above
+    surfacing exactly this collision for the first time.
+    """
+    rows = conn.execute(
         """
         SELECT s.*, m.name as model_name, m.org as model_org, m.release_date as model_release_date
         FROM scores s
@@ -325,12 +344,24 @@ def get_category_leaderboard(conn, category):
         WHERE s.category = ?
         AND s.id IN (
             SELECT MAX(id) FROM scores
-            WHERE category = ? GROUP BY model_id, source
+            WHERE category = ? GROUP BY model_id, source, score_type
         )
-        ORDER BY s.score DESC
         """,
         (category, category),
     ).fetchall()
+
+    groups = {}
+    for r in rows:
+        groups.setdefault(r["score_type"], []).append(r)
+
+    result = []
+    for score_type, group_rows in groups.items():
+        if all(r["score"] is None for r in group_rows):
+            continue
+        group_rows.sort(key=lambda r: (r["score"] is None, -(r["score"] if r["score"] is not None else 0)))
+        result.append((score_type, group_rows))
+    result.sort(key=lambda item: item[0] or "")
+    return result
 
 
 def get_sources_health(conn):

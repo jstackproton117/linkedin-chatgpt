@@ -117,7 +117,7 @@ def model_detail_modal(model_id):
 @app.route("/category/<category_key>")
 def category_view(category_key):
     conn = storage.get_db()
-    rows = storage.get_category_leaderboard(conn, category_key)
+    groups = storage.get_category_leaderboard(conn, category_key)
     cfg = config.load_config()
     sources_feeding = [
         {"key": k, **v} for k, v in cfg["sources"].items()
@@ -127,11 +127,22 @@ def category_view(category_key):
         k for k, v in cfg["sources"].items() if category_key in v.get("proxy_for", [])
     }
     conn.close()
+    metric_groups = [
+        {
+            "score_type": score_type,
+            "label": config.score_type_label(score_type),
+            "description": config.score_type_description(score_type),
+            "source": group_rows[0]["source"] if group_rows else None,
+            "is_proxy": bool(group_rows) and group_rows[0]["source"] in proxy_source_keys,
+            "rows": group_rows,
+        }
+        for score_type, group_rows in groups
+    ]
     return render_template(
         "category.html",
         category_key=category_key,
         category_name=config.category_name(category_key),
-        rows=rows,
+        metric_groups=metric_groups,
         sources_feeding=sources_feeding,
         proxy_source_keys=proxy_source_keys,
         categories=cfg["categories"],

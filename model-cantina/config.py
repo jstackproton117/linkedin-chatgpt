@@ -54,3 +54,17 @@ def source_config(source_key):
 
 def category_name(category_key):
     return load_config()["categories"].get(category_key, {}).get("name", category_key)
+
+
+def _prettify_score_type(score_type):
+    return (score_type or "unknown").replace("_", " ").strip().capitalize()
+
+
+def score_type_label(score_type):
+    entry = load_config().get("score_types", {}).get(score_type)
+    return entry["label"] if entry else _prettify_score_type(score_type)
+
+
+def score_type_description(score_type):
+    entry = load_config().get("score_types", {}).get(score_type)
+    return entry["description"] if entry else None

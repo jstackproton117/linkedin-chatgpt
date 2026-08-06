@@ -114,6 +114,49 @@ sources:
     proxy_for: []
     poll_cadence_hours: 168
 
+# Human-readable label + one-line description per score_type, used to split
+# a category's leaderboard into one table per metric instead of blending
+# incomparable scales (Elo vs. percentage) into a single ranked list — see
+# GOALS.md D11. Falls back to a prettified version of the raw score_type
+# string for anything not listed here, so a new source never breaks.
+score_types:
+  arena_elo:
+    label: "Arena — Elo"
+    description: "Blind pairwise human-preference Elo rating. Unbounded scale, not a percentage."
+  aa_intelligence_index:
+    label: "Artificial Analysis — Intelligence Index"
+    description: "Composite of 9 evals (GPQA Diamond, Humanity's Last Exam, SciCode, and others). 0-100ish scale."
+  aa_terminalbench_v2_1_score:
+    label: "Artificial Analysis — Terminal-Bench v2.1"
+    description: "Agentic terminal-use/coding benchmark. Resolve-rate percentage."
+  swebench_verified_resolve_rate:
+    label: "SWE-bench Verified"
+    description: "% of real GitHub issues resolved, 500 human-curated instances."
+  livecodebench_pass_at_1:
+    label: "LiveCodeBench — pass@1"
+    description: "% of contest coding problems solved on first attempt, contamination-resistant (continuously new problems)."
+  aider_polyglot_pass_rate_2:
+    label: "Aider Polyglot — pass rate"
+    description: "% of 225 Exercism exercises across 6 languages solved within 2 attempts."
+  mteb_eng_v2_mean_task:
+    label: "MTEB (eng, v2) — mean task score"
+    description: "Mean score across retrieval/classification/clustering/STS tasks, English embedding benchmark."
+  idp_leaderboard_olmocr_overall:
+    label: "IDP Leaderboard — olmOCR"
+    description: "OCR text-extraction fidelity sub-score."
+  idp_leaderboard_omnidocbench_overall:
+    label: "IDP Leaderboard — OmniDocBench"
+    description: "Document layout/structure parsing sub-score."
+  idp_leaderboard_idp_overall:
+    label: "IDP Leaderboard — IDP Core"
+    description: "Key-info extraction, table extraction, and document VQA sub-score."
+  agentdojo_targeted_defense_rate:
+    label: "AgentDojo — targeted defense rate"
+    description: "% of prompt-injection attacks successfully resisted (inverted from AgentDojo's raw attack-success-rate so higher is always better here)."
+  vals_legalbench_overall_accuracy_proxy:
+    label: "Vals.ai LegalBench — accuracy (proxy)"
+    description: "Legal text-classification accuracy, used as an imperfect proxy for general classification ability — not routing/triage specifically."
+
 # 5-tier rating scale reused from the "AI Benchtests" Lumo benchmark project,
 # for manual_notes.rating — kept consistent across Joe's tools.
 manual_note_ratings:
