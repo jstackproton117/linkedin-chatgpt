@@ -79,11 +79,19 @@ def models_list():
 def _load_model_detail(model_id):
     conn = storage.get_db()
     model = storage.get_model(conn, model_id)
-    scores = storage.get_scores_for_model(conn, model_id)
+    raw_scores = storage.get_scores_for_model(conn, model_id)
     notes = storage.get_notes_for_model(conn, model_id)
     conn.close()
     if model is None:
         return None
+    # Same human-readable label the category leaderboards use (config.yaml's
+    # score_types) — without this, this page showed raw strings like
+    # "aa_intelligence_index" while the category page showed "Artificial
+    # Analysis — Intelligence Index" for the exact same data.
+    scores = [
+        {**dict(s), "score_type_label": config.score_type_label(s["score_type"])}
+        for s in raw_scores
+    ]
     return dict(
         model=model,
         scores=scores,
@@ -188,8 +196,12 @@ def api_add_note():
     category = data.get("category")
     rating = data.get("rating")
     note = (data.get("note") or "").strip()
-    valid_ratings = config.load_config()["manual_note_ratings"]
-    if not name or not category or rating not in valid_ratings:
+    cfg = config.load_config()
+    valid_ratings = cfg["manual_note_ratings"]
+    # Without this, an invalid category string would silently create a note
+    # that never shows up on any category page (they all iterate config's
+    # real category list) — just an orphaned row, no error anywhere.
+    if not name or category not in cfg["categories"] or rating not in valid_ratings:
         return jsonify({"ok": False, "error": "missing or invalid fields"}), 400
     conn = storage.get_db()
     model_id = storage.find_or_create_model_by_name(conn, name)

@@ -55,7 +55,11 @@ def cmd_note(args):
         sys.exit(1)
     name, category, rating = args[0], args[1], args[2]
     text = " ".join(args[3:])
-    valid_ratings = config.load_config()["manual_note_ratings"]
+    cfg = config.load_config()
+    valid_ratings = cfg["manual_note_ratings"]
+    if category not in cfg["categories"]:
+        print(f"category must be one of: {', '.join(cfg['categories'])}")
+        sys.exit(1)
     if rating not in valid_ratings:
         print(f"rating must be one of: {', '.join(valid_ratings)}")
         sys.exit(1)
