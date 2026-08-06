@@ -179,7 +179,12 @@ def health():
     for key, scfg in cfg["sources"].items():
         row = sources_health.get(key, {})
         sources.append({"key": key, "name": scfg["name"], "tier": scfg["tier"],
-                         "categories": scfg.get("categories", []),
+                         "categories": [config.category_name(c) for c in scfg.get("categories", [])],
+                         # Without this, the health page didn't show that e.g.
+                         # swebench also feeds software_architecture — same
+                         # kind of invisible-proxy gap as the category pages
+                         # had (D11) until it was found and fixed there.
+                         "proxy_categories": [config.category_name(c) for c in scfg.get("proxy_for", [])],
                          "last_polled_at": row.get("last_polled_at"),
                          "last_status": row.get("last_status", "never polled"),
                          "last_error": row.get("last_error")})

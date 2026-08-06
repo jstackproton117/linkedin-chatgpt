@@ -16,7 +16,10 @@
     <tr>
       <td><span class="badge tier-{{ s.tier }}">{{ s.tier }}</span></td>
       <td>{{ s.name }}</td>
-      <td class="muted">{{ s.categories|join(', ') }}</td>
+      <td class="muted">
+        {{ s.categories|join(', ') }}
+        {% if s.proxy_categories %}<br><span class="badge proxy">proxy for</span> {{ s.proxy_categories|join(', ') }}{% endif %}
+      </td>
       <td><span class="badge status-{{ s.last_status if s.last_status != 'never polled' else 'unpolled' }}">{{ s.last_status }}</span></td>
       <td class="muted">{{ s.last_polled_at[:16] if s.last_polled_at else '—' }}</td>
       <td class="muted">{{ s.last_error or '—' }}</td>
