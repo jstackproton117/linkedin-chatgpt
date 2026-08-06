@@ -29,6 +29,7 @@ SOURCE_MODULES = {
     "ocr_benchmarks": "sources.ocr_benchmarks",
     "safety_benchmarks": "sources.safety_benchmarks",
     "vals_classification": "sources.vals_classification",
+    "browsecomp_plus": "sources.browsecomp_plus",
 }
 
 

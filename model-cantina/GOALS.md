@@ -124,6 +124,43 @@ session auth for a one-button admin feature, `IS_HOSTED_PUBLICLY` (true
 when `DATABASE_URL` is set) just disables the endpoint and hides the
 button entirely on Vercel; the daily cron is the only poll trigger there.
 
+**D11 — Category leaderboards split by score_type, never blended.** Joe
+flagged (2026-08-06) that ranking Elo against a 0-100 index in one list
+wasn't a real comparison. `get_category_leaderboard` now returns groups
+keyed by score_type, each rendered as its own table with a human-readable
+label + description (`config.yaml`'s `score_types` section). This surfaced
+two real, previously-invisible bugs, not just a display problem:
+- `proxy_for` in `config.yaml` had always been documentation-only — nothing
+  ever duplicated a source's scores into its proxy category, so
+  `software_architecture` and `chunking_index` had been completely empty
+  since launch. Fixed in `poller.py` (`_expand_proxy_records`), which
+  duplicates a source's records into each of its proxy categories at
+  write time.
+- The "latest score per model" dedup grouped by `(model_id, source)`
+  only, missing `score_type` — a source producing more than one metric
+  (Artificial Analysis: Intelligence Index + Terminal-Bench; IDP
+  Leaderboard: 3 OCR sub-benchmarks) could silently drop all but one score
+  per model. Invisible until the proxy-category fix above created the
+  first same-category collision between two of Artificial Analysis's
+  score_types. Fixed by adding `score_type` to the `GROUP BY`.
+
+**D12 — Research category built on BrowseComp-Plus, not Kaggle's FACTS
+Search V2.** Researched four real candidates for a "research/browsing"
+category: Humanity's Last Exam (real, multi-vendor, but closed-book
+trivia — not a research/browsing benchmark), GAIA (measures stacked
+multi-model agent scaffolds, not individual models — not a clean
+comparison), Kaggle FACTS Search V2 (best-designed — standardized search
+tool given equally to every model — but its data comes from an
+undocumented internal RPC endpoint that 400'd on every guessed request
+body; not worth reverse-engineering an unstable private API for a first
+cut), and BrowseComp-Plus (real, live, multi-vendor, and — checked by
+watching the HF Space's own network requests rather than assuming — backed
+by a genuinely static `/data/leaderboard.json`, no scraping needed). Uses a
+fixed 100K-doc corpus rather than live web search, deliberately isolating
+model quality from retriever quality; each (LLM, retriever) pair is kept as
+a distinct entry rather than collapsed to one row per model, since the
+retriever measurably changes the score.
+
 ## Open Questions
 
 | # | Question | Resolution trigger |
@@ -134,6 +171,8 @@ button entirely on Vercel; the daily cron is the only poll trigger there.
 | OQ4 | Should there be a daily email digest, like Rebel Intel's `notify.py`? | Joe explicitly deferred this for v1 (dashboard-only) on 2026-08-05 — revisit if checking the dashboard daily becomes tedious. |
 | OQ5 | Thornwick and Vercel poll independently into separate databases, so their model counts/scores will drift apart over time. Worth unifying (e.g. Thornwick becomes the only poller, Vercel just reads Thornwick's data some way) instead of two independent trackers? | Revisit if the divergence actually confuses Joe in practice — not a problem on day one when both are freshly seeded. |
 | OQ6 | Cold-start poll against Postgres (~48s) has less headroom under Vercel's 60s ceiling than steady-state (~15s). Only matters once (first-ever poll) at current data volume — would it matter again if many more sources get added later? | Revisit only if a future source addition measurably pushes cold-start close to 60s again. |
+| OQ7 | Kaggle's FACTS Search V2 looked like the best-designed research benchmark (standardized search tool per model, removing retriever confound) but was skipped since its leaderboard data requires reverse-engineering an undocumented internal RPC API. Worth the effort later? | Revisit if BrowseComp-Plus goes stale/dead, or if Joe specifically wants FACTS Search V2's fairer methodology badly enough to justify the fragility. |
+| OQ8 | classification_routing, chunking_index (proxy-only), and research are all thin (1-2 sources) compared to chat/coding. Worth actively looking for more sources for these specifically? | Revisit next time sources get added generally — no urgency, categories work fine with what they have, just less redundant than chat/coding. |
 
 ## Roadmap
 
@@ -154,4 +193,9 @@ button entirely on Vercel; the daily cron is the only poll trigger there.
 - [x] Vercel auto-deploys on push to master (Root Directory set to
       model-cantina via the Vercel API — the CLI has no command for this,
       only `vercel git connect` for the repo link itself)
-- [ ] OQ1–OQ6 above, as they come up
+- [x] Category leaderboards split by score_type instead of blended ranking
+- [x] Model-detail modal (in-page popup instead of full navigation)
+- [x] Model release_date, distinct from first_seen_at (populated where
+      available: Hugging Face, MTEB, IDP Leaderboard)
+- [x] 10th category: Research / Web Search & Synthesis (BrowseComp-Plus)
+- [ ] OQ1–OQ8 above, as they come up

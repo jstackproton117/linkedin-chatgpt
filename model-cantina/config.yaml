@@ -17,6 +17,8 @@ categories:
     name: "Classification, Routing & Triage"
   chunking_index:
     name: "Chunking & Index Enrichment"
+  research:
+    name: "Research / Web Search & Synthesis"
   privacy_trust:
     name: "Privacy & Trust-Boundary Enforcement"
 
@@ -114,6 +116,15 @@ sources:
     proxy_for: []
     poll_cadence_hours: 168
 
+  browsecomp_plus:
+    tier: A
+    name: "BrowseComp-Plus"
+    url: "https://tevatron-browsecomp-plus.hf.space/data/leaderboard.json"
+    note: "Fixed 100K-doc corpus, not live web search — isolates model quality from retriever quality by design."
+    categories: [research]
+    proxy_for: []
+    poll_cadence_hours: 168
+
 # Human-readable label + one-line description per score_type, used to split
 # a category's leaderboard into one table per metric instead of blending
 # incomparable scales (Elo vs. percentage) into a single ranked list — see
@@ -156,6 +167,9 @@ score_types:
   vals_legalbench_overall_accuracy_proxy:
     label: "Vals.ai LegalBench — accuracy (proxy)"
     description: "Legal text-classification accuracy, used as an imperfect proxy for general classification ability — not routing/triage specifically."
+  browsecomp_plus_accuracy:
+    label: "BrowseComp-Plus — accuracy"
+    description: "% of hard research questions answered correctly, given a fixed 100K-doc corpus and a search tool (not live web). Same model can appear multiple times with different retrievers."
 
 # 5-tier rating scale reused from the "AI Benchtests" Lumo benchmark project,
 # for manual_notes.rating — kept consistent across Joe's tools.
