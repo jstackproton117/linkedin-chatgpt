@@ -21,3 +21,4 @@ ENV/
 # OS files
 .DS_Store
 Thumbs.db
+discord_config.json

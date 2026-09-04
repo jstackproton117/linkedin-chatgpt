@@ -1,0 +1,541 @@
+# Content Radar Configuration
+# Pillars reflect Joe Stackpole's actual work and LinkedIn positioning.
+# Feeds are shared by both content-radar CLI and the Rebel Intel pipeline.
+
+pillars:
+  agentic_ai_engineering:
+    name: "Agentic AI & Local Inference"
+    keywords:
+      - "agentic AI"
+      - "AI agent"
+      - "multi-agent"
+      - "autonomous agent"
+      - "local inference"
+      - "local LLM"
+      - "local model"
+      - "model routing"
+      - "model orchestration"
+      - "AI harness"
+      - "sprint-based AI"
+      - "AI coding"
+      - "AI coding assistant"
+      - "autonomous coding"
+      - "Qwen"
+      - "open source model"
+      - "open weights"
+      - "inference optimization"
+      - "GPU inference"
+      - "LLM serving"
+      - "vLLM"
+      - "Ollama"
+      - "llama.cpp"
+      - "brain actor spine"
+      - "critic model"
+      - "GraphRAG"
+      - "tool use"
+      - "tool calling"
+      - "function calling"
+      - "LLM orchestration"
+      - "context window"
+      - "RAG"
+      - "retrieval augmented"
+      - "frontier model"
+      - "frontier spend"
+      - "AI evaluation"
+      - "eval framework"
+      - "LLM eval"
+      - "AI benchmark"
+      - "reasoning model"
+      - "AI model"
+      - "large language model"
+      - "LLM"
+      - "foundation model"
+      - "OpenAI"
+      - "Anthropic"
+      - "Claude"
+      - "GPT"
+      - "Gemini"
+      - "Mistral"
+      - "multi-agent workflow"
+      - "AI workflow"
+      - "AI automation"
+      - "generative AI"
+      - "prompt engineering"
+      - "AI agents"
+      - "AI safety"
+      - "AI governance"
+      - "AI regulation"
+      - "AI policy"
+      - "Google DeepMind"
+
+  technical_delivery:
+    name: "Technical Delivery & Production AI"
+    keywords:
+      - "technical program management"
+      - "TPM"
+      - "technical delivery"
+      - "AI deployment"
+      - "production AI"
+      - "shipping AI"
+      - "AI in production"
+      - "MLOps"
+      - "LLMOps"
+      - "machine learning ops"
+      - "AI observability"
+      - "AI monitoring"
+      - "sprint planning"
+      - "agile AI"
+      - "delivery leadership"
+      - "engineering leadership"
+      - "engineering management"
+      - "tech leadership"
+      - "developer experience"
+      - "engineering velocity"
+      - "developer productivity"
+      - "DORA metrics"
+      - "DevOps"
+      - "CI/CD"
+      - "SRE"
+      - "platform engineering"
+      - "platform team"
+      - "observability"
+      - "incident management"
+      - "engineering metrics"
+      - "tech debt"
+      - "system design"
+      - "distributed systems"
+      - "scalability"
+      - "reliability engineering"
+      - "API design"
+      - "microservices"
+      - "cloud native"
+
+  enterprise_it:
+    name: "Enterprise IT & Infrastructure"
+    keywords:
+      - "Microsoft Intune"
+      - "Apple Business Manager"
+      - "MDM"
+      - "mobile device management"
+      - "Microsoft Entra"
+      - "Entra ID"
+      - "Azure AD"
+      - "OIDC"
+      - "federated authentication"
+      - "identity and access management"
+      - "IAM"
+      - "zero trust"
+      - "SSO"
+      - "enterprise security"
+      - "endpoint management"
+      - "device management"
+      - "enterprise IT"
+      - "IT administration"
+      - "cloud infrastructure"
+      - "infrastructure"
+      - "security"
+      - "cybersecurity"
+      - "data security"
+      - "enterprise software"
+      - "SaaS"
+
+  ai_products:
+    name: "AI Products & Applied AI"
+    keywords:
+      - "AI product"
+      - "applied AI"
+      - "AI application"
+      - "workflow automation"
+      - "process automation"
+      - "natural language interface"
+      - "natural language querying"
+      - "business intelligence"
+      - "data platform"
+      - "IBM i"
+      - "AS400"
+      - "iSeries"
+      - "manufacturing AI"
+      - "client portal"
+      - "two-sided platform"
+      - "Airtable"
+      - "Stripe"
+      - "no-code"
+      - "low-code"
+      - "digital transformation"
+      - "operational efficiency"
+      - "AI ROI"
+      - "AI adoption"
+      - "enterprise AI"
+      - "AI implementation"
+      - "consulting"
+      - "AI consulting"
+      - "startup"
+      - "product development"
+      - "LangChain"
+      - "LangGraph"
+
+  career_remote:
+    name: "Career & Remote Work Identity"
+    keywords:
+      - "remote work"
+      - "remote-first"
+      - "distributed team"
+      - "remote engineering"
+      - "hybrid work"
+      - "work from home"
+      - "Chattanooga"
+      - "Tennessee"
+      - "talent"
+      - "tech career"
+      - "career transition"
+      - "career development"
+      - "leadership growth"
+      - "IC to manager"
+      - "tech talent"
+      - "hiring"
+      - "technical hiring"
+      - "job market"
+      - "salary"
+      - "compensation"
+      - "workforce development"
+      - "skills gap"
+      - "upskilling"
+      - "AI skills"
+
+
+feeds:
+  # ── Practitioner AI / must-read ──────────────────────────────────────────
+  - name: "Hugging Face Blog"
+    url: "https://huggingface.co/blog/feed.xml"
+    category: "ai"
+
+  # DEAD: 301 to a site with no feed as of 2026-09-04 — re-enable if the publisher restores it.
+  - name: "LangChain Blog"
+    enabled: false
+    url: "https://blog.langchain.dev/rss/"
+    category: "ai"
+
+  # DEAD: 404 as of 2026-09-04 — re-enable if the publisher restores it.
+  - name: "The Batch (deeplearning.ai)"
+    enabled: false
+    url: "https://www.deeplearning.ai/the-batch/feed/rss.xml"
+    category: "ai"
+
+  - name: "Import AI (Jack Clark)"
+    url: "https://importai.substack.com/feed"
+    category: "ai"
+
+  - name: "Interconnects (Nathan Lambert)"
+    url: "https://www.interconnects.ai/feed"
+    category: "ai"
+
+  - name: "Latent Space"
+    url: "https://www.latent.space/feed"
+    category: "ai"
+
+  - name: "Weights & Biases Blog"
+    url: "https://wandb.ai/fully-connected/rss.xml"
+    category: "ai"
+
+  # ── AI news ────────────────────────────────────────────────────────────────
+  - name: "MIT Technology Review - AI"
+    url: "https://www.technologyreview.com/topic/artificial-intelligence/feed"
+    category: "ai"
+
+  - name: "The Verge - AI"
+    url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+    category: "ai"
+
+  - name: "TechCrunch - AI"
+    url: "https://techcrunch.com/category/artificial-intelligence/feed/"
+    category: "ai"
+
+  - name: "OpenAI Blog"
+    url: "https://openai.com/blog/rss.xml"
+    category: "ai"
+
+  - name: "VentureBeat - AI"
+    url: "https://venturebeat.com/category/ai/feed/"
+    category: "ai"
+
+  # DEAD: 404 on every known URL as of 2026-09-04 — re-enable if the publisher restores it.
+  - name: "Anthropic News"
+    enabled: false
+    url: "https://www.anthropic.com/news/rss"
+    category: "ai"
+
+  # ── Engineering leadership & culture ──────────────────────────────────────
+  - name: "The Pragmatic Engineer"
+    url: "https://newsletter.pragmaticengineer.com/feed"
+    category: "leadership"
+
+  - name: "LeadDev"
+    url: "https://leaddev.com/rss.xml"
+    category: "leadership"
+
+  - name: "InfoQ"
+    url: "https://feed.infoq.com/ai-ml-data-eng/"
+    category: "engineering"
+
+  # ── Broader tech ──────────────────────────────────────────────────────────
+  - name: "Ars Technica"
+    url: "https://feeds.arstechnica.com/arstechnica/index"
+    category: "tech"
+
+  - name: "Wired"
+    url: "https://www.wired.com/feed/rss"
+    category: "tech"
+
+  - name: "The Register"
+    url: "https://www.theregister.com/headlines.atom"
+    category: "tech"
+
+  # hnrss.org is dead (returns zero entries), so this uses the Algolia API.
+  - name: "Hacker News"
+    url: "hn://top"
+    source: "hn"
+    min_points: 100
+    hits: 60
+    category: "tech"
+
+  # ── Architecture & systems ────────────────────────────────────────────────
+  - name: "Martin Fowler"
+    url: "https://martinfowler.com/feed.atom"
+    category: "architecture"
+
+  # ── Enterprise & market signals ───────────────────────────────────────────
+  # DEAD: 404 as of 2026-09-04 — re-enable if the publisher restores it.
+  - name: "a16z"
+    enabled: false
+    url: "https://a16z.com/feed/"
+    category: "business"
+
+  # DEAD: feed returns nothing as of 2026-09-04 — re-enable if the publisher restores it.
+  - name: "Harvard Business Review"
+    enabled: false
+    url: "https://feeds.hbr.org/harvardbusiness"
+    category: "leadership"
+
+  # ── Policy & workforce ────────────────────────────────────────────────────
+  - name: "EFF Deeplinks"
+    url: "https://www.eff.org/rss/updates.xml"
+    category: "policy"
+
+
+  # ── Podcasts ─────────────────────────────────────────────────────────────
+  # The main latent.space feed is dominated by the daily AINews digests, so
+  # actual episodes get buried. This is the dedicated podcast feed.
+  # Episodes ship roughly every 4 days (max observed gap 13), so the default
+  # 72h window would miss most of them — hence the 14-day override.
+  - name: "Latent Space Podcast"
+    url: "https://api.substack.com/feed/podcast/1084089.rss"
+    category: "ai"
+    type: "podcast"
+    freshness_hours: 336
+
+  # ── Papers ───────────────────────────────────────────────────────────────
+  # Hugging Face Daily Papers: community-curated with upvotes, which is the
+  # closest thing to "what the ML community actually surfaced today".
+  # Raw arXiv is ~800 papers/day and would drown every other source.
+  - name: "HF Daily Papers"
+    url: "https://huggingface.co/papers"
+    source: "hf_papers"
+    category: "ai"
+    type: "paper"
+    freshness_hours: 72
+    min_upvotes: 5
+    max_items: 12
+
+
+
+  # ── Discord ───────────────────────────────────────────────────────────────
+  # Harvests paper links people share in Discord channels, using reaction
+  # counts as the quality signal. Disabled until a bot token exists.
+  #
+  # A bot can only be added to a server by someone holding Manage Server
+  # THERE. So this works for servers Joe controls, and for another server's
+  # announcement channels mirrored into his via Discord Channel Following.
+  # It CANNOT read the Latent Space Discord unless their admins add the bot.
+  #
+  # Setup: cp discord_config.example.json discord_config.json, follow the
+  # _setup steps inside it, then run: .venv/bin/python check_discord.py
+  # When that passes, flip `enabled` to true.
+  - name: "Discord - shared papers"
+    url: "discord://configured-channels"
+    source: "discord"
+    enabled: false
+    category: "ai"
+    type: "paper"
+    freshness_hours: 168
+    papers_only: true
+    min_reactions: 0
+    per_channel_limit: 100
+
+  # ── AI podcasts ───────────────────────────────────────────────────────────
+  # All verified live with their real publish cadence. Podcasts get a 14-day
+  # window because most are weekly — a 72h window would miss them entirely.
+  # ThursdAI's dedicated podcast RSS is stale (78 days); its Substack feed is
+  # the live one, so use that.
+  - name: "ThursdAI"
+    url: "https://sub.thursdai.news/feed"
+    category: "ai"
+    type: "podcast"
+    freshness_hours: 336
+
+  - name: "Dwarkesh Podcast"
+    url: "https://www.dwarkesh.com/feed"
+    category: "ai"
+    type: "podcast"
+    freshness_hours: 336
+
+  - name: "No Priors"
+    url: "https://feeds.megaphone.fm/nopriors"
+    category: "ai"
+    type: "podcast"
+    freshness_hours: 336
+
+  - name: "Practical AI"
+    url: "https://changelog.com/practicalai/feed"
+    category: "ai"
+    type: "podcast"
+    freshness_hours: 336
+
+  - name: "TWIML AI Podcast"
+    url: "https://twimlai.com/feed/podcast/"
+    category: "ai"
+    type: "podcast"
+    freshness_hours: 504
+
+  - name: "Machine Learning Street Talk"
+    url: "https://anchor.fm/s/1e4a0eac/podcast/rss"
+    category: "ai"
+    type: "podcast"
+    freshness_hours: 504
+
+  - name: "Last Week in AI"
+    url: "https://lastweekin.ai/feed"
+    category: "ai"
+    type: "podcast"
+    freshness_hours: 336
+
+  # ── Wider paper net ───────────────────────────────────────────────────────
+  # HF Daily Papers shows what is already popular. These catch things earlier
+  # and from different crowds. Each query is deliberately narrow and capped —
+  # arXiv category firehoses would bury everything else.
+
+  # Papers that working engineers upvoted on HN — a different, usually earlier
+  # population than the one voting on Hugging Face.
+  - name: "HN - papers"
+    url: "hn://arxiv"
+    source: "hn"
+    category: "ai"
+    type: "paper"
+    query: "arxiv.org"
+    min_points: 15
+    hits: 40
+    resolve_papers: true
+    freshness_hours: 168
+    max_items: 8
+
+
+
+
+
+
+
+  # ── arXiv ─────────────────────────────────────────────────────────────────
+  # ONE request per run, deliberately. Two things were broken before:
+  #   * http://export.arxiv.org 301-redirects now and feedparser returns
+  #     nothing, so every arXiv query had silently stopped working.
+  #   * eight separate queries got 429-rate-limited after about two, so most
+  #     came back empty even when the URL was correct.
+  # One broad OR query, ranked locally afterwards, fixes both.
+  #
+  # Add a phrase here when a paper you liked would have been missed. The
+  # consumer-GPU training terms exist because arXiv:2608.27370 ("Puro-2B ...
+  # Trained on RTX 5090") slipped through — the earlier queries covered
+  # inference but never training on consumer hardware.
+  - name: "arXiv - Joe's topics"
+    url: "https://export.arxiv.org/api/query?search_query=abs:%22LLM+inference%22+OR+abs:%22inference+serving%22+OR+abs:%22model+quantization%22+OR+abs:%22consumer+GPU%22+OR+abs:%22single+GPU%22+OR+abs:%22low-cost+training%22+OR+abs:%22efficient+pretraining%22+OR+abs:%22model+routing%22+OR+abs:%22LLM+cascade%22+OR+abs:%22inference+cost%22+OR+abs:%22LLM+agent%22+OR+abs:%22multi-agent+system%22+OR+abs:%22agent+harness%22+OR+abs:%22agentic+workflow%22+OR+abs:%22retrieval-augmented+generation%22+OR+abs:%22benchmark+contamination%22+OR+abs:%22evaluation+harness%22+OR+abs:%22text-to-SQL%22+OR+abs:%22code+generation%22&sortBy=submittedDate&sortOrder=descending&max_results=100"
+    category: "ai"
+    type: "paper"
+    freshness_hours: 120
+    max_items: 12
+
+  # ── Community signal ──────────────────────────────────────────────────────
+  # Reddit rate-limits aggressively; a failed fetch is logged and skipped, and
+  # r/LocalLLaMA in particular tracks Joe's local-inference work closely.
+  - name: "r/LocalLLaMA"
+    user_agent: "rebel-intel/1.0 (personal news aggregator)"
+    url: "https://www.reddit.com/r/LocalLLaMA/top/.rss?t=day"
+    category: "ai"
+    freshness_hours: 96
+    max_items: 8
+
+  - name: "r/MachineLearning"
+    user_agent: "rebel-intel/1.0 (personal news aggregator)"
+    url: "https://www.reddit.com/r/MachineLearning/top/.rss?t=week"
+    category: "ai"
+    freshness_hours: 168
+    max_items: 6
+
+  - name: "The Sequence"
+    url: "https://thesequence.substack.com/feed"
+    category: "ai"
+    freshness_hours: 168
+
+  - name: "AI Snake Oil"
+    url: "https://www.aisnakeoil.com/feed"
+    category: "ai"
+    freshness_hours: 720
+
+  - name: "Ollama Blog"
+    url: "https://ollama.com/blog/rss.xml"
+    category: "ai"
+    freshness_hours: 336
+
+  # ── Practitioner writing (verified live and current) ──────────────────────
+  - name: "Simon Willison"
+    url: "https://simonwillison.net/atom/everything/"
+    category: "ai"
+
+  - name: "Ethan Mollick"
+    url: "https://www.oneusefulthing.org/feed"
+    category: "ai"
+
+  - name: "Google DeepMind"
+    url: "https://deepmind.google/blog/rss.xml"
+    category: "ai"
+
+  - name: "Google AI Blog"
+    url: "https://blog.google/technology/ai/rss/"
+    category: "ai"
+
+  - name: "Together AI"
+    url: "https://www.together.ai/blog/rss.xml"
+    category: "ai"
+    freshness_hours: 168
+
+  # These two publish every 1-2 weeks, so they need a longer window or they
+  # would almost never land inside a 72h fetch.
+  - name: "Sebastian Raschka"
+    url: "https://magazine.sebastianraschka.com/feed"
+    category: "ai"
+    freshness_hours: 336
+
+  - name: "Answer.AI"
+    url: "https://www.answer.ai/index.xml"
+    category: "ai"
+    freshness_hours: 336
+
+
+# Scoring configuration
+scoring:
+  min_relevance: 40
+  review_limit: 15
+  feedback_weight: 0.3
+  freshness_hours: 72
+
+summary:
+  batch_size: 5
+  tone: "concise, practitioner-focused, relevant to a production AI builder and technical delivery leader"

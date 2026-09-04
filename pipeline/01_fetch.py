@@ -15,6 +15,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import feedparser
+import requests
 import yaml
 from dateutil import parser as dateparser
 
@@ -28,9 +29,16 @@ OUT_PATH = DATA / "articles.json"
 THEME_PATH = DATA / "theme_counts.json"
 WEIGHTS_PATH = DATA / "weights.json"
 SELECTION_LOG_PATH = DATA / "selection_log.json"
+QUEUE_PATH = DATA / "queue.json"
 
 MAX_ARTICLES = SETTINGS["pipeline"]["max_articles"]
 FRESHNESS_H = SETTINGS["pipeline"]["freshness_hours"]
+
+# Must exceed the longest per-feed freshness window, or an item could be
+# forgotten while still inside its window and get re-fetched as a duplicate.
+SEEN_RETENTION_DAYS = 30
+
+HF_PAPERS_API = "https://huggingface.co/api/daily_papers"
 
 # Weight learning — conservative by design
 MIN_TOTAL_SELECTIONS = 10       # don't adjust until we have this many total selections
@@ -50,7 +58,7 @@ def load_seen():
     if not SEEN_PATH.exists():
         return {}
     entries = json.loads(SEEN_PATH.read_text())
-    cutoff = datetime.now(timezone.utc) - timedelta(days=14)
+    cutoff = datetime.now(timezone.utc) - timedelta(days=SEEN_RETENTION_DAYS)
     return {url: ts for url, ts in entries.items()
             if datetime.fromisoformat(ts) > cutoff}
 
@@ -87,6 +95,340 @@ def get_content(entry):
         if val:
             return strip_html(val)
     return ""
+
+
+def fetch_hf_papers(conf):
+    """Hugging Face Daily Papers — community-curated, with upvote counts.
+
+    Not an RSS feed, so it gets its own adapter. Upvotes are the quality
+    signal: raw arXiv is ~800 papers a day and would drown everything, while
+    this is the subset the ML community actually surfaced and voted on.
+    """
+    resp = requests.get(HF_PAPERS_API, timeout=30,
+                        headers={"User-Agent": "rebel-intel/1.0"})
+    resp.raise_for_status()
+    min_upvotes = conf.get("min_upvotes", 0)
+    out = []
+    for item in resp.json():
+        paper = item.get("paper") or {}
+        paper_id = paper.get("id")
+        if not paper_id:
+            continue
+        upvotes = paper.get("upvotes") or 0
+        if upvotes < min_upvotes:
+            continue
+        title = strip_html(paper.get("title") or item.get("title") or "")
+        # ai_summary is a plain-language summary; the raw abstract is the
+        # fallback. Either beats the title alone for embedding and ranking.
+        snippet = strip_html(paper.get("ai_summary") or paper.get("summary") or "")
+        published = parse_date(paper.get("publishedAt") or item.get("publishedAt") or "")
+        if not title:
+            continue
+        out.append({
+            "title": title,
+            "url": f"https://huggingface.co/papers/{paper_id}",
+            "published": published,
+            "snippet": snippet[:400],
+            "upvotes": upvotes,
+        })
+    out.sort(key=lambda x: -x["upvotes"])
+    return out
+
+
+# Per-run record of what each source actually returned, so a feed that quietly
+# dies is visible instead of just contributing nothing forever. Both the
+# hnrss.org feed and every arXiv query had been returning zero for an unknown
+# length of time before this existed.
+FEED_STATUS = {}
+
+
+def fetch_rss(conf):
+    name = conf.get("name", conf["url"])
+    # Use feedparser's own User-Agent by default. Overriding it globally made
+    # 17 of 48 feeds start returning 301/307/404 — plenty of publishers treat
+    # an unknown UA differently. Only set `user_agent` on feeds that need one
+    # (Reddit does).
+    headers = {}
+    if conf.get("user_agent"):
+        headers["User-Agent"] = conf["user_agent"]
+    feed = feedparser.parse(conf["url"], request_headers=headers or None)
+    status = getattr(feed, "status", None)
+    # feedparser follows redirects and still parses the result, so a 301/302
+    # that yields entries is perfectly healthy — only an empty result is a
+    # real failure. Reporting on status alone flagged 17 working feeds.
+    if not feed.entries:
+        hint = {
+            301: "moved and no longer serves a feed — find the new URL",
+            302: "redirect leads nowhere — find the new URL",
+            307: "redirect leads nowhere — find the new URL",
+            400: "bad request — the query URL is malformed",
+            401: "auth required",
+            403: "blocked (needs a User-Agent, or login)",
+            404: "gone — find a new feed URL",
+            429: "rate limited — fetch it less often",
+        }.get(status, "returned no entries")
+        FEED_STATUS[name] = f"HTTP {status}: {hint}" if status else hint
+        print(f"  Warning: {name} — {FEED_STATUS[name]}")
+    elif status and status not in (200, 301, 302, 307):
+        # Parsed fine, but worth noting.
+        print(f"  Note: {name} returned HTTP {status} but parsed {len(feed.entries)} entries")
+    out = []
+    for entry in feed.entries:
+        title = strip_html(entry.get("title", ""))
+        url = entry.get("link", "")
+        if not title or not url:
+            continue
+        out.append({
+            "title": title,
+            "url": url,
+            "published": parse_date(entry.get("published", "") or entry.get("updated", "")),
+            "snippet": get_content(entry)[:400],
+            "upvotes": None,
+        })
+    return out
+
+
+DISCORD_API = "https://discord.com/api/v10"
+DISCORD_CONFIG_PATH = BASE / "discord_config.json"
+
+# Links worth turning into a reviewable item. Everything else in a message is
+# chatter — the point is the papers people share, not the conversation.
+PAPER_LINK_RE = re.compile(
+    r"https?://(?:www\.)?("
+    r"arxiv\.org/(?:abs|pdf)/[\w.\-/]+"
+    r"|huggingface\.co/papers/[\w.\-/]+"
+    r"|openreview\.net/forum\?id=[\w.\-]+"
+    r"|aclanthology\.org/[\w.\-/]+"
+    r")",
+    re.I,
+)
+GENERIC_LINK_RE = re.compile(r"https?://[^\s<>()\[\]]+", re.I)
+
+
+def load_discord_config():
+    """Bot token lives in its own gitignored file, the same pattern
+    notify_config.json already uses for the Gmail app password.
+
+    Returns None (not an error) when unconfigured, so the daily job runs
+    normally on a box with no Discord token.
+    """
+    if not DISCORD_CONFIG_PATH.exists():
+        return None
+    try:
+        cfg = json.loads(DISCORD_CONFIG_PATH.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"  Warning: discord_config.json unreadable -- {e}")
+        return None
+    token = (cfg.get("bot_token") or "").strip()
+    if not token or token.startswith("PASTE_"):
+        return None
+    return cfg
+
+
+def _resolve_paper_title(url):
+    """Best-effort real title/abstract for a shared paper link.
+
+    A chat message makes a poor title for ranking, and the embedding stage
+    works far better on an actual paper title. Failure is fine — the caller
+    falls back to the message text.
+    """
+    try:
+        m = re.search(r"arxiv\.org/(?:abs|pdf)/([\w.\-]+?)(?:v\d+)?(?:\.pdf)?$", url, re.I)
+        if m:
+            feed = feedparser.parse(
+                f"http://export.arxiv.org/api/query?id_list={m.group(1)}&max_results=1")
+            if feed.entries:
+                entry = feed.entries[0]
+                return strip_html(entry.get("title", "")), strip_html(entry.get("summary", ""))[:400]
+        m = re.search(r"huggingface\.co/papers/([\w.\-]+)", url, re.I)
+        if m:
+            resp = requests.get(f"https://huggingface.co/api/papers/{m.group(1)}",
+                                timeout=20, headers={"User-Agent": "rebel-intel/1.0"})
+            if resp.ok:
+                data = resp.json()
+                return (strip_html(data.get("title", "")),
+                        strip_html(data.get("ai_summary") or data.get("summary") or "")[:400])
+    except Exception:
+        pass
+    return None, None
+
+
+def fetch_discord(conf):
+    """Harvest paper links shared in Discord channels the bot can read.
+
+    Each shared link becomes one reviewable item rather than each message —
+    the goal is the papers people surface, not the surrounding chat. Reaction
+    counts are the quality signal, the same role upvotes play for HF papers.
+
+    Requires a bot token in discord_config.json AND the bot to be a member of
+    the server with View Channel + Read Message History. Note a bot can only
+    be added to a server by someone holding Manage Server there, so this works
+    for servers Joe controls (including ones mirroring another server's
+    announcement channels via Discord's Channel Following feature).
+    """
+    cfg = load_discord_config()
+    if not cfg:
+        print("  Discord: not configured (no token in discord_config.json) -- skipping")
+        return []
+
+    channels = conf.get("channels") or cfg.get("channels") or []
+    if not channels:
+        print("  Discord: no channels configured -- skipping")
+        return []
+
+    per_channel = conf.get("per_channel_limit", 100)
+    papers_only = conf.get("papers_only", True)
+    min_reactions = conf.get("min_reactions", 0)
+    headers = {
+        "Authorization": f"Bot {cfg['bot_token']}",
+        "User-Agent": "rebel-intel/1.0",
+    }
+
+    found = {}
+    for channel in channels:
+        is_obj = isinstance(channel, dict)
+        channel_id = channel["id"] if is_obj else channel
+        channel_name = channel.get("name", str(channel_id)) if is_obj else str(channel_id)
+        try:
+            resp = requests.get(f"{DISCORD_API}/channels/{channel_id}/messages",
+                                headers=headers, params={"limit": per_channel}, timeout=30)
+            if resp.status_code == 401:
+                print("  Discord: token rejected (401) -- check bot_token")
+                return []
+            if resp.status_code == 403:
+                print(f"  Discord: no access to #{channel_name} (403) -- bot needs "
+                      "View Channel + Read Message History on that channel")
+                continue
+            if resp.status_code == 404:
+                print(f"  Discord: channel #{channel_name} not found (404)")
+                continue
+            resp.raise_for_status()
+            messages = resp.json()
+        except Exception as e:
+            print(f"  Discord: #{channel_name} failed -- {e}")
+            continue
+
+        for msg in messages:
+            content = msg.get("content") or ""
+            # A bare URL usually arrives as an embed rather than message text.
+            for embed in msg.get("embeds") or []:
+                for key in ("url", "title", "description"):
+                    if embed.get(key):
+                        content += " " + str(embed[key])
+
+            urls = [m.group(0) for m in PAPER_LINK_RE.finditer(content)]
+            if not urls and not papers_only:
+                urls = [m.group(0) for m in GENERIC_LINK_RE.finditer(content)][:1]
+            if not urls:
+                continue
+
+            reactions = sum((r.get("count") or 0) for r in (msg.get("reactions") or []))
+            if reactions < min_reactions:
+                continue
+
+            author = ((msg.get("author") or {}).get("global_name")
+                      or (msg.get("author") or {}).get("username") or "someone")
+
+            for url in urls[:2]:
+                url = url.rstrip(".,);]")
+                if url in found:
+                    # Same paper shared twice — keep the more-reacted mention.
+                    if reactions > (found[url].get("upvotes") or 0):
+                        found[url]["upvotes"] = reactions
+                    continue
+
+                title, abstract = _resolve_paper_title(url)
+                body = strip_html(content)
+                if not title:
+                    title = body[:110] or url
+                if abstract and body:
+                    snippet = f"Shared by {author}: {body[:150]} — {abstract}"
+                else:
+                    snippet = abstract or body
+                found[url] = {
+                    "title": title,
+                    "url": url,
+                    "published": parse_date(msg.get("timestamp") or ""),
+                    "snippet": snippet[:400],
+                    "upvotes": reactions,
+                }
+
+    out = sorted(found.values(), key=lambda x: -(x["upvotes"] or 0))
+    print(f"  Discord: {len(out)} shared link(s) from {len(channels)} channel(s)")
+    return out
+
+
+HN_SEARCH_API = "https://hn.algolia.com/api/v1/search_by_date"
+
+
+def fetch_hn(conf):
+    """Hacker News via the Algolia API.
+
+    Replaces hnrss.org, which is dead — it returns no entries at all, so the
+    "Hacker News - Best" feed had been silently contributing nothing.
+
+    Doubles as a paper source: pointing `query` at arxiv.org surfaces papers
+    that working engineers upvoted, which is a different and usually earlier
+    population than the one voting on Hugging Face Daily Papers.
+    """
+    params = {
+        "tags": "story",
+        "hitsPerPage": conf.get("hits", 50),
+        "numericFilters": f"points>{conf.get('min_points', 20)}",
+    }
+    if conf.get("query"):
+        params["query"] = conf["query"]
+    try:
+        resp = requests.get(HN_SEARCH_API, params=params, timeout=30,
+                            headers={"User-Agent": "rebel-intel/1.0"})
+        resp.raise_for_status()
+        hits = resp.json().get("hits", [])
+    except Exception as e:
+        print(f"  HN: request failed -- {e}")
+        return []
+
+    resolve = conf.get("resolve_papers", False)
+    out = []
+    for h in hits:
+        url = h.get("url") or ""
+        title = strip_html(h.get("title") or "")
+        if not title:
+            continue
+        if not url:
+            # Ask HN / self-post — link to the discussion itself.
+            url = f"https://news.ycombinator.com/item?id={h.get('objectID')}"
+        snippet = strip_html(h.get("story_text") or "")
+        if resolve and PAPER_LINK_RE.search(url):
+            # A bare paper title carries little signal; the abstract ranks far
+            # better. Same resolver the Discord adapter uses.
+            paper_title, abstract = _resolve_paper_title(url)
+            if paper_title:
+                title = paper_title
+            if abstract:
+                snippet = abstract
+        if not snippet:
+            snippet = f"{title} — {h.get('points', 0)} points, {h.get('num_comments', 0)} comments on Hacker News"
+        out.append({
+            "title": title,
+            "url": url,
+            "published": parse_date(h.get("created_at") or ""),
+            "snippet": snippet[:400],
+            "upvotes": h.get("points") or 0,
+        })
+    return out
+
+
+def fetch_source(conf):
+    """Every source normalises to the same shape, so the main loop does not
+    care whether an item came from RSS, an Atom feed, a JSON API or Discord."""
+    source = conf.get("source")
+    if source == "hf_papers":
+        return fetch_hf_papers(conf)
+    if source == "discord":
+        return fetch_discord(conf)
+    if source == "hn":
+        return fetch_hn(conf)
+    return fetch_rss(conf)
 
 
 def sync_weights(pillars):
@@ -231,48 +573,125 @@ def main():
 
     print(f"\nFetching {len(feeds)} feeds...")
 
+    now = datetime.now(timezone.utc)
+    yields = {}
+
     for feed_conf in feeds:
+        # A feed can be parked in the config without being fetched, so sources
+        # that need credentials can ship disabled until they are set up.
+        if feed_conf.get("enabled") is False:
+            continue
+
         feed_name = feed_conf.get("name", feed_conf["url"])
+        feed_type = feed_conf.get("type", "news")
+
+        # Per-feed freshness. A daily news site is stale in 72h, but the
+        # Latent Space podcast ships an episode every ~4 days (max gap 13),
+        # so a 72h window would silently miss most episodes entirely.
+        feed_hours = feed_conf.get("freshness_hours", FRESHNESS_H)
+        feed_cutoff = now - timedelta(hours=feed_hours)
+        max_items = feed_conf.get("max_items")
+
         try:
-            feed = feedparser.parse(feed_conf["url"])
-            for entry in feed.entries:
-                title = strip_html(entry.get("title", ""))
-                url = entry.get("link", "")
-                if not title or not url or url in seen:
-                    continue
-
-                published = parse_date(entry.get("published", ""))
-                try:
-                    pub_dt = datetime.fromisoformat(published)
-                    if pub_dt.tzinfo is None:
-                        pub_dt = pub_dt.replace(tzinfo=timezone.utc)
-                    if pub_dt < cutoff_dt:
-                        continue
-                except Exception:
-                    pass
-
-                snippet = get_content(entry)[:400]
-                pillar, score, keywords = score_article(f"{title} {snippet}", pillars, weights)
-
-                total_scanned += 1
-                seen[url] = datetime.now(timezone.utc).isoformat()
-
-                articles.append({
-                    "url": url,
-                    "title": title,
-                    "source": feed_name,
-                    "published": published,
-                    "snippet": snippet,
-                    "pillar": pillar,
-                    "score": score,
-                    "keywords_matched": keywords,
-                })
-
-                if keywords:
-                    record_themes(keywords)
-
+            entries = fetch_source(feed_conf)
         except Exception as e:
             print(f"  Warning: {feed_name} -- {e}")
+            continue
+
+        kept = 0
+        for item in entries:
+            if max_items is not None and kept >= max_items:
+                break
+
+            url = item["url"]
+            title = item["title"]
+            if not title or not url or url in seen:
+                continue
+
+            published = item["published"]
+            try:
+                pub_dt = datetime.fromisoformat(published)
+                if pub_dt.tzinfo is None:
+                    pub_dt = pub_dt.replace(tzinfo=timezone.utc)
+                if pub_dt < feed_cutoff:
+                    continue
+            except Exception:
+                pub_dt = now
+
+            snippet = item.get("snippet", "")
+            pillar, score, keywords = score_article(f"{title} {snippet}", pillars, weights)
+
+            total_scanned += 1
+            kept += 1
+            seen[url] = now.isoformat()
+
+            record = {
+                "url": url,
+                "title": title,
+                "source": feed_name,
+                "type": feed_type,
+                "published": published,
+                # Carried forward until this passes, so each feed ages out on
+                # its own schedule rather than a single global window.
+                "expires_at": (pub_dt + timedelta(hours=feed_hours)).isoformat(),
+                "snippet": snippet,
+                "pillar": pillar,
+                "score": score,
+                "keywords_matched": keywords,
+            }
+            if item.get("upvotes") is not None:
+                record["upvotes"] = item["upvotes"]
+            articles.append(record)
+
+            if keywords:
+                record_themes(keywords)
+
+        yields[feed_name] = kept
+        if kept == 0 and feed_name not in FEED_STATUS:
+            # Reached the source fine, but nothing was new or fresh enough.
+            FEED_STATUS[feed_name] = "no new items in window"
+
+        if feed_type != "news":
+            print(f"  {feed_name} [{feed_type}]: {kept} item(s) within {feed_hours}h")
+
+    # Carry forward anything from the previous run that Joe has not reviewed
+    # yet and that is still inside the freshness window. seen_urls stops these
+    # coming back from the feeds, so without this step a daily fetch would
+    # quietly discard yesterday's unreviewed backlog. Reviewed articles are
+    # not carried — they already live in queue.json.
+    carried = 0
+    if OUT_PATH.exists():
+        try:
+            reviewed = set()
+            if QUEUE_PATH.exists():
+                reviewed = {x.get("url") for x in json.loads(QUEUE_PATH.read_text())}
+            new_urls = {a["url"] for a in articles}
+            for prev in json.loads(OUT_PATH.read_text()):
+                url = prev.get("url")
+                if not url or url in new_urls or url in reviewed:
+                    continue
+                # Prefer the item's own expiry (set from its feed's window);
+                # fall back to the global window for records written before
+                # per-feed freshness existed.
+                try:
+                    if prev.get("expires_at"):
+                        exp_dt = datetime.fromisoformat(prev["expires_at"])
+                        if exp_dt.tzinfo is None:
+                            exp_dt = exp_dt.replace(tzinfo=timezone.utc)
+                        if exp_dt < datetime.now(timezone.utc):
+                            continue
+                    else:
+                        pub_dt = datetime.fromisoformat(prev.get("published", ""))
+                        if pub_dt.tzinfo is None:
+                            pub_dt = pub_dt.replace(tzinfo=timezone.utc)
+                        if pub_dt < cutoff_dt:
+                            continue
+                except Exception:
+                    continue
+                articles.append(prev)
+                carried += 1
+        except Exception as e:
+            print(f"  Warning: could not carry forward previous articles -- {e}")
 
     def _age_hours(article):
         try:
@@ -296,9 +715,30 @@ def main():
     OUT_PATH.write_text(json.dumps(articles, indent=2))
     save_seen(seen)
 
+    # ── Feed health ──────────────────────────────────────────────────────
+    # A broken feed is invisible otherwise: it just silently stops
+    # contributing. Anything that errored, redirected or came back empty is
+    # named here and persisted for the dashboard.
+    broken = {n: r for n, r in FEED_STATUS.items()
+              if not r.startswith("no new items")}
+    health = {
+        "checked_at": now.isoformat(),
+        "feeds_total": len(feeds),
+        "feeds_with_items": sum(1 for v in yields.values() if v > 0),
+        "yields": yields,
+        "problems": FEED_STATUS,
+    }
+    (DATA / "feed_health.json").write_text(json.dumps(health, indent=2))
+
+    if broken:
+        print(f"\n  FEED PROBLEMS ({len(broken)}) — these contributed nothing:")
+        for n, reason in sorted(broken.items()):
+            print(f"    {n}: {reason}")
+
     rising = get_rising_themes()
 
-    print(f"\nScanned {total_scanned} new articles -> {len(articles)} saved (ranked by relevance).")
+    print(f"\nScanned {total_scanned} new articles, carried {carried} unreviewed "
+          f"from the previous run -> {len(articles)} saved (ranked by relevance).")
     if rising:
         print("Rising themes:")
         for kw, n in rising[:5]:

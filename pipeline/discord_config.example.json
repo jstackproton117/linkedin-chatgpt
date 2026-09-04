@@ -1,0 +1,17 @@
+{
+  "_comment": "Copy to discord_config.json and chmod 600. Never commit the real file.",
+  "_setup": [
+    "1. https://discord.com/developers/applications -> New Application -> Bot",
+    "2. Bot tab -> Reset Token -> copy it into bot_token below",
+    "3. Bot tab -> enable the MESSAGE CONTENT INTENT toggle",
+    "4. OAuth2 -> URL Generator -> scopes: bot -> permissions: View Channels + Read Message History",
+    "5. Open that URL and add the bot to a server where YOU have Manage Server",
+    "6. In Discord: User Settings -> Advanced -> enable Developer Mode",
+    "7. Right-click each channel -> Copy Channel ID -> add below"
+  ],
+  "bot_token": "PASTE_YOUR_BOT_TOKEN_HERE",
+  "channels": [
+    { "id": "000000000000000000", "name": "papers" },
+    { "id": "000000000000000000", "name": "research" }
+  ]
+}
