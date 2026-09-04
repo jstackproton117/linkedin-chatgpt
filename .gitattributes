@@ -1,0 +1,2 @@
+# Shell scripts get copied to RedRose (Linux); CRLF would break bash.
+*.sh text eol=lf
