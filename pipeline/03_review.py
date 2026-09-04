@@ -195,13 +195,27 @@ def review_article(article, num, model_ok, selection_log):
 
     status = {"d": "draft", "s": "skip", "h": "hold"}[choice]
 
+    # Same shape as the dashboard writes in app.py — the url and snippet let
+    # 07_rank.py embed the real article text when it rebuilds the taste model,
+    # and the rank fields let its accuracy be measured against what was chosen.
+    rank = article.get("rank") or {}
     selection_log.append({
         "date": date.today().isoformat(),
+        "logged_at": datetime.now().isoformat(),
         "article_title": article["title"],
+        "url": article.get("url", ""),
+        "snippet": article.get("snippet", ""),
         "source": article.get("source", ""),
         "pillar": article.get("pillar", ""),
         "score": article.get("score", 0),
         "keywords_matched": article.get("keywords_matched", []),
+        "rank_score": article.get("rank_score"),
+        "rank_stage": rank.get("stage"),
+        "rank_kind": rank.get("kind"),
+        "rank_reason": rank.get("reason"),
+        "rank_factors": rank.get("factors"),
+        "rank_run_id": rank.get("run_id"),
+        "matched_experience": rank.get("matched_experience"),
         "action": status,
     })
 

@@ -1,5 +1,6 @@
 """Rebel Intel — Local web UI for the LinkedIn Content Pipeline."""
 
+import fcntl
 import json
 import re
 import subprocess
@@ -25,6 +26,10 @@ SELECTION_LOG_PATH = DATA / "selection_log.json"
 EXPIRY_LOG_PATH = DATA / "expiry_log.json"
 
 DRAFT_EXPIRY_HOURS = 24
+
+# Shared with run_daily.sh, which holds the same lock for the scheduled
+# fetch + rank. Both write articles.json, so only one may run at a time.
+FETCH_LOCK_PATH = BASE / ".daily.lock"
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────
@@ -267,7 +272,7 @@ def _is_bad_response(angle, hook, summary):
 def call_local_model(title, summary):
     settings = get_settings()
     lm = settings.get("local_model", {})
-    url = lm.get("url", "http://192.168.1.46:11434/api/chat")
+    url = lm.get("url", "http://thornwick.local:11434/api/chat")
     model = lm.get("model", "qwen2.5:3b")
     timeout = lm.get("timeout", 60)
 
@@ -370,15 +375,40 @@ def fetch_page():
 
 @app.route("/api/fetch", methods=["POST"])
 def api_fetch():
+    lock = open(FETCH_LOCK_PATH, "w")
     try:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            return jsonify({
+                "ok": False, "ranked": False,
+                "output": "The scheduled daily fetch is running right now. "
+                          "Give it a few minutes and refresh — the ranked list "
+                          "will appear on its own.",
+                "article_count": len(load_json(ARTICLES_PATH, [])),
+                "rising": get_rising_themes(),
+            })
         ok, output = run_script("01_fetch.py", timeout=300)
+        ranked = False
+        if ok:
+            # 07_rank.py re-scores and re-sorts articles.json by post potential.
+            # It fails safe: if the local models are down it leaves the keyword
+            # ordering alone, so a rank failure never blocks the review step.
+            ranked, rank_output = run_script("07_rank.py", timeout=1800)
+            output += "\n" + rank_output
         articles = load_json(ARTICLES_PATH, [])
-        return jsonify({"ok": ok, "output": output,
+        return jsonify({"ok": ok, "ranked": ranked, "output": output,
                         "article_count": len(articles), "rising": get_rising_themes()})
     except subprocess.TimeoutExpired:
         return jsonify({"ok": False, "output": "Timed out after 5 minutes.", "article_count": 0, "rising": []})
     except Exception as e:
         return jsonify({"ok": False, "output": str(e), "article_count": 0, "rising": []})
+    finally:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+        except Exception:
+            pass
+        lock.close()
 
 
 # ── Review ────────────────────────────────────────────────────────────────
@@ -444,14 +474,30 @@ def api_action(num):
         queue.append(entry)
     save_json(QUEUE_PATH, queue)
 
+    # Every decision is a labelled training example for the taste model in
+    # 07_rank.py. Store the url and snippet so future runs can embed the real
+    # article text instead of joining on title, and store the rank breakdown
+    # so the ranker's own accuracy can be measured against what Joe actually
+    # chose. LOG EVERYTHING.
+    rank = article.get("rank") or {}
     sel_log = load_json(SELECTION_LOG_PATH, [])
     sel_log.append({
         "date": date.today().isoformat(),
+        "logged_at": datetime.now().isoformat(),
         "article_title": article["title"],
+        "url": article.get("url", ""),
+        "snippet": article.get("snippet", ""),
         "source": article.get("source", ""),
         "pillar": article.get("pillar", ""),
         "score": article.get("score", 0),
         "keywords_matched": article.get("keywords_matched", []),
+        "rank_score": article.get("rank_score"),
+        "rank_stage": rank.get("stage"),
+        "rank_kind": rank.get("kind"),
+        "rank_reason": rank.get("reason"),
+        "rank_factors": rank.get("factors"),
+        "rank_run_id": rank.get("run_id"),
+        "matched_experience": rank.get("matched_experience"),
         "action": action,
     })
     save_json(SELECTION_LOG_PATH, sel_log)
@@ -560,7 +606,7 @@ def _extract_post_body(content):
 def _call_local_model_rewrite(post_body):
     settings = get_settings()
     lm = settings.get("local_model", {})
-    url   = lm.get("url",   "http://192.168.1.46:11434/api/chat")
+    url   = lm.get("url",   "http://thornwick.local:11434/api/chat")
     model = lm.get("model", "qwen2.5:3b")
     timeout = lm.get("timeout", 120)
 
@@ -707,7 +753,7 @@ def api_merge_drafts_ai():
 
     settings = get_settings()
     lm = settings.get("local_model", {})
-    url   = lm.get("url",   "http://192.168.1.46:11434/api/chat")
+    url   = lm.get("url",   "http://thornwick.local:11434/api/chat")
     model = lm.get("model", "qwen2.5:3b")
     timeout = lm.get("timeout", 180)
 

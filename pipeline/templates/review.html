@@ -56,6 +56,34 @@ body { overflow: hidden; }
 .search-box:focus { outline: none; border-color: var(--sw-yellow); box-shadow: 0 0 6px rgba(212,148,30,0.2); }
 .search-box::placeholder { color: var(--text-dim); }
 
+.type-filters { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+.type-chip {
+  font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 1px;
+  padding: 4px 9px; border-radius: 3px; cursor: pointer;
+  background: transparent; color: var(--text-dim);
+  border: 1px solid var(--card-border); transition: all 0.12s;
+}
+.type-chip:hover { color: var(--text-sec); border-color: var(--text-dim); }
+.type-chip.active {
+  color: var(--sw-yellow); border-color: rgba(212,148,30,0.5);
+  background: rgba(212,148,30,0.08);
+}
+.row-reason {
+  font-size: 10px; color: var(--text-dim); margin-top: 3px;
+  line-height: 1.35; overflow: hidden; text-overflow: ellipsis;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.rank-factors {
+  display: grid; grid-template-columns: 92px 1fr 38px; gap: 5px 8px;
+  align-items: center; margin-top: 10px;
+}
+.rank-factors .fname {
+  font-family: 'Orbitron', sans-serif; font-size: 9px;
+  letter-spacing: 1px; color: var(--text-dim);
+}
+.rank-factors .ftrack { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; }
+.rank-factors .ffill  { height: 100%; border-radius: 2px; }
+.rank-factors .fval   { font-size: 10px; color: var(--text-sec); text-align: right; }
 .article-list {
   flex: 1; overflow-y: auto;
   padding: 4px 0;
@@ -336,6 +364,12 @@ body { overflow: hidden; }
       </div>
       <input class="search-box" id="search-box" type="text"
         placeholder="SEARCH TRANSMISSIONS..." oninput="filterList(this.value)">
+      <div class="type-filters" id="type-filters">
+        <button class="type-chip active" data-type="all"     onclick="setTypeFilter('all', this)">ALL</button>
+        <button class="type-chip"        data-type="news"    onclick="setTypeFilter('news', this)">NEWS</button>
+        <button class="type-chip"        data-type="paper"   onclick="setTypeFilter('paper', this)">PAPERS</button>
+        <button class="type-chip"        data-type="podcast" onclick="setTypeFilter('podcast', this)">PODCASTS</button>
+      </div>
     </div>
 
     <div class="article-list" id="article-list"></div>
@@ -375,6 +409,41 @@ function scoreColor(score, ageH) {
   if (score >= 30) return '#2EB8CC';
   return '#607080';
 }
+// Prefer the ranked score; fall back to the keyword score when 07_rank.py
+// has not run (or bailed out because the local models were unreachable).
+function rankScore(a) {
+  return (typeof a.rank_score === 'number') ? a.rank_score : a.score;
+}
+function isFiltered(a) {
+  const st = a.rank && a.rank.stage;
+  return st === 'noise' || st === 'noise_model' || st === 'duplicate';
+}
+const KIND_STYLE = {
+  experience_report: ['EXPERIENCE', '#39D353'],
+  opinion:           ['OPINION',    '#D4941E'],
+  analysis:          ['ANALYSIS',   '#2EB8CC'],
+  announcement:      ['ANNOUNCE',   '#607080'],
+  shopping:          ['SHOPPING',   '#C43030'],
+};
+const TYPE_STYLE = {
+  paper:   ['PAPER',   '#B47EE8'],
+  podcast: ['PODCAST', '#39D353'],
+};
+function typeBadge(a) {
+  const t = a.type || (a.rank && a.rank.type);
+  if (!t || !TYPE_STYLE[t]) return '';
+  const [label, color] = TYPE_STYLE[t];
+  return `<span style="font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:1px;
+    color:${color};background:${color}1A;border:1px solid ${color}55;padding:1px 4px;
+    border-radius:2px;margin-right:4px;">${label}</span>`;
+}
+function kindBadge(a) {
+  const k = a.rank && a.rank.kind;
+  if (!k || !KIND_STYLE[k]) return '';
+  const [label, color] = KIND_STYLE[k];
+  return `<span style="font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:1px;
+    color:${color};border:1px solid ${color}44;padding:1px 4px;border-radius:2px;margin-right:4px;">${label}</span>`;
+}
 function ageColor(ageH) {
   if (ageH < 4)  return '#28A850';
   if (ageH < 12) return '#D4941E';
@@ -399,15 +468,16 @@ function renderList(articles) {
   let prevScored = null;
 
   articles.forEach((a) => {
-    const hasScore = a.score > 0;
+    const hasScore = !isFiltered(a);
     if (prevScored === true && !hasScore) {
-      html += `<div class="divider-label">─── NO KEYWORD MATCH ───</div>`;
+      html += `<div class="divider-label">─── FILTERED: DEALS &amp; DUPLICATES ───</div>`;
     }
     prevScored = hasScore;
 
     const st = STATUS[a.url];
-    const pct = Math.min(a.score, 100);
-    const sc = scoreColor(a.score, a.age_hours);
+    const rs = rankScore(a);
+    const pct = Math.min(rs, 100);
+    const sc = scoreColor(rs, a.age_hours);
     const ac = ageColor(a.age_hours);
     const pillar = (a.pillar || '').split(' ').slice(0,2).join(' ').substring(0,18) || '—';
     const title = esc(a.title.length > 60 ? a.title.substring(0,57)+'...' : a.title);
@@ -431,7 +501,8 @@ function renderList(articles) {
           <span class="row-status">${statusBadge}</span>
         </div>
         <div class="row-title">${title}</div>
-        <div class="row-meta">${esc(a.source)} · ${esc(pillar)}</div>
+        <div class="row-meta">${typeBadge(a)}${kindBadge(a)} ${esc(a.source)}</div>
+        ${a.rank && a.rank.reason ? `<div class="row-reason">${esc(a.rank.reason)}</div>` : ''}
       </div>`;
   });
 
@@ -472,7 +543,8 @@ function renderList(articles) {
 function toggleArchive() {
   archiveExpanded = !archiveExpanded;
   const q = document.getElementById('search-box').value.toLowerCase();
-  const active = activeArticles();
+  let active = activeArticles();
+  if (typeFilter !== 'all') active = active.filter(a => articleType(a) === typeFilter);
   renderList(q ? active.filter(a =>
     a.title.toLowerCase().includes(q) ||
     (a.source||'').toLowerCase().includes(q) ||
@@ -481,14 +553,27 @@ function toggleArchive() {
   ) : active);
 }
 
+let typeFilter = 'all';
+function articleType(a) {
+  return a.type || (a.rank && a.rank.type) || 'news';
+}
+function setTypeFilter(t, btn) {
+  typeFilter = t;
+  document.querySelectorAll('.type-chip').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  filterList(document.getElementById('search-box').value);
+}
+
 function filterList(q) {
   q = q.toLowerCase();
-  const active = activeArticles();
+  let active = activeArticles();
+  if (typeFilter !== 'all') active = active.filter(a => articleType(a) === typeFilter);
   const filtered = q
     ? active.filter(a =>
         a.title.toLowerCase().includes(q) ||
         (a.source||'').toLowerCase().includes(q) ||
         (a.pillar||'').toLowerCase().includes(q) ||
+        (a.type||'').toLowerCase().includes(q) ||
         (a.keywords_matched||[]).some(k => k.toLowerCase().includes(q))
       )
     : active;
@@ -496,6 +581,14 @@ function filterList(q) {
 }
 
 function updateStats() {
+  // Label each chip with how many of that type are awaiting review.
+  const act = activeArticles();
+  document.querySelectorAll('.type-chip').forEach(b => {
+    const t = b.dataset.type;
+    const n = t === 'all' ? act.length : act.filter(a => articleType(a) === t).length;
+    const base = b.textContent.replace(/\s*\(\d+\)$/, '');
+    b.textContent = `${base} (${n})`;
+  });
   const vals = Object.values(STATUS);
   document.getElementById('stat-draft').textContent = vals.filter(v=>v==='draft').length;
   document.getElementById('stat-hold').textContent  = vals.filter(v=>v==='hold').length;
@@ -525,7 +618,7 @@ function openArticle(num) {
 
 function buildDetail(a) {
   const st = STATUS[a.url];
-  const sc = scoreColor(a.score, a.age_hours);
+  const sc = scoreColor(rankScore(a), a.age_hours);
   const ac = ageColor(a.age_hours);
   const pillar = a.pillar || '—';
   const isArchived = a.log_status === 'scheduled' || a.log_status === 'published';
@@ -567,8 +660,10 @@ function buildDetail(a) {
       <div class="meta-item"><label>SOURCE</label><span class="val">${esc(a.source)}</span></div>
       <div class="meta-item"><label>AGE</label><span class="val" style="color:${ac}">${esc(a.age)}</span></div>
       <div class="meta-item"><label>PILLAR</label><span class="val">${esc(pillar)}</span></div>
-      <div class="meta-item"><label>INTEL SCORE</label><span class="val" style="color:${sc}">${a.score}</span></div>
+      <div class="meta-item"><label>POST POTENTIAL</label><span class="val" style="color:${sc}">${rankScore(a)}</span></div>
+      <div class="meta-item"><label>KEYWORD SCORE</label><span class="val" style="color:var(--text-dim)">${a.score}</span></div>
     </div>
+    ${rankBreakdown(a)}
     <a class="detail-url" href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.url)}</a>
     ${a.snippet ? `<div class="detail-excerpt">${esc(a.snippet)}</div>` : ''}
     <div class="angle-box" id="angle-box">
@@ -582,6 +677,50 @@ function buildDetail(a) {
       ${a.keywords_matched.map(k => `<span style="color:var(--text-sec)">${esc(k)}</span>`).join(' · ')}
     </div>` : ''}
   `;
+}
+
+// Why did this article rank where it did? Every factor 07_rank.py used,
+// with the weight it carried, so the ranking is auditable rather than magic.
+const FACTOR_LABEL = {
+  taste: 'YOUR TASTE',
+  experience: 'EXPERIENCE',
+  takeability: 'TAKE-ABILITY',
+  freshness: 'FRESHNESS',
+  corroboration: 'COVERAGE',
+};
+function rankBreakdown(a) {
+  const r = a.rank;
+  if (!r) return '';
+  const f = r.factors || {};
+  const w = r.weights_used || {};
+  let rows = '';
+  for (const key of ['taste','experience','takeability','freshness','corroboration']) {
+    const v = f[key];
+    if (v === null || v === undefined) continue;
+    const pct = Math.round(v * 100);
+    const col = pct >= 60 ? '#D4941E' : (pct >= 30 ? '#2EB8CC' : '#607080');
+    const wt = w[key] ? ` ${Math.round(w[key]*100)}%` : '';
+    rows += `
+      <div class="fname">${FACTOR_LABEL[key] || key}${wt}</div>
+      <div class="ftrack"><div class="ffill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="fval">${pct}</div>`;
+  }
+  const dupes = (r.dupe_sources || []).length;
+  const extras = [];
+  if (dupes) extras.push(`${dupes} other outlet${dupes>1?'s':''} covering this`);
+  if (r.taste_active === false) extras.push('taste model not yet trained');
+  if (r.llm_error) extras.push(`classifier failed: ${esc(r.llm_error)}`);
+
+  return `
+    <div style="background:var(--card-bg);border:1px solid var(--card-border);
+                border-radius:4px;padding:12px 14px;margin-bottom:16px;">
+      <div style="font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;
+                  color:var(--text-dim);margin-bottom:6px;">WHY THIS RANKS HERE</div>
+      <div style="font-size:12px;color:var(--text-sec);">${typeBadge(a)}${kindBadge(a)} ${esc(r.reason || '')}</div>
+      ${r.summary ? `<div style="font-size:11px;color:var(--text-dim);margin-top:5px;font-style:italic;">"${esc(r.summary)}"</div>` : ''}
+      <div class="rank-factors">${rows}</div>
+      ${extras.length ? `<div style="font-size:10px;color:var(--text-dim);margin-top:9px;">${extras.join(' · ')}</div>` : ''}
+    </div>`;
 }
 
 async function loadAngle(num, a) {

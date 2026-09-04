@@ -1,0 +1,232 @@
+# Rebel Intel — experience corpus and ranking config.
+#
+# The `experience` block is the ground truth for "do I actually have something
+# useful to say about this?" Every article is embedded and compared against
+# every phrase here. Articles that touch work Joe has actually done rank higher.
+#
+# EDIT THIS FILE FREELY. Adding a phrase or an item takes effect on the next
+# run — no code change needed.
+#
+# WHY PHRASES AND NOT PARAGRAPHS: an embedding of a long paragraph is the
+# average of everything in it, which matches everything weakly and nothing
+# strongly. Short, concrete, single-idea phrases match sharply. An item scores
+# as its best-matching phrase, so more phrases costs nothing but coverage.
+#
+#   id      — short slug, recorded on every article as the matched experience
+#   label   — human-readable name, shown in the review UI
+#   short   — one line, kept for reference and future prompts
+#   phrases — the things that actually get embedded. Concrete nouns beat
+#             abstractions: "VRAM limits on consumer GPUs" not "hardware".
+
+experience:
+  - id: raptor
+    label: "Raptor coding harness"
+    short: "built Raptor, an autonomous sprint-based AI coding harness on local GPUs"
+    phrases:
+      - "autonomous AI coding harness that plans and executes sprints"
+      - "running Qwen3-Coder 30B locally on dual RTX 5090 GPUs"
+      - "routing work between local open-weight models and frontier APIs"
+      - "critic models reviewing generated code across multiple GPUs"
+      - "conditional QA stages in an automated coding pipeline"
+      - "measuring frontier API spend per coding sprint"
+
+  - id: agent_orchestration
+    label: "Multi-agent orchestration"
+    short: "designs multi-agent architectures, tool discovery, self-improving harnesses"
+    phrases:
+      - "multi-agent architecture with planner and executor agents"
+      - "orchestrating multiple AI agents on one task"
+      - "agent tool discovery and tool selection at scale"
+      - "GraphRAG for retrieving tools and context"
+      - "agent memory and context window management"
+      - "self-improving agent harness that rewrites its own tools"
+      - "why multi-agent systems drift off task and fail"
+      - "subagent fan-out and result synthesis"
+
+  - id: local_inference
+    label: "Local inference & open-weight models"
+    short: "runs open-weight models on consumer GPUs, quantization, VRAM, throughput"
+    phrases:
+      - "running open-weight LLMs locally on consumer GPUs"
+      - "Ollama, vLLM and llama.cpp for self-hosted inference"
+      - "GGUF quantization and its effect on model quality"
+      - "VRAM limits and context length tradeoffs"
+      - "tokens per second and inference latency under load"
+      - "small open models versus hosted frontier APIs"
+      - "when a 7B model is good enough for a task"
+      - "self-hosting inference instead of paying per token"
+
+  - id: model_routing_cost
+    label: "Model routing & frontier spend"
+    short: "measures and cuts frontier API spend by routing work to cheaper models"
+    phrases:
+      - "cutting AI API costs by routing to cheaper models"
+      - "cost per task and cost per resolved issue as a metric"
+      - "token budgets and prompt caching to control spend"
+      - "the rising price of agentic coding tools"
+      - "AI inference economics and unit costs at scale"
+      - "when frontier model quality is worth the price premium"
+
+  - id: agentic_coding_practice
+    label: "Agentic coding in real use"
+    short: "uses agentic coding tools daily and knows where they break"
+    phrases:
+      - "using AI coding agents on a real production codebase"
+      - "Claude Code and other agentic coding tools in daily work"
+      - "AI agents opening pull requests and reviewing code"
+      - "where coding agents break on large or messy codebases"
+      - "vibe coding a demo versus shipping production software"
+      - "test driven development inside an agent loop"
+      - "measuring whether an AI coding tool actually saves time"
+      - "AI-generated code introducing security problems"
+
+  - id: model_evals
+    label: "Benchmarks & model evaluation"
+    short: "built a leaderboard aggregator, knows benchmark reliability problems"
+    phrases:
+      - "comparing AI models on benchmark leaderboards"
+      - "SWE-bench, LiveCodeBench and coding benchmark results"
+      - "benchmark contamination and saturation"
+      - "why leaderboards disagree about which model is best"
+      - "normalizing scores across incompatible benchmark sources"
+      - "picking a model for a real workload rather than a headline score"
+      - "new model release and how it scores against rivals"
+
+  - id: enterprise_it
+    label: "Enterprise IT & identity"
+    short: "runs Intune/Entra/Apple Business Manager migrations and federated auth"
+    phrases:
+      - "Microsoft Intune and Entra ID device management"
+      - "Apple Business Manager and Apple device deployment"
+      - "federated authentication with OIDC and SAML single sign-on"
+      - "MDM policy and endpoint compliance across a device fleet"
+      - "enterprise identity as the security control plane"
+      - "rolling out IT policy changes across an organization"
+
+  - id: legacy_ai_products
+    label: "AI on legacy manufacturing systems"
+    short: "builds natural-language querying over IBM i / AS400 manufacturing data"
+    phrases:
+      - "natural language querying over an enterprise database"
+      - "text to SQL against a real production schema"
+      - "IBM i and AS/400 legacy manufacturing systems"
+      - "connecting modern AI to decades-old ERP and MRP software"
+      - "semantic layers and schema mapping for business data"
+      - "legacy system modernization using LLMs"
+      - "data quality problems in manufacturing systems"
+
+  - id: delivery_management
+    label: "Technical delivery & consulting"
+    short: "manages delivery teams shipping AI to real users under real constraints"
+    phrases:
+      - "managing a team delivering an AI project to a deadline"
+      - "why enterprise AI pilots stall before reaching production"
+      - "scoping AI work against measurable business outcomes"
+      - "translating between engineers and executives on AI"
+      - "companies rehiring engineers after over-automating with AI"
+      - "AI adoption and organizational change inside a company"
+      - "consulting engagements and accelerator programs for AI"
+
+  - id: production_ai_reality
+    label: "Production AI operations"
+    short: "ships AI to real users: evals, reliability, failure modes, rollback"
+    phrases:
+      - "evaluation harnesses and regression tests for LLM applications"
+      - "hallucination, grounding and retrieval augmented generation"
+      - "guardrails and safety filters on a deployed AI product"
+      - "observability and tracing for LLM systems in production"
+      - "a model provider changing the model underneath your product"
+      - "reliability and rollback strategy for AI features"
+      - "AI agents behaving unpredictably once deployed to users"
+
+  - id: remote_identity
+    label: "Remote work & distributed teams"
+    short: "works remote from Chattanooga, family-first, no hustle culture"
+    phrases:
+      - "fully remote engineering roles and distributed teams"
+      - "AI's effect on engineering hiring and headcount"
+      - "the technical job market for engineers"
+      - "building a tech career outside a major tech hub"
+      - "sustainable pace instead of hustle culture and burnout"
+      - "return to office mandates and remote work policy"
+
+
+# ── Noise filters ────────────────────────────────────────────────────────
+# Articles whose title matches any of these regexes are pushed to the bottom
+# of the list, never deleted. Every match is recorded in data/rank_log.jsonl
+# so you can audit what was suppressed and loosen a pattern if it overreaches.
+noise_filters:
+  title_patterns:
+    # Shopping context is required. Bare "deal" or "discount" patterns were
+    # too broad — they suppressed "Fujitsu education deal", "a Bad Deal for
+    # Teens", and an AINews digest that merely used the word "discounted".
+    - '\bpromo code'
+    - '\bcoupon'
+    - '\bdiscount codes?\b'
+    - '\d+\s*%\s*off\b'
+    - '\bdeals?:\s'
+    - '\bbest\b[^|]*\bdeals?\b'
+    - '\b(holiday|prime day|black friday|cyber monday|labor day|memorial day)\s+deals?\b'
+    - '\bsave up to\b'
+    - '\bprime day\b'
+    - '\bgift guide\b'
+    - '\bon sale\b'
+    - '\blowest price\b'
+    - '\bgiveaway\b'
+    - '\bunboxing\b'
+    - '\bbest \w+ (laptops?|phones?|tablets?|tvs?|headphones|monitors?)\b'
+    - '\bwordle\b'
+    - '\bconnections\b.*\bhints?\b'
+    - '\bhoroscope\b'
+    - '\b(shares|stock) (jump|jumps|fall|falls|slide|slides|surge|surges|plunge|plunges)\b'
+    - '\bcrypto (price|prices)\b'
+
+
+# ── Tunables ─────────────────────────────────────────────────────────────
+tunables:
+  # How many articles get the local-model classification pass, in prior order.
+  # At roughly 1.5s each this comfortably covers a full 200-article fetch, and
+  # classifying everything avoids judged and unjudged articles competing on
+  # different scales. Lower it only if a run starts taking too long.
+  llm_judge_top_n: 250
+
+  # Scoring weights. `taste` is the user-feedback factor and is HARD BOUNDED
+  # to [0.33, 0.50] in code — not less than a third (Joe's judgment matters),
+  # not more than half (one person's taste shouldn't dominate the signal).
+  weights:
+    taste: 0.40
+    experience: 0.30
+    takeability: 0.15
+    freshness: 0.10
+    corroboration: 0.05
+
+  # Taste model. Needs this many of each label before it is trusted at all;
+  # below the threshold its weight is redistributed to the other factors.
+  min_draft_samples: 12
+  min_skip_samples: 12
+  hold_weight: 0.5          # a "hold" counts as a half-strength positive
+
+  # Near-duplicate detection. A pair must clear BOTH thresholds to merge.
+  dup_cosine: 0.90
+  dup_jaccard: 0.25
+  max_corroboration: 5      # cap on how much repeated coverage can boost a story
+
+  # Performance-metrics feedback. Deliberately inert until there is enough
+  # data to learn from — see metrics_multiplier() in 07_rank.py.
+  min_metrics_posts: 20
+
+  # Minimum match strength before an experience topic is named in the UI.
+  # Vectors are mean-centered first, so this is a small number by design:
+  # across a typical 200-article batch the median best-match cosine is ~0.15.
+  # Below this the article is shown as unattributed rather than labelled with
+  # a topic the numbers do not actually support.
+  min_attribution_cosine: 0.12
+
+  # When the runner-up topic is within this margin of the winner and also
+  # clears the cosine bar, BOTH are named. Two of your areas matching at once
+  # means a richer article, not an ambiguous one.
+  min_attribution_gap: 0.02
+
+  # Log retention
+  rank_log_days: 30
+  embedding_cache_days: 14
