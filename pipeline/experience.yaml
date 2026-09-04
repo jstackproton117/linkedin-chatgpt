@@ -24,7 +24,7 @@ experience:
     short: "built Raptor, an autonomous sprint-based AI coding harness on local GPUs"
     phrases:
       - "autonomous AI coding harness that plans and executes sprints"
-      - "running Qwen3-Coder 30B locally on dual RTX 5090 GPUs"
+      - "running a 30B open-weight coding model locally on dual RTX 5090 GPUs"
       - "routing work between local open-weight models and frontier APIs"
       - "critic models reviewing generated code across multiple GPUs"
       - "conditional QA stages in an automated coding pipeline"
@@ -112,7 +112,7 @@ experience:
       - "IBM i and AS/400 legacy manufacturing systems"
       - "connecting modern AI to decades-old ERP and MRP software"
       - "semantic layers and schema mapping for business data"
-      - "legacy system modernization using LLMs"
+      - "natural language search over decades of legacy records and reports"
       - "data quality problems in manufacturing systems"
 
   - id: delivery_management
@@ -185,10 +185,16 @@ noise_filters:
 # ── Tunables ─────────────────────────────────────────────────────────────
 tunables:
   # How many articles get the local-model classification pass, in prior order.
-  # At roughly 1.5s each this comfortably covers a full 200-article fetch, and
-  # classifying everything avoids judged and unjudged articles competing on
-  # different scales. Lower it only if a run starts taking too long.
-  llm_judge_top_n: 250
+  # Classifications are cached by content, so only genuinely new articles cost
+  # anything (~1.5s each). Keep this at or above max_articles so the bottom of
+  # the list gets a kind and summary too; at 250 the last ~150 of a 400-item
+  # pool showed no summary at all.
+  llm_judge_top_n: 400
+
+  # Attribution confidence. A match at or above strong_attribution_cosine is
+  # named regardless of margin; between min_attribution_cosine and that, it
+  # is named only if it beat the runner-up by min_attribution_gap.
+  strong_attribution_cosine: 0.20
 
   # Scoring weights. `taste` is the user-feedback factor and is HARD BOUNDED
   # to [0.33, 0.50] in code — not less than a third (Joe's judgment matters),

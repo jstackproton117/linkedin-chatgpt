@@ -11,6 +11,7 @@ import html
 import json
 import re
 import sys
+import time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -235,22 +236,44 @@ def _resolve_paper_title(url):
     try:
         m = re.search(r"arxiv\.org/(?:abs|pdf)/([\w.\-]+?)(?:v\d+)?(?:\.pdf)?$", url, re.I)
         if m:
+            # https, not http — export.arxiv.org 301s plain http and feedparser
+            # then returns nothing, the same bug that killed the feed queries.
             feed = feedparser.parse(
-                f"http://export.arxiv.org/api/query?id_list={m.group(1)}&max_results=1")
+                f"https://export.arxiv.org/api/query?id_list={m.group(1)}&max_results=1")
+            # arXiv asks for ~3s between API calls and 429s a burst after
+            # about two. A failed resolve here means no categories, which
+            # means the non-AI filter cannot fire — so politeness is what
+            # makes the filter work at all.
+            time.sleep(3)
             if feed.entries:
                 entry = feed.entries[0]
-                return strip_html(entry.get("title", "")), strip_html(entry.get("summary", ""))[:400]
+                cats = [t.get("term") for t in (entry.get("tags") or []) if t.get("term")]
+                return (strip_html(entry.get("title", "")),
+                        strip_html(entry.get("summary", ""))[:400],
+                        cats)
         m = re.search(r"huggingface\.co/papers/([\w.\-]+)", url, re.I)
         if m:
             resp = requests.get(f"https://huggingface.co/api/papers/{m.group(1)}",
                                 timeout=20, headers={"User-Agent": "rebel-intel/1.0"})
             if resp.ok:
                 data = resp.json()
+                # HF Daily Papers is ML by construction; no category to check.
                 return (strip_html(data.get("title", "")),
-                        strip_html(data.get("ai_summary") or data.get("summary") or "")[:400])
+                        strip_html(data.get("ai_summary") or data.get("summary") or "")[:400],
+                        ["cs.LG"])
     except Exception:
         pass
-    return None, None
+    return None, None, []
+
+
+# arXiv categories that count as "AI" for the purpose of a paper feed. The HN
+# paper query matches ANY arxiv.org link, which pulled in "Higher multipoles of
+# the cow" (astrophysics, 116 points) and "Longest straight line paths on
+# Earth" (207 points) — great HN stories, useless for a LinkedIn AI post.
+ARXIV_AI_CATEGORIES = {
+    "cs.AI", "cs.CL", "cs.LG", "cs.SE", "cs.MA", "cs.IR", "cs.DC", "cs.CR",
+    "cs.HC", "cs.NE", "cs.PF", "cs.DB", "cs.CY", "cs.RO", "stat.ML",
+}
 
 
 def fetch_discord(conf):
@@ -337,7 +360,7 @@ def fetch_discord(conf):
                         found[url]["upvotes"] = reactions
                     continue
 
-                title, abstract = _resolve_paper_title(url)
+                title, abstract, _cats = _resolve_paper_title(url)
                 body = strip_html(content)
                 if not title:
                     title = body[:110] or url
@@ -398,10 +421,18 @@ def fetch_hn(conf):
             # Ask HN / self-post — link to the discussion itself.
             url = f"https://news.ycombinator.com/item?id={h.get('objectID')}"
         snippet = strip_html(h.get("story_text") or "")
-        if resolve and PAPER_LINK_RE.search(url):
+        if resolve:
+            # This is a paper feed: only actual paper links belong in it. An
+            # HN post pointing at an arXiv *listing* page ("ArXiv has almost
+            # 600 submissions today") is a story about arXiv, not a paper.
+            if not PAPER_LINK_RE.search(url):
+                continue
             # A bare paper title carries little signal; the abstract ranks far
             # better. Same resolver the Discord adapter uses.
-            paper_title, abstract = _resolve_paper_title(url)
+            paper_title, abstract, cats = _resolve_paper_title(url)
+            if cats and not (set(cats) & ARXIV_AI_CATEGORIES):
+                # Resolved fine, but it is astrophysics or maths — skip.
+                continue
             if paper_title:
                 title = paper_title
             if abstract:

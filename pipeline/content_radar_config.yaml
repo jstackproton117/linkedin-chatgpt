@@ -432,7 +432,7 @@ feeds:
     type: "paper"
     query: "arxiv.org"
     min_points: 15
-    hits: 40
+    hits: 25
     resolve_papers: true
     freshness_hours: 168
     max_items: 8

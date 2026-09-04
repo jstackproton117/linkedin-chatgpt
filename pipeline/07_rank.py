@@ -652,6 +652,7 @@ def main():
 
     min_gap = tun.get("min_attribution_gap", 0.02)
     min_cos = tun.get("min_attribution_cosine", 0.12)
+    strong_cos = tun.get("strong_attribution_cosine", 0.20)
     unattributed = 0
 
     for a in articles:
@@ -680,10 +681,22 @@ def main():
         # A small margin over the runner-up is NOT ambiguity to hide. When two
         # of Joe's experience areas both match strongly that is a better
         # article, not a murkier one, so both get named.
-        if a["_exp_best_sim"] >= min_cos:
+        # Two ways to earn a label. A STRONG match (>= strong_cos) is named
+        # regardless of margin. A MARGINAL one (>= min_cos) is named only if
+        # it clearly beat the runner-up. Dense paper abstracts push cosines
+        # past the floor even when nothing really matched — measured: 96% of
+        # papers were labelled vs 77% of news, and the weakest labels were a
+        # 3D-tokenization paper as "local inference" and an image-captioning
+        # paper as "enterprise IT", all with gaps under 0.01.
+        best, gap = a["_exp_best_sim"], a["_exp_gap"]
+        strong = best >= strong_cos
+        marginal = (not strong) and best >= min_cos and gap >= min_gap
+        if strong or marginal:
             a["_exp_best"] = sims[0][1]["id"]
             labels = [sims[0][1]["label"]]
-            if len(sims) > 1 and a["_exp_gap"] < min_gap and sims[1][0] >= min_cos:
+            # Name a runner-up only when BOTH are strong. A marginal pair with
+            # a tiny gap is two guesses, not two matches.
+            if strong and len(sims) > 1 and gap < min_gap and sims[1][0] >= strong_cos:
                 labels.append(sims[1][1]["label"])
                 a["_exp_second"] = sims[1][1]["id"]
             a["_exp_best_label"] = " + ".join(labels)
@@ -698,7 +711,8 @@ def main():
             a["_taste_raw"] = None
 
     print(f"  [B] experience match: {len(articles) - unattributed} attributed, "
-          f"{unattributed} below the match threshold (cosine < {min_cos})")
+          f"{unattributed} unlabelled (cosine < {min_cos}, or < {strong_cos} "
+          f"with no clear winner)")
 
     exp_norms = minmax([a["_exp_raw"] for a in articles])
     taste_norms = minmax([a["_taste_raw"] for a in articles])
@@ -897,7 +911,13 @@ def main():
         a["_bucket"] = bucket
 
         records.append({
+            # Spread the rank block FIRST so nothing inside it can clobber the
+            # record schema. It carries its own "type" (news/paper/podcast),
+            # which for two days overwrote this "article" tag and made every
+            # log consumer that filters on it see zero rows.
+            **a["rank"],
             "type": "article",
+            "item_type": a["rank"].get("type", "news"),
             "run_id": run_id,
             "url": a["url"],
             "title": a["title"],
@@ -905,7 +925,6 @@ def main():
             "published": a.get("published", ""),
             "rank_score": score,
             "bucket": bucket,
-            **a["rank"],
             "llm_raw": a.get("_llm_raw", ""),
         })
 
