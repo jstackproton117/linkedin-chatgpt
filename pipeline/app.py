@@ -30,6 +30,8 @@ DRAFT_EXPIRY_HOURS = 24
 # Shared with run_daily.sh, which holds the same lock for the scheduled
 # fetch + rank. Both write articles.json, so only one may run at a time.
 FETCH_LOCK_PATH = BASE / ".daily.lock"
+RUN_DAILY_PATH = BASE / "run_daily.sh"
+FETCH_LOG_PATH = BASE / "logs" / "daily.log"
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────
@@ -370,45 +372,84 @@ def index():
 
 @app.route("/fetch")
 def fetch_page():
-    return render_template("fetch.html")
+    # The page used to hardcode "26 feeds / top 200 / 30-60 seconds", all of
+    # which drifted. feed_health.json is written by every fetch, so it is
+    # the truth about what is actually configured.
+    health = load_json(DATA / "feed_health.json", {})
+    return render_template(
+        "fetch.html",
+        # Active, not configured: parked dead feeds should not count.
+        feeds_total=health.get("feeds_active") or health.get("feeds_total"),
+        feeds_with_items=health.get("feeds_with_items"),
+        max_articles=get_settings().get("pipeline", {}).get("max_articles"),
+        already_running=_fetch_running(),
+    )
 
 
 @app.route("/api/fetch", methods=["POST"])
 def api_fetch():
-    lock = open(FETCH_LOCK_PATH, "w")
+    """Start fetch + rank in the background and return at once.
+
+    This used to run both scripts inline and block the request for the
+    duration — fine at 30s, not at the 3-5 minutes a full fetch + rank of
+    100 new articles takes. Now it launches the same run_daily.sh that cron
+    uses (one code path, one lock, one log) and the page follows progress
+    through /api/fetch/status.
+    """
+    if _fetch_running():
+        return jsonify({"started": False, "running": True,
+                        "message": "A fetch is already running — following it."})
+    subprocess.Popen(
+        ["/bin/bash", str(RUN_DAILY_PATH)],
+        cwd=str(BASE), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        start_new_session=True,   # survives a gunicorn worker recycle
+    )
+    return jsonify({"started": True, "running": True})
+
+
+def _fetch_running():
+    """Probe the shared lock without holding it."""
     try:
-        try:
+        with open(FETCH_LOCK_PATH, "w") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except OSError:
-            return jsonify({
-                "ok": False, "ranked": False,
-                "output": "The scheduled daily fetch is running right now. "
-                          "Give it a few minutes and refresh — the ranked list "
-                          "will appear on its own.",
-                "article_count": len(load_json(ARTICLES_PATH, [])),
-                "rising": get_rising_themes(),
-            })
-        ok, output = run_script("01_fetch.py", timeout=300)
-        ranked = False
-        if ok:
-            # 07_rank.py re-scores and re-sorts articles.json by post potential.
-            # It fails safe: if the local models are down it leaves the keyword
-            # ordering alone, so a rank failure never blocks the review step.
-            ranked, rank_output = run_script("07_rank.py", timeout=1800)
-            output += "\n" + rank_output
-        articles = load_json(ARTICLES_PATH, [])
-        return jsonify({"ok": ok, "ranked": ranked, "output": output,
-                        "article_count": len(articles), "rising": get_rising_themes()})
-    except subprocess.TimeoutExpired:
-        return jsonify({"ok": False, "output": "Timed out after 5 minutes.", "article_count": 0, "rising": []})
-    except Exception as e:
-        return jsonify({"ok": False, "output": str(e), "article_count": 0, "rising": []})
-    finally:
-        try:
             fcntl.flock(lock, fcntl.LOCK_UN)
-        except Exception:
-            pass
-        lock.close()
+        return False
+    except OSError:
+        return True
+
+
+@app.route("/api/fetch/status")
+def api_fetch_status():
+    """Progress of the current (or most recent) run, straight from daily.log.
+
+    Returns the log from the last "daily run starting" marker onward, so the
+    page can decide completion from the log itself rather than from the lock
+    — there is a brief window after Popen before the script takes the lock,
+    and a lock-only check would read that as "already finished".
+    """
+    lines = []
+    try:
+        text = FETCH_LOG_PATH.read_text(encoding="utf-8", errors="replace")
+        all_lines = text.splitlines()
+        start = 0
+        for i in range(len(all_lines) - 1, -1, -1):
+            if "daily run starting" in all_lines[i]:
+                start = i
+                break
+        lines = all_lines[start:][-400:]
+    except FileNotFoundError:
+        pass
+    joined = "\n".join(lines)
+    complete = ("daily run complete" in joined or "FATAL" in joined
+                or "SKIP" in joined)
+    articles = load_json(ARTICLES_PATH, [])
+    return jsonify({
+        "running": _fetch_running(),
+        "complete": complete,
+        "log": lines,
+        "article_count": len(articles),
+        "rising": get_rising_themes() if complete else [],
+    })
 
 
 # ── Review ────────────────────────────────────────────────────────────────

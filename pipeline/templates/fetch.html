@@ -77,11 +77,13 @@
   <div class="scan-panel">
     <div class="card" style="text-align:center; padding: 40px 24px;">
       <div style="font-size:13px; color:var(--text-sec); margin-bottom:8px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">
-        26 FEEDS READY
+        {{ feeds_total or '—' }} SOURCES READY
       </div>
       <div style="font-size:12px; color:var(--text-dim); margin-bottom: 32px; line-height:1.8;">
-        Pulls from 26 RSS feeds · Scores by keyword relevance · Penalizes articles older than 48h<br>
-        Keeps top 200 articles. Takes about 30–60 seconds.
+        Pulls from {{ feeds_total or 'all' }} sources — news, podcasts, papers · Ranks by post potential:
+        experience match, your taste, take-ability<br>
+        Keeps top {{ max_articles or 400 }}. Fetching takes about a minute; ranking adds ~1.5s per new article.
+        Progress streams below — the page keeps working while it runs.
       </div>
       <div class="scan-btn-wrap">
         <button class="scan-btn" id="scan-btn" onclick="startFetch()">
@@ -126,6 +128,47 @@
 
 {% block scripts %}
 <script>
+// The fetch runs in the background on the server (the same run_daily.sh the
+// 07:00 cron uses) and this page follows its log. Nothing here blocks on the
+// request, so a 4-minute rank pass is 4 minutes of visible progress instead
+// of a frozen spinner.
+const POLL_MS = 2000;
+const MAX_WAIT_MS = 25 * 60 * 1000;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function styleLine(line) {
+  if (line.includes('FATAL') || line.includes('ERROR') || line.includes('Traceback')) return `<span class="line-err">${esc(line)}</span>`;
+  if (line.includes('WARN') || line.includes('Warning') || line.includes('SKIP') || line.includes('FEED PROBLEMS')) return `<span class="line-warn">${esc(line)}</span>`;
+  if (line.includes('Rising') || line.startsWith('  *')) return `<span class="line-theme">${esc(line)}</span>`;
+  if (line.includes('Scanned') || line.includes('saved') || line.includes('Done') || line.includes('daily run complete') || line.includes('Wrote')) return `<span class="line-ok">${esc(line)}</span>`;
+  if (line.includes('TOP 10') || /^\s+\d+\.\s\[/.test(line)) return `<span class="line-theme">${esc(line)}</span>`;
+  return `<span>${esc(line)}</span>`;
+}
+
+async function getStatus() {
+  const res = await fetch('/api/fetch/status', { cache: 'no-store' });
+  return res.json();
+}
+
+function renderLog(box, lines) {
+  const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+  box.innerHTML = lines.map(styleLine).join('\n');
+  if (atBottom) box.scrollTop = box.scrollHeight;
+}
+
+function showResults(st) {
+  document.getElementById('res-count').textContent = st.article_count;
+  const rs = document.getElementById('result-summary');
+  rs.style.removeProperty('display'); rs.style.display = 'flex';
+  if (st.rising && st.rising.length) {
+    document.getElementById('themes-chips').innerHTML = st.rising.map(t =>
+      `<span class="theme-chip">${esc(t.keyword)} <strong>${t.count}×</strong></span>`
+    ).join('');
+    document.getElementById('themes-result').style.display = 'block';
+  }
+  document.getElementById('goto-review').style.display = 'block';
+}
+
 async function startFetch() {
   const btn = document.getElementById('scan-btn');
   const box = document.getElementById('output-box');
@@ -133,41 +176,49 @@ async function startFetch() {
   btn.textContent = 'FETCHING...';
   btn.classList.add('scanning');
   box.style.display = 'block';
-  box.innerHTML = '<span class="line-ok">// Starting article fetch...</span>\n';
+  box.innerHTML = '<span class="line-ok">// Starting fetch + rank...</span>\n';
 
   try {
+    // Snapshot the marker line of whatever run is currently last in the log.
+    // Right after we start, the previous run's finished log is still the
+    // latest segment for a moment, and it reads as "complete" — so a run
+    // only counts as ours once the marker changes.
+    const before = await getStatus();
+    const prevMarker = (before.log && before.log[0]) || '';
+
     const res = await fetch('/api/fetch', { method: 'POST' });
     const data = await res.json();
-
-    const lines = (data.output || '').split('\n');
-    box.innerHTML = lines.map(line => {
-      if (line.includes('WARNING') || line.includes('Warning')) return `<span class="line-warn">${esc(line)}</span>`;
-      if (line.includes('ERROR')   || line.includes('error'))   return `<span class="line-err">${esc(line)}</span>`;
-      if (line.includes('Rising')  || line.startsWith('  *'))   return `<span class="line-theme">${esc(line)}</span>`;
-      if (line.includes('Scanned') || line.includes('saved') || line.includes('Done')) return `<span class="line-ok">${esc(line)}</span>`;
-      return `<span>${esc(line)}</span>`;
-    }).join('\n');
-
-    if (data.ok) {
-      document.getElementById('res-count').textContent = data.article_count;
-      const rs = document.getElementById('result-summary');
-      rs.style.display = 'flex'; rs.style.removeProperty('display'); rs.style.display = 'flex';
-
-      if (data.rising && data.rising.length) {
-        document.getElementById('themes-chips').innerHTML = data.rising.map(t =>
-          `<span class="theme-chip">${esc(t.keyword)} <strong>${t.count}×</strong></span>`
-        ).join('');
-        document.getElementById('themes-result').style.display = 'block';
-      }
-
-      document.getElementById('goto-review').style.display = 'block';
-      btn.textContent = 'FETCH COMPLETE';
-      toast(data.article_count + ' articles fetched and saved');
-    } else {
-      btn.textContent = 'FETCH FAILED — RETRY';
-      btn.disabled = false;
-      toast('Fetch failed — see output above', 'err');
+    if (!data.running) throw new Error('The server could not start the fetch');
+    const following = !data.started;
+    if (following) {
+      box.innerHTML += '<span class="line-warn">// A fetch is already running (probably the scheduled one) — following it</span>\n';
     }
+
+    const t0 = Date.now();
+    while (Date.now() - t0 < MAX_WAIT_MS) {
+      await sleep(POLL_MS);
+      const st = await getStatus();
+      const isOurRun = following || ((st.log && st.log[0]) || '') !== prevMarker;
+      if (isOurRun && st.log && st.log.length) renderLog(box, st.log);
+      if (isOurRun && st.complete && !st.running) {
+        const joined = (st.log || []).join('\n');
+        const ok = joined.includes('daily run complete');
+        if (ok) {
+          showResults(st);
+          btn.textContent = 'FETCH COMPLETE';
+          toast(st.article_count + ' articles fetched and ranked');
+        } else {
+          btn.textContent = 'FETCH FAILED — RETRY';
+          btn.disabled = false;
+          toast('Fetch did not complete — see output above', 'err');
+        }
+        btn.classList.remove('scanning');
+        return;
+      }
+      const secs = Math.round((Date.now() - t0) / 1000);
+      btn.textContent = `FETCHING... ${secs}s`;
+    }
+    throw new Error('Gave up waiting after 25 minutes — check logs/daily.log on RedRose');
   } catch (e) {
     box.innerHTML += `\n<span class="line-err">// Error: ${esc(String(e))}</span>`;
     btn.textContent = 'FETCH FAILED — RETRY';
@@ -176,6 +227,15 @@ async function startFetch() {
   }
   btn.classList.remove('scanning');
 }
+
+// If the scheduled run is already going when the page opens, say so and
+// offer to follow it rather than presenting a button that would just bounce.
+{% if already_running %}
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('scan-btn');
+  btn.textContent = 'FETCH IN PROGRESS — FOLLOW';
+});
+{% endif %}
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');

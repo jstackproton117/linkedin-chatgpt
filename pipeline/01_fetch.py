@@ -12,6 +12,7 @@ import json
 import re
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -384,8 +385,13 @@ def fetch_discord(conf):
 HN_SEARCH_API = "https://hn.algolia.com/api/v1/search_by_date"
 
 
-def fetch_hn(conf):
+def fetch_hn(conf, seen=None):
     """Hacker News via the Algolia API.
+
+    `seen` lets this skip URLs the main loop would discard anyway. That
+    matters because resolving a paper link costs an arXiv call plus a 3s
+    courtesy delay: on 2026-09-05 the feed resolved 25 already-seen links
+    (~75s) to keep exactly one new paper.
 
     Replaces hnrss.org, which is dead — it returns no entries at all, so the
     "Hacker News - Best" feed had been silently contributing nothing.
@@ -411,8 +417,13 @@ def fetch_hn(conf):
         return []
 
     resolve = conf.get("resolve_papers", False)
+    seen = seen or {}
+    max_items = conf.get("max_items")
     out = []
     for h in hits:
+        if max_items is not None and len(out) >= max_items:
+            # Enough kept; every further candidate would be a wasted resolve.
+            break
         url = h.get("url") or ""
         title = strip_html(h.get("title") or "")
         if not title:
@@ -420,6 +431,8 @@ def fetch_hn(conf):
         if not url:
             # Ask HN / self-post — link to the discussion itself.
             url = f"https://news.ycombinator.com/item?id={h.get('objectID')}"
+        if url in seen:
+            continue
         snippet = strip_html(h.get("story_text") or "")
         if resolve:
             # This is a paper feed: only actual paper links belong in it. An
@@ -449,7 +462,7 @@ def fetch_hn(conf):
     return out
 
 
-def fetch_source(conf):
+def fetch_source(conf, seen=None):
     """Every source normalises to the same shape, so the main loop does not
     care whether an item came from RSS, an Atom feed, a JSON API or Discord."""
     source = conf.get("source")
@@ -458,7 +471,7 @@ def fetch_source(conf):
     if source == "discord":
         return fetch_discord(conf)
     if source == "hn":
-        return fetch_hn(conf)
+        return fetch_hn(conf, seen)
     return fetch_rss(conf)
 
 
@@ -607,6 +620,23 @@ def main():
     now = datetime.now(timezone.utc)
     yields = {}
 
+    # Fetch every source concurrently. 42 feeds fetched one after another is
+    # 20-30s of pure network wait, and it also hides the HN resolver's arXiv
+    # courtesy delays behind other feeds' downloads. Parsing, scoring and the
+    # seen/theme bookkeeping below stay sequential on purpose.
+    active = [f for f in feeds if f.get("enabled") is not False]
+
+    def _fetch(conf):
+        try:
+            return conf, fetch_source(conf, seen), None
+        except Exception as e:
+            return conf, [], e
+
+    fetched = {}
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for conf, entries, err in pool.map(_fetch, active):
+            fetched[id(conf)] = (entries, err)
+
     for feed_conf in feeds:
         # A feed can be parked in the config without being fetched, so sources
         # that need credentials can ship disabled until they are set up.
@@ -623,10 +653,9 @@ def main():
         feed_cutoff = now - timedelta(hours=feed_hours)
         max_items = feed_conf.get("max_items")
 
-        try:
-            entries = fetch_source(feed_conf)
-        except Exception as e:
-            print(f"  Warning: {feed_name} -- {e}")
+        entries, err = fetched.get(id(feed_conf), ([], None))
+        if err is not None:
+            print(f"  Warning: {feed_name} -- {err}")
             continue
 
         kept = 0
@@ -755,6 +784,7 @@ def main():
     health = {
         "checked_at": now.isoformat(),
         "feeds_total": len(feeds),
+        "feeds_active": len(active),
         "feeds_with_items": sum(1 for v in yields.values() if v > 0),
         "yields": yields,
         "problems": FEED_STATUS,
