@@ -36,6 +36,14 @@ QUEUE_PATH = DATA / "queue.json"
 MAX_ARTICLES = SETTINGS["pipeline"]["max_articles"]
 FRESHNESS_H = SETTINGS["pipeline"]["freshness_hours"]
 
+# How long an UNREVIEWED article stays on the review list after Joe first
+# saw it. Distinct from a feed's freshness_hours, which only governs how old
+# an item may be when first fetched. Before this existed the list sat
+# permanently at the cap ("collecting and collecting"). 0 = clear the
+# unreviewed list on every fetch. Reviewed items live in queue.json and are
+# never touched by this.
+REVIEW_TTL_H = SETTINGS["pipeline"].get("review_ttl_hours", 72)
+
 # Must exceed the longest per-feed freshness window, or an item could be
 # forgotten while still inside its window and get re-fetched as a duplicate.
 SEEN_RETENTION_DAYS = 30
@@ -694,6 +702,8 @@ def main():
                 # Carried forward until this passes, so each feed ages out on
                 # its own schedule rather than a single global window.
                 "expires_at": (pub_dt + timedelta(hours=feed_hours)).isoformat(),
+                # When Joe first saw it — the review-list TTL counts from here.
+                "fetched_at": now.isoformat(),
                 "snippet": snippet,
                 "pillar": pillar,
                 "score": score,
@@ -720,7 +730,9 @@ def main():
     # quietly discard yesterday's unreviewed backlog. Reviewed articles are
     # not carried — they already live in queue.json.
     carried = 0
-    if OUT_PATH.exists():
+    expired_ttl = 0
+    expired_window = 0
+    if OUT_PATH.exists() and REVIEW_TTL_H > 0:
         try:
             reviewed = set()
             if QUEUE_PATH.exists():
@@ -739,15 +751,32 @@ def main():
                         if exp_dt.tzinfo is None:
                             exp_dt = exp_dt.replace(tzinfo=timezone.utc)
                         if exp_dt < datetime.now(timezone.utc):
+                            expired_window += 1
                             continue
                     else:
                         pub_dt = datetime.fromisoformat(prev.get("published", ""))
                         if pub_dt.tzinfo is None:
                             pub_dt = pub_dt.replace(tzinfo=timezone.utc)
                         if pub_dt < cutoff_dt:
+                            expired_window += 1
                             continue
                 except Exception:
                     continue
+                # Review-list TTL, counted from first sight. Records written
+                # before fetched_at existed get stamped now, so the backlog
+                # gets one full TTL rather than vanishing in a single run.
+                if not prev.get("fetched_at"):
+                    prev["fetched_at"] = now.isoformat()
+                try:
+                    seen_dt = datetime.fromisoformat(prev["fetched_at"])
+                    if seen_dt.tzinfo is None:
+                        seen_dt = seen_dt.replace(tzinfo=timezone.utc)
+                except Exception:
+                    seen_dt = now
+                if now - seen_dt > timedelta(hours=REVIEW_TTL_H):
+                    expired_ttl += 1
+                    continue
+                prev["_carried"] = True
                 articles.append(prev)
                 carried += 1
         except Exception as e:
@@ -769,8 +798,37 @@ def main():
         if hours < 48:  return 0.45
         return 0.20
 
-    articles.sort(key=lambda a: a["score"] * _freshness(_age_hours(a)), reverse=True)
-    articles = articles[:MAX_ARTICLES]
+    # Cap in two tiers. New items have no rank yet, so they all get a look
+    # (ordered by keyword score x freshness, the only signal they have).
+    # Carried survivors compete for the remaining slots on post potential —
+    # previously the cap trimmed everything by keyword score, discarding
+    # articles the ranker had scored highly.
+    fresh = [a for a in articles if not a.get("_carried")]
+    held = [a for a in articles if a.get("_carried")]
+    fresh.sort(key=lambda a: a["score"] * _freshness(_age_hours(a)), reverse=True)
+
+    # Carried items compete on rank_score PERCENTILE WITHIN THEIR OWN TYPE,
+    # not raw rank_score. Papers score systematically higher (gentler
+    # freshness curve, take-ability floor, and a taste model that has never
+    # seen a paper verdict), so a raw sort turned a 20%-paper pool into a
+    # 56%-paper list on the first capped run. Percentile-within-type keeps
+    # the surviving mix proportional to what came in.
+    by_type = {}
+    for a in held:
+        by_type.setdefault(a.get("type", "news"), []).append(a)
+    for items in by_type.values():
+        items.sort(key=lambda a: a.get("rank_score") or 0, reverse=True)
+        n = len(items)
+        for i, a in enumerate(items):
+            a["_pct"] = 1.0 - i / n
+    held.sort(key=lambda a: (a["_pct"], a.get("rank_score") or 0), reverse=True)
+
+    before_cap = len(articles)
+    articles = (fresh + held)[:MAX_ARTICLES]
+    trimmed = before_cap - len(articles)
+    for a in articles:
+        a.pop("_carried", None)
+        a.pop("_pct", None)
 
     OUT_PATH.write_text(json.dumps(articles, indent=2))
     save_seen(seen)
@@ -786,6 +844,15 @@ def main():
         "feeds_total": len(feeds),
         "feeds_active": len(active),
         "feeds_with_items": sum(1 for v in yields.values() if v > 0),
+        "retention": {
+            "review_ttl_hours": REVIEW_TTL_H,
+            "max_articles": MAX_ARTICLES,
+            "new": total_scanned,
+            "carried": carried,
+            "expired_ttl": expired_ttl,
+            "expired_window": expired_window,
+            "trimmed_by_cap": trimmed,
+        },
         "yields": yields,
         "problems": FEED_STATUS,
     }
@@ -799,7 +866,9 @@ def main():
     rising = get_rising_themes()
 
     print(f"\nScanned {total_scanned} new articles, carried {carried} unreviewed "
-          f"from the previous run -> {len(articles)} saved (ranked by relevance).")
+          f"-> {len(articles)} saved (cap {MAX_ARTICLES}).")
+    print(f"  Retention: {expired_ttl} left after {REVIEW_TTL_H}h unreviewed, "
+          f"{expired_window} aged past their feed window, {trimmed} trimmed by the cap.")
     if rising:
         print("Rising themes:")
         for kw, n in rising[:5]:

@@ -5,8 +5,9 @@
     "timeout": 60
   },
   "pipeline": {
-    "max_articles": 400,
-    "freshness_hours": 72
+    "max_articles": 200,
+    "freshness_hours": 72,
+    "review_ttl_hours": 72
   },
   "content_radar_config": "C:/Users/Prome/OneDrive/Documents/Joe/content-radar/config.yaml"
 }

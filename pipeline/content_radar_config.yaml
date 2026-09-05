@@ -456,7 +456,7 @@ feeds:
   # Trained on RTX 5090") slipped through — the earlier queries covered
   # inference but never training on consumer hardware.
   - name: "arXiv - Joe's topics"
-    url: "https://export.arxiv.org/api/query?search_query=abs:%22LLM+inference%22+OR+abs:%22inference+serving%22+OR+abs:%22model+quantization%22+OR+abs:%22consumer+GPU%22+OR+abs:%22single+GPU%22+OR+abs:%22low-cost+training%22+OR+abs:%22efficient+pretraining%22+OR+abs:%22model+routing%22+OR+abs:%22LLM+cascade%22+OR+abs:%22inference+cost%22+OR+abs:%22LLM+agent%22+OR+abs:%22multi-agent+system%22+OR+abs:%22agent+harness%22+OR+abs:%22agentic+workflow%22+OR+abs:%22retrieval-augmented+generation%22+OR+abs:%22benchmark+contamination%22+OR+abs:%22evaluation+harness%22+OR+abs:%22text-to-SQL%22+OR+abs:%22code+generation%22&sortBy=submittedDate&sortOrder=descending&max_results=100"
+    url: "https://export.arxiv.org/api/query?search_query=abs:%22LLM+inference%22+OR+abs:%22inference+serving%22+OR+abs:%22model+quantization%22+OR+abs:%22consumer+GPU%22+OR+abs:%22single+GPU%22+OR+abs:%22low-cost+training%22+OR+abs:%22efficient+pretraining%22+OR+abs:%22model+routing%22+OR+abs:%22LLM+cascade%22+OR+abs:%22inference+cost%22+OR+abs:%22LLM+agent%22+OR+abs:%22multi-agent+system%22+OR+abs:%22agent+harness%22+OR+abs:%22agentic+workflow%22+OR+abs:%22retrieval-augmented+generation%22+OR+abs:%22benchmark+contamination%22+OR+abs:%22evaluation+harness%22+OR+abs:%22text-to-SQL%22+OR+abs:%22code+generation%22+OR+abs:%22developer+productivity%22+OR+abs:%22software+engineering+management%22+OR+abs:%22engineering+teams%22&sortBy=submittedDate&sortOrder=descending&max_results=100"
     category: "ai"
     type: "paper"
     freshness_hours: 120
@@ -493,6 +493,58 @@ feeds:
     url: "https://ollama.com/blog/rss.xml"
     category: "ai"
     freshness_hours: 336
+
+  # ── Engineering leadership & product management ───────────────────────────
+  # Added 2026-09-05: a review found the pool strong on dev workflow and nearly
+  # empty on the management side. All verified live with measured cadence.
+  # Daily publishers are capped so they cannot crowd out the rest.
+  - name: "DX - Abi Noda"
+    url: "https://newsletter.getdx.com/feed"
+    category: "leadership"
+    freshness_hours: 240
+
+  - name: "Dev Interrupted"
+    url: "https://devinterrupted.substack.com/feed"
+    category: "leadership"
+    freshness_hours: 240
+
+  - name: "Lenny's Newsletter"
+    url: "https://www.lennysnewsletter.com/feed"
+    category: "leadership"
+    freshness_hours: 120
+    max_items: 4
+
+  - name: "Product Talk"
+    url: "https://www.producttalk.org/feed/"
+    category: "leadership"
+    freshness_hours: 240
+
+  - name: "Will Larson"
+    url: "https://lethain.com/feeds/"
+    category: "leadership"
+    freshness_hours: 720
+
+  - name: "SVPG"
+    url: "https://www.svpg.com/feed/"
+    category: "leadership"
+    freshness_hours: 720
+
+  - name: "charity.wtf"
+    url: "https://charity.wtf/feed/"
+    category: "leadership"
+    freshness_hours: 720
+
+  - name: "Stack Overflow Blog"
+    url: "https://stackoverflow.blog/feed/"
+    category: "tech"
+    freshness_hours: 120
+    max_items: 4
+
+  - name: "GitHub Blog"
+    url: "https://github.blog/feed/"
+    category: "tech"
+    freshness_hours: 120
+    max_items: 4
 
   # ── Practitioner writing (verified live and current) ──────────────────────
   - name: "Simon Willison"

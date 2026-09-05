@@ -116,8 +116,8 @@ experience:
       - "data quality problems in manufacturing systems"
 
   - id: delivery_management
-    label: "Technical delivery & consulting"
-    short: "manages delivery teams shipping AI to real users under real constraints"
+    label: "Program & delivery management"
+    short: "runs AI delivery as a TPM: teams, sprints, scope, and how AI changes the job"
     phrases:
       - "managing a team delivering an AI project to a deadline"
       - "why enterprise AI pilots stall before reaching production"
@@ -126,6 +126,19 @@ experience:
       - "companies rehiring engineers after over-automating with AI"
       - "AI adoption and organizational change inside a company"
       - "consulting engagements and accelerator programs for AI"
+      # Program / project management — the roles Joe is targeting. Added
+      # 2026-09-05 after a review found the pool strong on dev workflow but
+      # nearly empty on the management side.
+      - "technical program manager coordinating AI engineering teams"
+      - "sprint planning and estimation when AI agents write most of the code"
+      - "how AI coding agents change engineering team size and roles"
+      - "measuring developer productivity after adopting AI tools"
+      - "product managers writing specs for AI agents to implement"
+      - "roadmap and prioritization for an AI product"
+      - "engineering managers reviewing AI-generated pull requests"
+      - "agile and scrum practices adapted for AI-assisted development"
+      - "the changing role of the engineering manager in the age of AI"
+      - "burnout and psychological effects of AI adoption on engineers"
 
   - id: production_ai_reality
     label: "Production AI operations"
