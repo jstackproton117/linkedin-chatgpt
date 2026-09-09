@@ -110,4 +110,9 @@ for p in sent:
 
 print()
 print("=" * 60)
+from buffer_client import usage_summary  # noqa: E402
+u = usage_summary()
+print(f"  API usage: {u['calls_24h']}/{u['daily_budget']} today (plan {u['plan_24h']}) · "
+      f"{u['calls_30d']}/{u['monthly_budget']} this month (plan {u['plan_30d']})")
+print("  This check itself costs ~4 requests; the daily sync costs 1-2.")
 print("  Ready. The pipeline can now schedule to Buffer and read metrics back.")

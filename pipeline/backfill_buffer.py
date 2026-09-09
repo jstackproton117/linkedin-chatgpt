@@ -82,8 +82,11 @@ def main():
 
     b = Buffer(cfg)
     try:
-        sent = b.posts(cfg["organization_id"], cfg["channel_id"], status="sent", first=50,
-                       extra_fields=("status", "sentAt", "externalLink"))
+        # Two pages at most: one request each. Old Buffer history is not
+        # worth more quota than that.
+        sent = b.posts_all(cfg["organization_id"], cfg["channel_id"], "sent",
+                           extra_fields=("status", "sentAt", "externalLink"),
+                           page_size=50, max_pages=2)
     except BufferError as e:
         print("Buffer error:", e); sys.exit(1)
     post_log = json.loads(POST_LOG_PATH.read_text(encoding="utf-8"))

@@ -102,6 +102,18 @@
   <div style="margin-bottom: 24px;">
     <div class="page-title">MISSION LOG</div>
     <div class="page-subtitle">TRACK SCHEDULED, PUBLISHED POSTS AND ENGAGEMENT METRICS</div>
+    {% if buffer_usage %}
+    <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px; margin-top:6px; font-family:'Orbitron',sans-serif;">
+      BUFFER API ·
+      <span style="color:{{ 'var(--sw-red)' if buffer_usage.calls_24h >= buffer_usage.daily_budget else 'var(--text-sec)' }};">{{ buffer_usage.calls_24h }}/{{ buffer_usage.daily_budget }} TODAY</span>
+      <span style="opacity:0.6;">(plan {{ buffer_usage.plan_24h }})</span> ·
+      <span style="color:{{ 'var(--sw-red)' if buffer_usage.calls_30d >= buffer_usage.monthly_budget else 'var(--text-sec)' }};">{{ buffer_usage.calls_30d }}/{{ buffer_usage.monthly_budget }} THIS MONTH</span>
+      <span style="opacity:0.6;">(plan {{ "{:,}".format(buffer_usage.plan_30d) }})</span>
+      {% if buffer_usage.reported_24h is not none %}
+      · <span style="opacity:0.6;">BUFFER REPORTS {{ buffer_usage.reported_24h }} / {{ buffer_usage.reported_30d }}</span>
+      {% endif %}
+    </div>
+    {% endif %}
   </div>
 
   {% if overdue_count %}

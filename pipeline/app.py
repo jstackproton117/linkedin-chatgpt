@@ -840,10 +840,18 @@ def post_log_page():
     # "AWAITING CONTENT"; Mission Log should only list real candidates.
     visible = [p for p in posts
                if p.get("published_at") or p.get("scheduled_for") or _has_drafted_content(p.get("draft_file"))]
+    # Buffer quota visibility: the pipeline holds itself to a fraction of the
+    # Free plan (250/day, 3,000/month) and this is where Joe can see it.
+    try:
+        from buffer_client import usage_summary, load_config
+        buffer_usage = usage_summary() if load_config() else None
+    except Exception:
+        buffer_usage = None
     return render_template("post_log.html",
         posts=visible,
         overdue_count=overdue_count,
         next_scheduled=get_next_scheduled(posts),
+        buffer_usage=buffer_usage,
     )
 
 

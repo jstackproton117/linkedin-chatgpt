@@ -12,6 +12,10 @@
   "content_radar_config": "C:/Users/Prome/OneDrive/Documents/Joe/content-radar/config.yaml",
   "buffer": {
     "timezone": "America/New_York",
-    "post_time_local": "08:30"
+    "post_time_local": "08:30",
+    "daily_call_budget": 40,
+    "monthly_call_budget": 600,
+    "metrics_window_days": 60,
+    "batch_size": 50
   }
 }
