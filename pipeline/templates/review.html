@@ -158,6 +158,10 @@ body { overflow: hidden; }
 
 .detail-content { padding: 24px 28px; }
 
+/* Rising-bar summary: only exists on phones (see the mobile block). */
+.themes-summary { display: none; }
+.themes-summary .chev { display: inline-block; transition: transform 0.15s ease; }
+
 /* Mobile-only "back to list" control at the top of the detail sheet.
    Shown by the max-width:700px block below; never rendered on desktop. */
 .mobile-back {
@@ -353,8 +357,20 @@ body { overflow: hidden; }
   /* Meta row wraps tighter */
   .detail-meta-row { gap: 12px; }
 
-  /* Themes bar wraps */
-  .themes-bar { padding: 6px 10px; gap: 6px; }
+  /* Rising-themes bar: one tappable line by default, pills on demand.
+     The header stack (themes, stats, search, chips) was ~324px of an
+     812px phone screen before the first article; this gives most of the
+     bar's share back. */
+  .themes-bar {
+    padding: 8px 12px; gap: 6px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .themes-bar:not(.expanded) .theme-pill { display: none; }
+  .themes-summary {
+    display: inline-flex; align-items: center; gap: 6px; margin-left: auto;
+    color: var(--text-sec); font-size: 10px; letter-spacing: 1px;
+  }
+  .themes-bar.expanded .themes-summary .chev { transform: rotate(90deg); }
 
   /* 16px prevents iOS Safari from zooming on input focus */
   .search-box { font-size: 16px; }
@@ -373,11 +389,14 @@ body { overflow: hidden; }
 
     <!-- Rising themes bar -->
     {% if rising %}
-    <div class="themes-bar">
+    {# On phones this bar starts collapsed to one line and expands on tap;
+       on desktop the summary is hidden and the pills always show. #}
+    <div class="themes-bar" id="themes-bar" onclick="toggleRising()">
       <span class="themes-bar-label">RISING:</span>
       {% for t in rising[:6] %}
       <span class="theme-pill">{{ t.keyword }} {{ t.count }}×</span>
       {% endfor %}
+      <span class="themes-summary">{{ rising|length }} theme{{ '' if rising|length == 1 else 's' }} <span class="chev">&#8250;</span></span>
     </div>
     {% endif %}
 
@@ -667,6 +686,26 @@ function closeDetail(fromPop) {
   if (!fromPop && history.state && history.state.detail) history.back();
 }
 window.addEventListener('popstate', () => closeDetail(true));
+
+// ── Rising-themes bar (mobile only) ──
+// Collapsed by default on phones; the choice is remembered per browser so
+// someone who wants it open doesn't re-open it every visit. Desktop never
+// collapses, so the toggle is a no-op there.
+function toggleRising() {
+  if (!isMobile()) return;
+  const bar = document.getElementById('themes-bar');
+  if (!bar) return;
+  bar.classList.toggle('expanded');
+  try { localStorage.setItem('rising-open', bar.classList.contains('expanded') ? '1' : '0'); } catch (e) {}
+}
+(function restoreRising() {
+  try {
+    if (isMobile() && localStorage.getItem('rising-open') === '1') {
+      const bar = document.getElementById('themes-bar');
+      if (bar) bar.classList.add('expanded');
+    }
+  } catch (e) {}
+})();
 
 function buildDetail(a) {
   const st = STATUS[a.url];
