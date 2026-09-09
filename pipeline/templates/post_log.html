@@ -214,6 +214,10 @@
             {% elif is_sched %}
               <span class="badge badge-hold">SCHEDULED</span>
               <div class="date">{{ p.scheduled_for }}</div>
+              {% if p.buffer_post_id %}
+              <div class="date" style="color:var(--sw-blue);">BUFFER · {{ (p.buffer_status or 'queued') | upper | replace('_', ' ') }}</div>
+              {% if p.buffer_error %}<div class="date" style="color:var(--sw-red);">{{ p.buffer_error[:60] }}</div>{% endif %}
+              {% endif %}
             {% else %}
               <span class="badge badge-skip">PENDING</span>
             {% endif %}
@@ -248,6 +252,12 @@
               <button class="btn btn-dim"
                   onclick="openScheduleModal('{{ p.id }}', '{{ p.article_title | replace("'", "\\'") | truncate(40, True) }}')">
                 SCHEDULE
+              </button>
+              {% endif %}
+              {% if is_sched and not is_over and draft_fn and not p.buffer_post_id %}
+              <button class="btn btn-blue"
+                  onclick="openBufferModal('{{ p.id }}', '{{ p.article_title | replace("'", "\\'") | truncate(40, True) }}', '{{ p.scheduled_for }}')">
+                SEND TO BUFFER
               </button>
               {% endif %}
               <button class="btn btn-yellow"
@@ -327,6 +337,35 @@
     <div class="modal-actions">
       <button class="btn btn-yellow" onclick="submitPublish()">CONFIRM PUBLISHED</button>
       <button class="btn btn-dim" onclick="closePublishModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- SEND TO BUFFER Modal -->
+<div class="modal-overlay" id="buffer-modal" onclick="closeBufferModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>SEND TO BUFFER</h3>
+    <div style="font-size:12px; color:var(--text-sec); margin-bottom:14px;" id="buf-modal-title"></div>
+    <div style="font-size:11px; color:var(--text-sec); margin-bottom:12px;">
+      Buffer will post this to LinkedIn on <strong id="buf-date" style="color:var(--text-pri);"></strong> at the time below.
+      The pipeline marks it published only after Buffer confirms it went out, and pulls metrics daily from then on.
+    </div>
+    <label style="font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">POST TIME (Eastern)</label>
+    <input type="time" id="buf-time" value="08:30" style="margin-bottom:12px;">
+    <label style="display:flex; align-items:center; gap:10px; font-size:12px; color:var(--text-pri); margin-bottom:10px; cursor:pointer;">
+      <input type="radio" name="buf-mode" value="schedule" checked> Schedule — goes out automatically at that time
+    </label>
+    <label style="display:flex; align-items:center; gap:10px; font-size:12px; color:var(--text-pri); margin-bottom:16px; cursor:pointer;">
+      <input type="radio" name="buf-mode" value="approval"> Hold for approval — parks in Buffer until you approve it there
+    </label>
+    <label style="display:flex; align-items:flex-start; gap:10px; font-size:12px; color:var(--sw-yellow); margin-bottom:16px; cursor:pointer;
+                  padding:10px; border:1px solid rgba(212,148,30,0.35); border-radius:4px; background:rgba(212,148,30,0.05);">
+      <input type="checkbox" id="buf-qa" style="margin-top:2px;">
+      <span>I ran the QA checklist: no client names, internal metrics, security details or HR matters; it reads like me.</span>
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-blue" id="buf-submit" onclick="submitBuffer()">CONFIRM — SEND TO BUFFER</button>
+      <button class="btn btn-dim" onclick="closeBufferModal()">CANCEL</button>
     </div>
   </div>
 </div>
@@ -541,6 +580,42 @@ async function submitPublish() {
 }
 
 // ── METRICS ──
+// ── SEND TO BUFFER ──
+let bufId = null;
+function openBufferModal(id, title, date) {
+  bufId = id;
+  document.getElementById('buf-modal-title').textContent = title;
+  document.getElementById('buf-date').textContent = date;
+  document.getElementById('buf-qa').checked = false;
+  document.querySelector('input[name="buf-mode"][value="schedule"]').checked = true;
+  const btn = document.getElementById('buf-submit');
+  btn.disabled = false; btn.textContent = 'CONFIRM — SEND TO BUFFER';
+  document.getElementById('buffer-modal').classList.add('open');
+}
+function closeBufferModal() {
+  document.getElementById('buffer-modal').classList.remove('open');
+}
+async function submitBuffer() {
+  if (!document.getElementById('buf-qa').checked) { toast('Confirm the QA checklist first', 'err'); return; }
+  const time = document.getElementById('buf-time').value || '08:30';
+  const needsApproval = document.querySelector('input[name="buf-mode"]:checked').value === 'approval';
+  const btn = document.getElementById('buf-submit');
+  btn.disabled = true; btn.textContent = 'SENDING...';
+  try {
+    const res = await postJSON(`/api/post-log/${bufId}/buffer`, { qa_passed: true, time, needs_approval: needsApproval });
+    if (res.ok) {
+      toast(needsApproval ? 'Parked in Buffer for your approval' : 'Scheduled in Buffer for ' + res.due_local);
+      setTimeout(() => location.reload(), 700);
+    } else {
+      toast(res.error || 'Buffer refused the post', 'err');
+      btn.disabled = false; btn.textContent = 'CONFIRM — SEND TO BUFFER';
+    }
+  } catch (e) {
+    toast('Request failed: ' + e, 'err');
+    btn.disabled = false; btn.textContent = 'CONFIRM — SEND TO BUFFER';
+  }
+}
+
 let metId = null;
 function openMetricsModal(id, title, existing) {
   metId = id;

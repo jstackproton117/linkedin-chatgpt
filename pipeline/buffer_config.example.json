@@ -1,0 +1,13 @@
+{
+  "_comment": "Copy to buffer_config.json and chmod 600. Never commit the real file.",
+  "_setup": [
+    "1. buffer.com -> Settings -> API -> create an API key",
+    "2. paste it into api_key below (the only field you need to fill)",
+    "3. run:  .venv/bin/python check_buffer.py",
+    "   it finds your LinkedIn channel and fills organization_id / channel_id in"
+  ],
+  "api_key": "PASTE_YOUR_BUFFER_API_KEY_HERE",
+  "organization_id": null,
+  "channel_id": null,
+  "channel_name": null
+}

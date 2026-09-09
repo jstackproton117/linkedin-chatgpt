@@ -9,5 +9,9 @@
     "freshness_hours": 72,
     "review_ttl_hours": 72
   },
-  "content_radar_config": "C:/Users/Prome/OneDrive/Documents/Joe/content-radar/config.yaml"
+  "content_radar_config": "C:/Users/Prome/OneDrive/Documents/Joe/content-radar/config.yaml",
+  "buffer": {
+    "timezone": "America/New_York",
+    "post_time_local": "08:30"
+  }
 }

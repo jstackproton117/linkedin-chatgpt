@@ -55,5 +55,14 @@ if ! "$PY" "$BASE/07_rank.py" >> "$LOG" 2>&1; then
 fi
 log "rank done in $(( $(date +%s) - start ))s"
 
+# Buffer -> post_log: confirms sends, pulls per-post metrics. Skips itself
+# when no key is configured; never fails the run.
+start=$(date +%s)
+if "$PY" "$BASE/08_sync_buffer.py" >> "$LOG" 2>&1; then
+    log "buffer sync done in $(( $(date +%s) - start ))s"
+else
+    log "WARN — 08_sync_buffer.py failed (see above); continuing"
+fi
+
 count=$("$PY" -c "import json;print(len(json.load(open('$BASE/data/articles.json'))))" 2>/dev/null || echo "?")
 log "=== daily run complete — $count articles ready for review ==="

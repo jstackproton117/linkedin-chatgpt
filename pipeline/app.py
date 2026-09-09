@@ -860,6 +860,77 @@ def api_publish(post_id):
     return jsonify({"ok": True})
 
 
+@app.route("/api/post-log/<post_id>/buffer", methods=["POST"])
+def api_send_to_buffer(post_id):
+    """Schedule a drafted, dated post through Buffer.
+
+    Requires an explicit qa_passed from the page — the manual QA checklist is
+    the final confidentiality checkpoint and this makes it enforced rather
+    than remembered. With needs_approval the post parks in Buffer as
+    needs_approval and will not go out until approved in Buffer's UI.
+    published_at is NOT set here: 08_sync_buffer.py sets it from Buffer's
+    real sentAt once the post has actually gone out.
+    """
+    from zoneinfo import ZoneInfo
+    from buffer_client import Buffer, BufferError, load_config
+
+    data = request.get_json() or {}
+    if not data.get("qa_passed"):
+        return jsonify({"ok": False, "error": "Confirm the QA checklist first."}), 400
+    try:
+        cfg = load_config()
+    except BufferError as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+    if not cfg or not cfg.get("channel_id"):
+        return jsonify({"ok": False, "error": "Buffer is not configured — run check_buffer.py on RedRose."}), 400
+
+    post_log = load_json(POST_LOG_PATH, [])
+    entry = next((p for p in post_log if p.get("id") == post_id), None)
+    if not entry:
+        abort(404)
+    if entry.get("buffer_post_id"):
+        return jsonify({"ok": False, "error": f"Already in Buffer ({entry.get('buffer_status')})."}), 400
+    if entry.get("published_at"):
+        return jsonify({"ok": False, "error": "Already published."}), 400
+    if not entry.get("scheduled_for"):
+        return jsonify({"ok": False, "error": "Schedule a date first."}), 400
+    draft_name = entry.get("draft_file") or ""
+    draft_path = DRAFTS_DIR / draft_name
+    if not draft_name or not draft_path.exists():
+        return jsonify({"ok": False, "error": "No draft file for this post yet."}), 400
+    text = _extract_post_body(draft_path.read_text(encoding="utf-8"))
+    if not text:
+        return jsonify({"ok": False, "error": "Draft file has no post body."}), 400
+
+    bcfg = get_settings().get("buffer", {})
+    tz = ZoneInfo(bcfg.get("timezone", "America/New_York"))
+    hhmm = (data.get("time") or bcfg.get("post_time_local", "08:30")).strip()
+    try:
+        local_dt = datetime.fromisoformat(f"{entry['scheduled_for'][:10]}T{hhmm}:00").replace(tzinfo=tz)
+    except ValueError:
+        return jsonify({"ok": False, "error": "Time must be HH:MM."}), 400
+    if local_dt <= datetime.now(tz):
+        return jsonify({"ok": False, "error": "That date and time is already in the past."}), 400
+    due_iso = local_dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    needs_approval = bool(data.get("needs_approval"))
+
+    try:
+        post = Buffer(cfg).create_post(text, cfg["channel_id"], due_iso, needs_approval=needs_approval)
+    except BufferError as e:
+        return jsonify({"ok": False, "error": str(e)}), 502
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    entry["buffer_post_id"] = post["id"]
+    entry["buffer_status"] = post.get("status")
+    entry["buffer_due_at"] = due_iso
+    entry["buffer_needs_approval"] = needs_approval
+    entry["sent_to_buffer_at"] = now_iso
+    entry["qa_passed_at"] = now_iso
+    save_json(POST_LOG_PATH, post_log)
+    return jsonify({"ok": True, "buffer_post_id": post["id"], "status": post.get("status"),
+                    "due_local": local_dt.strftime("%Y-%m-%d %H:%M %Z")})
+
+
 @app.route("/api/post-log/<post_id>/metrics", methods=["POST"])
 def api_metrics(post_id):
     data = request.get_json()
