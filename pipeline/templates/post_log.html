@@ -260,22 +260,31 @@
                 {% if has_met %}METRICS{% else %}ADD METRICS{% endif %}
               </button>
             {% else %}
-              {% if is_pend %}
+              {# Manual controls exist in both modes but only SHOW in manual
+                 mode (or for an overdue, un-Buffered post that needs a new
+                 date). Switch modes in Settings. #}
+              {% if (is_pend and publish_mode == 'manual') or (is_over and publish_mode == 'buffer' and not p.buffer_post_id) %}
               <button class="btn btn-dim"
                   onclick="openScheduleModal('{{ p.id }}', '{{ p.article_title | replace("'", "\\'") | truncate(40, True) }}')">
-                SCHEDULE
+                {% if is_over %}RESCHEDULE{% else %}SCHEDULE{% endif %}
               </button>
               {% endif %}
-              {% if is_sched and not is_over and draft_fn and not p.buffer_post_id %}
-              <button class="btn btn-blue"
-                  onclick="openBufferModal('{{ p.id }}', '{{ p.article_title | replace("'", "\\'") | truncate(40, True) }}', '{{ p.scheduled_for }}')">
-                SEND TO BUFFER
-              </button>
+              {% if publish_mode == 'buffer' and is_sched and not is_over and draft_fn and not p.buffer_post_id %}
+                {% if p.approved_at %}
+                <button class="btn btn-blue"
+                    onclick="openBufferModal('{{ p.id }}', '{{ p.article_title | replace("'", "\\'") | truncate(40, True) }}', '{{ p.scheduled_for }}')">
+                  SEND TO BUFFER
+                </button>
+                {% else %}
+                <a href="/drafts" class="btn btn-dim" title="Approve the draft first">APPROVE IN DRAFTS &#8594;</a>
+                {% endif %}
               {% endif %}
+              {% if publish_mode == 'manual' %}
               <button class="btn btn-yellow"
                   onclick="openPublishModal('{{ p.id }}', '{{ p.article_title | replace("'", "\\'") | truncate(40, True) }}', '{{ p.scheduled_for or "" }}')">
                 PUBLISH
               </button>
+              {% endif %}
               {% if is_pend %}
               <button class="btn btn-dim" id="del-{{ p.id }}"
                   onclick="confirmDelete('{{ p.id }}', this)"
@@ -370,11 +379,9 @@
     <label style="display:flex; align-items:center; gap:10px; font-size:12px; color:var(--text-pri); margin-bottom:16px; cursor:pointer;">
       <input type="radio" name="buf-mode" value="approval"> Hold for approval — parks in Buffer until you approve it there
     </label>
-    <label style="display:flex; align-items:flex-start; gap:10px; font-size:12px; color:var(--sw-yellow); margin-bottom:16px; cursor:pointer;
-                  padding:10px; border:1px solid rgba(212,148,30,0.35); border-radius:4px; background:rgba(212,148,30,0.05);">
-      <input type="checkbox" id="buf-qa" style="margin-top:2px;">
-      <span>I ran the QA checklist: no client names, internal metrics, security details or HR matters; it reads like me.</span>
-    </label>
+    <div style="font-size:11px; color:var(--sw-blue); margin-bottom:16px; padding:10px; border:1px solid rgba(46,184,204,0.3); border-radius:4px; background:rgba(46,184,204,0.05);">
+      This draft was approved on the Drafts page — the QA checklist is recorded on the post.
+    </div>
     <div class="modal-actions">
       <button class="btn btn-blue" id="buf-submit" onclick="submitBuffer()">CONFIRM — SEND TO BUFFER</button>
       <button class="btn btn-dim" onclick="closeBufferModal()">CANCEL</button>
@@ -598,7 +605,6 @@ function openBufferModal(id, title, date) {
   bufId = id;
   document.getElementById('buf-modal-title').textContent = title;
   document.getElementById('buf-date').textContent = date;
-  document.getElementById('buf-qa').checked = false;
   document.querySelector('input[name="buf-mode"][value="schedule"]').checked = true;
   const btn = document.getElementById('buf-submit');
   btn.disabled = false; btn.textContent = 'CONFIRM — SEND TO BUFFER';
@@ -608,13 +614,12 @@ function closeBufferModal() {
   document.getElementById('buffer-modal').classList.remove('open');
 }
 async function submitBuffer() {
-  if (!document.getElementById('buf-qa').checked) { toast('Confirm the QA checklist first', 'err'); return; }
   const time = document.getElementById('buf-time').value || '08:30';
   const needsApproval = document.querySelector('input[name="buf-mode"]:checked').value === 'approval';
   const btn = document.getElementById('buf-submit');
   btn.disabled = true; btn.textContent = 'SENDING...';
   try {
-    const res = await postJSON(`/api/post-log/${bufId}/buffer`, { qa_passed: true, time, needs_approval: needsApproval });
+    const res = await postJSON(`/api/post-log/${bufId}/buffer`, { time, needs_approval: needsApproval });
     if (res.ok) {
       toast(needsApproval ? 'Parked in Buffer for your approval' : 'Scheduled in Buffer for ' + res.due_local);
       setTimeout(() => location.reload(), 700);

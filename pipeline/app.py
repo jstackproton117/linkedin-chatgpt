@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -51,6 +52,50 @@ def save_json(path, data):
 
 def get_settings():
     return load_json(SETTINGS_PATH, {})
+
+
+def save_settings(settings):
+    SETTINGS_PATH.write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
+
+
+def buffer_configured():
+    try:
+        from buffer_client import load_config
+        cfg = load_config()
+        return bool(cfg and cfg.get("channel_id"))
+    except Exception:
+        return False
+
+
+def publish_mode():
+    """'buffer' or 'manual'.
+
+    The explicit setting wins, but Buffer mode without a connected Buffer
+    is meaningless, so that case falls back to manual — the manual buttons
+    reappear rather than leaving every draft with no way out.
+    """
+    mode = (get_settings().get("publishing") or {}).get("mode")
+    if mode == "manual":
+        return "manual"
+    return "buffer" if buffer_configured() else "manual"
+
+
+@app.context_processor
+def _inject_publishing():
+    # Every template can hide or show the manual controls from this.
+    return {"publish_mode": publish_mode(), "buffer_connected": buffer_configured()}
+
+
+def _find_entry(post_log, post_id):
+    return next((p for p in post_log if p.get("id") == post_id), None)
+
+
+QA_CHECKS = {
+    "no_confidential": "No client names, internal metrics, roadmap or contract details",
+    "no_security": "No security implementation details",
+    "no_hr": "No employee or HR matters",
+    "voice": "Reads like me — specific, first person, no hustle, not a job-seeker performing",
+}
 
 
 def format_age(published_iso):
@@ -581,6 +626,10 @@ def drafts_page():
                 "title": log_entry["article_title"] if log_entry else f.stem,
                 "scheduled_for": log_entry.get("scheduled_for") if log_entry else None,
                 "published_at": log_entry.get("published_at") if log_entry else None,
+                "approved_at": log_entry.get("approved_at") if log_entry else None,
+                "buffer_post_id": log_entry.get("buffer_post_id") if log_entry else None,
+                "buffer_status": log_entry.get("buffer_status") if log_entry else None,
+                "linkedin_url": log_entry.get("linkedin_url") if log_entry else None,
             }
             if is_published or is_scheduled:
                 archived_drafts.append(d)
@@ -724,7 +773,22 @@ def api_save_draft():
         return jsonify({"ok": False, "error": "Invalid filename"}), 400
     path = DRAFTS_DIR / filename
     path.write_text(content, encoding="utf-8")
-    return jsonify({"ok": True})
+    # Content changed after approval: the approval no longer describes what
+    # would be published, so it is withdrawn. Not applied once the post is
+    # already in Buffer or published — those have left the draft stage.
+    revoked = False
+    post_log = load_json(POST_LOG_PATH, [])
+    for entry in post_log:
+        if (entry.get("draft_file") == filename and entry.get("approved_at")
+                and not entry.get("buffer_post_id") and not entry.get("published_at")):
+            for k in ("approved_at", "qa_checklist", "qa_passed_at"):
+                entry.pop(k, None)
+            entry["approval_revoked_at"] = datetime.now(timezone.utc).isoformat()
+            entry["approval_revoked_reason"] = "content edited"
+            revoked = True
+    if revoked:
+        save_json(POST_LOG_PATH, post_log)
+    return jsonify({"ok": True, "approval_revoked": revoked})
 
 
 @app.route("/api/draft/merge", methods=["POST"])
@@ -830,6 +894,148 @@ def api_merge_drafts_ai():
 
 # ── Post Log ──────────────────────────────────────────────────────────────
 
+# ── Settings ──────────────────────────────────────────────────────────────
+
+def _buffer_status():
+    """What Settings shows about Buffer. Never includes the key."""
+    from buffer_client import load_config, usage_summary
+    try:
+        cfg = load_config()
+    except Exception as e:
+        return {"connected": False, "error": str(e)}
+    if not cfg:
+        return {"connected": False}
+    key = cfg.get("api_key", "")
+    return {
+        "connected": bool(cfg.get("channel_id")),
+        "channel_name": cfg.get("channel_name"),
+        "organization_id": cfg.get("organization_id"),
+        "channel_id": cfg.get("channel_id"),
+        "key_hint": ("…" + key[-4:]) if len(key) >= 4 else "set",
+        "usage": usage_summary(),
+    }
+
+
+def _discord_status():
+    path = BASE / "discord_config.json"
+    if not path.exists():
+        return {"configured": False}
+    try:
+        cfg = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {"configured": False, "error": "unreadable"}
+    token = (cfg.get("bot_token") or "").strip()
+    return {"configured": bool(token) and not token.startswith("PASTE_"),
+            "channels": len(cfg.get("channels") or [])}
+
+
+@app.route("/settings")
+def settings_page():
+    s = get_settings()
+    post_log = load_json(POST_LOG_PATH, [])
+    last_sync = max((p.get("metrics_updated_at") or "" for p in post_log), default="")
+    return render_template(
+        "settings.html",
+        settings=s,
+        explicit_mode=(s.get("publishing") or {}).get("mode") or "auto",
+        buffer=_buffer_status(),
+        discord=_discord_status(),
+        last_sync=last_sync,
+        qa_checks=QA_CHECKS,
+    )
+
+
+@app.route("/api/settings", methods=["POST"])
+def api_settings():
+    data = request.get_json() or {}
+    s = get_settings()
+    pub = s.setdefault("publishing", {})
+    mode = data.get("mode")
+    if mode in ("buffer", "manual", "auto"):
+        if mode == "auto":
+            pub.pop("mode", None)
+        else:
+            pub["mode"] = mode
+    b = s.setdefault("buffer", {})
+    if "timezone" in data:
+        from zoneinfo import ZoneInfo
+        try:
+            ZoneInfo(data["timezone"])
+        except Exception:
+            return jsonify({"ok": False, "error": f"Unknown timezone {data['timezone']!r}"}), 400
+        b["timezone"] = data["timezone"]
+    if "post_time_local" in data:
+        if not re.fullmatch(r"\d{2}:\d{2}", str(data["post_time_local"])):
+            return jsonify({"ok": False, "error": "Post time must be HH:MM."}), 400
+        b["post_time_local"] = data["post_time_local"]
+    for k in ("daily_call_budget", "monthly_call_budget", "metrics_window_days"):
+        if k in data:
+            try:
+                v = int(data[k])
+            except (TypeError, ValueError):
+                return jsonify({"ok": False, "error": f"{k} must be a whole number."}), 400
+            if v < 1:
+                return jsonify({"ok": False, "error": f"{k} must be at least 1."}), 400
+            b[k] = v
+    # Never let the self-imposed budget exceed the plan.
+    b["daily_call_budget"] = min(b.get("daily_call_budget", 40), 250)
+    b["monthly_call_budget"] = min(b.get("monthly_call_budget", 600), 3000)
+    save_settings(s)
+    return jsonify({"ok": True, "publish_mode": publish_mode()})
+
+
+@app.route("/api/settings/buffer/connect", methods=["POST"])
+def api_buffer_connect():
+    """Store a Buffer API key and discover the LinkedIn channel. The key is
+    validated against Buffer before anything is written (2-3 requests) and
+    is never returned to the browser."""
+    from buffer_client import Buffer, BufferError, CONFIG_PATH as BUFFER_CONFIG_PATH, save_config
+    key = ((request.get_json() or {}).get("api_key") or "").strip()
+    if len(key) < 16:
+        return jsonify({"ok": False, "error": "That doesn't look like a Buffer API key."}), 400
+    cfg = {"api_key": key}
+    try:
+        channels = Buffer(cfg).linkedin_channels()
+    except BufferError as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
+    if not channels:
+        return jsonify({"ok": False, "error": "Key accepted, but no LinkedIn channel is connected in Buffer. "
+                                              "Connect your LinkedIn profile in Buffer, then try again."}), 400
+    ch = channels[0]
+    cfg.update({"organization_id": ch["organizationId"], "channel_id": ch["id"], "channel_name": ch.get("name")})
+    if BUFFER_CONFIG_PATH.exists():
+        BUFFER_CONFIG_PATH.rename(BUFFER_CONFIG_PATH.with_name(
+            f"buffer_config.json.replaced-{datetime.now().strftime('%Y%m%d-%H%M%S')}"))
+    save_config(cfg)
+    return jsonify({"ok": True, "channel_name": ch.get("name"), "publish_mode": publish_mode()})
+
+
+@app.route("/api/settings/buffer/disconnect", methods=["POST"])
+def api_buffer_disconnect():
+    from buffer_client import CONFIG_PATH as BUFFER_CONFIG_PATH
+    if BUFFER_CONFIG_PATH.exists():
+        # Kept, not deleted: reconnecting later is a rename away.
+        BUFFER_CONFIG_PATH.rename(BUFFER_CONFIG_PATH.with_name(
+            f"buffer_config.json.disconnected-{datetime.now().strftime('%Y%m%d-%H%M%S')}"))
+    return jsonify({"ok": True, "publish_mode": publish_mode()})
+
+
+@app.route("/api/settings/buffer/test", methods=["POST"])
+def api_buffer_test():
+    """One request: proves the key still works and refreshes the usage view."""
+    from buffer_client import Buffer, BufferError, load_config, usage_summary
+    try:
+        cfg = load_config()
+        if not cfg:
+            return jsonify({"ok": False, "error": "Buffer is not connected."}), 400
+        acct = Buffer(cfg).account()
+    except BufferError as e:
+        return jsonify({"ok": False, "error": str(e)}), 502
+    return jsonify({"ok": True, "account_id": acct.get("id"),
+                    "organizations": [o.get("name") for o in acct.get("organizations") or []],
+                    "usage": usage_summary()})
+
+
 @app.route("/post-log")
 def post_log_page():
     posts = load_json(POST_LOG_PATH, [])
@@ -868,6 +1074,128 @@ def api_publish(post_id):
     return jsonify({"ok": True})
 
 
+@app.route("/api/post-log/<post_id>/approve", methods=["POST"])
+def api_approve(post_id):
+    """Approve a drafted post for publishing. All four QA checks must be
+    affirmed — this is the manual checklist from the operating manual,
+    now recorded per post instead of remembered."""
+    data = request.get_json() or {}
+    checks = data.get("qa") or {}
+    missing = [k for k in QA_CHECKS if not checks.get(k)]
+    if missing:
+        return jsonify({"ok": False, "error": "Every QA check must be confirmed.", "missing": missing}), 400
+    post_log = load_json(POST_LOG_PATH, [])
+    entry = _find_entry(post_log, post_id)
+    if not entry:
+        abort(404)
+    if entry.get("published_at"):
+        return jsonify({"ok": False, "error": "Already published."}), 400
+    if entry.get("buffer_post_id"):
+        return jsonify({"ok": False, "error": "Already queued in Buffer."}), 400
+    if not _has_drafted_content(entry.get("draft_file")):
+        return jsonify({"ok": False, "error": "This draft has no content yet."}), 400
+    now_iso = datetime.now(timezone.utc).isoformat()
+    entry["approved_at"] = now_iso
+    entry["qa_passed_at"] = now_iso
+    entry["qa_checklist"] = {k: True for k in QA_CHECKS}
+    entry.pop("approval_revoked_at", None)
+    entry.pop("approval_revoked_reason", None)
+    save_json(POST_LOG_PATH, post_log)
+    return jsonify({"ok": True, "approved_at": now_iso})
+
+
+@app.route("/api/post-log/<post_id>/unapprove", methods=["POST"])
+def api_unapprove(post_id):
+    post_log = load_json(POST_LOG_PATH, [])
+    entry = _find_entry(post_log, post_id)
+    if not entry:
+        abort(404)
+    if entry.get("buffer_post_id") or entry.get("published_at"):
+        return jsonify({"ok": False, "error": "Already queued or published — approval can't be withdrawn here."}), 400
+    for k in ("approved_at", "qa_checklist", "qa_passed_at"):
+        entry.pop(k, None)
+    entry["approval_revoked_at"] = datetime.now(timezone.utc).isoformat()
+    entry["approval_revoked_reason"] = "revoked by user"
+    save_json(POST_LOG_PATH, post_log)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/post-log/<post_id>/publish-now", methods=["POST"])
+def api_publish_now(post_id):
+    """Publish an approved draft to LinkedIn immediately through Buffer
+    (ShareMode shareNow). One follow-up read confirms the send so the
+    dashboard can mark it published from Buffer's real sentAt."""
+    from buffer_client import Buffer, BufferError, load_config
+    if publish_mode() != "buffer":
+        return jsonify({"ok": False, "error": "Publishing is in manual mode — switch to Buffer in Settings."}), 400
+    try:
+        cfg = load_config()
+    except BufferError as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+    if not cfg or not cfg.get("channel_id"):
+        return jsonify({"ok": False, "error": "Buffer is not connected — see Settings."}), 400
+    post_log = load_json(POST_LOG_PATH, [])
+    entry = _find_entry(post_log, post_id)
+    if not entry:
+        abort(404)
+    if entry.get("published_at"):
+        return jsonify({"ok": False, "error": "Already published."}), 400
+    if entry.get("buffer_post_id"):
+        return jsonify({"ok": False, "error": f"Already in Buffer ({entry.get('buffer_status')})."}), 400
+    if not entry.get("approved_at"):
+        return jsonify({"ok": False, "error": "Approve the draft first."}), 400
+    draft_name = entry.get("draft_file") or ""
+    draft_path = DRAFTS_DIR / draft_name
+    if not draft_name or not draft_path.exists():
+        return jsonify({"ok": False, "error": "No draft file for this post."}), 400
+    text = _extract_post_body(draft_path.read_text(encoding="utf-8"))
+    if not text:
+        return jsonify({"ok": False, "error": "Draft file has no post body."}), 400
+
+    b = Buffer(cfg)
+    try:
+        post = b.create_post(text, cfg["channel_id"], mode="shareNow")
+    except BufferError as e:
+        return jsonify({"ok": False, "error": str(e)}), 502
+    now_iso = datetime.now(timezone.utc).isoformat()
+    entry["buffer_post_id"] = post["id"]
+    entry["buffer_status"] = post.get("status")
+    entry["buffer_mode"] = "shareNow"
+    entry["sent_to_buffer_at"] = now_iso
+    save_json(POST_LOG_PATH, post_log)
+
+    # Buffer sends within seconds. One confirmation read; if it is still
+    # 'sending', the daily sync will finish the job.
+    confirmed = False
+    try:
+        time.sleep(4)
+        p2 = b.get_post(post["id"], extra_fields=Buffer.POST_EXTRA)
+        if p2:
+            entry["buffer_status"] = p2.get("status")
+            if p2.get("status") == "sent":
+                from zoneinfo import ZoneInfo
+                tz = ZoneInfo(get_settings().get("buffer", {}).get("timezone", "America/New_York"))
+                sent = p2.get("sentAt") or now_iso
+                try:
+                    dt = datetime.fromisoformat(sent.replace("Z", "+00:00"))
+                except ValueError:
+                    dt = datetime.now(timezone.utc)
+                entry["published_at"] = dt.astimezone(tz).date().isoformat()
+                entry["published_via"] = "buffer"
+                entry["buffer_sent_at"] = dt.isoformat()
+                if p2.get("externalLink"):
+                    entry["linkedin_url"] = p2["externalLink"]
+                confirmed = True
+            elif p2.get("status") == "error":
+                entry["buffer_error"] = ((p2.get("error") or {}).get("message") or "unknown error")
+            save_json(POST_LOG_PATH, post_log)
+    except BufferError:
+        pass
+    return jsonify({"ok": True, "buffer_post_id": post["id"], "status": entry.get("buffer_status"),
+                    "published": confirmed, "linkedin_url": entry.get("linkedin_url"),
+                    "error": entry.get("buffer_error")})
+
+
 @app.route("/api/post-log/<post_id>/buffer", methods=["POST"])
 def api_send_to_buffer(post_id):
     """Schedule a drafted, dated post through Buffer.
@@ -883,8 +1211,8 @@ def api_send_to_buffer(post_id):
     from buffer_client import Buffer, BufferError, load_config
 
     data = request.get_json() or {}
-    if not data.get("qa_passed"):
-        return jsonify({"ok": False, "error": "Confirm the QA checklist first."}), 400
+    if publish_mode() != "buffer":
+        return jsonify({"ok": False, "error": "Publishing is in manual mode — switch to Buffer in Settings."}), 400
     try:
         cfg = load_config()
     except BufferError as e:
@@ -900,8 +1228,13 @@ def api_send_to_buffer(post_id):
         return jsonify({"ok": False, "error": f"Already in Buffer ({entry.get('buffer_status')})."}), 400
     if entry.get("published_at"):
         return jsonify({"ok": False, "error": "Already published."}), 400
+    if not entry.get("approved_at"):
+        return jsonify({"ok": False, "error": "Approve the draft first (Drafts page)."}), 400
+    # The Drafts page schedules in one step: it sends the date here.
+    if data.get("scheduled_for"):
+        entry["scheduled_for"] = str(data["scheduled_for"])[:10]
     if not entry.get("scheduled_for"):
-        return jsonify({"ok": False, "error": "Schedule a date first."}), 400
+        return jsonify({"ok": False, "error": "Pick a date first."}), 400
     draft_name = entry.get("draft_file") or ""
     draft_path = DRAFTS_DIR / draft_name
     if not draft_name or not draft_path.exists():
@@ -933,7 +1266,6 @@ def api_send_to_buffer(post_id):
     entry["buffer_due_at"] = due_iso
     entry["buffer_needs_approval"] = needs_approval
     entry["sent_to_buffer_at"] = now_iso
-    entry["qa_passed_at"] = now_iso
     save_json(POST_LOG_PATH, post_log)
     return jsonify({"ok": True, "buffer_post_id": post["id"], "status": post.get("status"),
                     "due_local": local_dt.strftime("%Y-%m-%d %H:%M %Z")})

@@ -2,7 +2,7 @@
 {% set active = 'drafts' %}
 {% set step = 3 %}
 {% block title %}REBEL INTEL — WRITE DRAFTS{% endblock %}
-{% block step_hint %}Build a prompt file · Copy it · Paste into Claude.ai · Paste the response back here · Then schedule in Mission Log.{% endblock %}
+{% block step_hint %}Build a prompt file · Copy it · Paste into Claude.ai · Paste the response back here · <strong>Approve</strong> it · Then {% if publish_mode == 'buffer' %}<strong>Publish now</strong> or <strong>Schedule</strong> via Buffer{% else %}publish it yourself and mark it in Mission Log{% endif %}.{% endblock %}
 
 {% block extra_style %}
 .drafts-layout {
@@ -25,6 +25,17 @@
 .draft-card.unpublished::before { background: linear-gradient(90deg, transparent, var(--sw-yellow), transparent); opacity: 0.6; }
 .draft-card.published::before   { background: linear-gradient(90deg, transparent, var(--sw-green), transparent); opacity: 0.6; }
 .draft-card.empty::before       { background: linear-gradient(90deg, transparent, var(--text-dim), transparent); opacity: 0.3; }
+.draft-card.approved::before    { background: linear-gradient(90deg, transparent, var(--sw-blue), transparent); opacity: 0.7; }
+.approved-strip {
+  font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 2px;
+  color: var(--sw-blue); margin: 10px 0 6px;
+}
+.qa-item {
+  display: flex; align-items: flex-start; gap: 10px; font-size: 12px;
+  color: var(--text-pri); padding: 9px 10px; margin-bottom: 6px; cursor: pointer;
+  border: 1px solid var(--card-border); border-radius: 4px; background: rgba(0,0,0,0.25);
+}
+.qa-item input { margin-top: 2px; }
 
 /* ── Merge mode ─────────────────────────────────────── */
 .merge-mode-btn { transition: color 0.15s, border-color 0.15s; }
@@ -179,7 +190,7 @@
   <div style="margin-bottom: 24px; display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
     <div>
       <div class="page-title">WRITE DRAFTS</div>
-      <div class="page-subtitle">STEP 3 OF 4 — BUILD PROMPT · COPY TO CLAUDE.AI · PASTE RESPONSE BACK</div>
+      <div class="page-subtitle">STEP 3 OF 4 — BUILD PROMPT · PASTE RESPONSE · APPROVE · {% if publish_mode == 'buffer' %}PUBLISH OR SCHEDULE VIA BUFFER{% else %}PUBLISH MANUALLY IN THE LOG{% endif %}</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       {% if drafts | selectattr('has_real_content') | list | length >= 2 %}
@@ -226,7 +237,7 @@
   <h2 style="margin-bottom:16px;">DRAFT FILES — {{ drafts|length }}</h2>
   <div class="drafts-layout" id="drafts-layout">
     {% for d in drafts %}
-    <div class="draft-card {{ 'published' if d.published else ('unpublished' if d.has_real_content else 'empty') }}"
+    <div class="draft-card {{ 'published' if d.published else ('approved' if d.approved_at else ('unpublished' if d.has_real_content else 'empty')) }}"
          id="card-{{ loop.index }}"
          data-filename="{{ d.filename }}"
          data-title="{{ d.title }}"
@@ -242,6 +253,8 @@
         <div class="draft-filename">{{ d.filename }}</div>
         {% if d.published %}
           <span class="badge badge-pub">PUBLISHED</span>
+        {% elif d.approved_at %}
+          <span class="badge badge-hold">APPROVED</span>
         {% elif d.has_real_content %}
           <span class="badge badge-draft">READY</span>
         {% else %}
@@ -253,18 +266,37 @@
 
       {% if d.has_real_content %}
         <div class="draft-preview">{{ d.content[:400] }}</div>
+        {% if d.approved_at and d.log_id %}
+        {# ── Approved: the only way forward is publishing. ── #}
+        <div class="approved-strip">APPROVED {{ d.approved_at[:16] | replace('T', ' ') }} UTC · QA CHECKLIST PASSED</div>
         <div class="draft-actions">
+          {% if publish_mode == 'buffer' %}
+          <button class="btn btn-green" onclick="openPublishNow('{{ d.log_id }}', {{ loop.index }})">PUBLISH NOW</button>
+          <button class="btn btn-blue"  onclick="openSchedule('{{ d.log_id }}', {{ loop.index }})">SCHEDULE</button>
+          {% else %}
+          <a href="/post-log" class="btn btn-yellow">PUBLISH / SCHEDULE IN LOG &#8594;</a>
+          {% endif %}
+          <button class="btn btn-dim" onclick="copyDraft('{{ d.filename }}', {{ loop.index }})">COPY DRAFT</button>
+          <button class="btn btn-dim" onclick="togglePaste({{ loop.index }})">EDIT (REVOKES)</button>
+          <button class="btn btn-dim" onclick="unapprove('{{ d.log_id }}')">REVOKE APPROVAL</button>
+        </div>
+        {% else %}
+        <div class="draft-actions">
+          {% if d.log_id %}
+          <button class="btn btn-green" onclick="openApprove('{{ d.log_id }}', {{ loop.index }})">APPROVE</button>
+          {% endif %}
           <button class="btn btn-yellow" onclick="copyDraft('{{ d.filename }}', {{ loop.index }})">COPY DRAFT</button>
           {% if d.prompt_content %}
           <button class="btn btn-dim" onclick="showPrompt({{ loop.index }})">VIEW PROMPT</button>
           {% endif %}
-          <button class="btn btn-green" onclick="togglePaste({{ loop.index }})">UPDATE CONTENT</button>
+          <button class="btn btn-dim" onclick="togglePaste({{ loop.index }})">UPDATE CONTENT</button>
           {% if d.article_url %}
           <button class="btn btn-dim" id="del-draft-{{ loop.index }}"
                   style="font-size:10px;padding:6px 12px;letter-spacing:1px;color:rgba(255,68,68,0.6);border-color:rgba(255,68,68,0.2);"
                   onclick="deleteDraft('{{ d.filename }}', '{{ d.article_url }}', {{ loop.index }})">DELETE</button>
           {% endif %}
         </div>
+        {% endif %}
       {% else %}
         <div class="draft-preview empty-preview">No content yet. Generate prompt file then paste Claude.ai response.</div>
         <div class="draft-actions">
@@ -330,7 +362,9 @@
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
             <div class="draft-filename">{{ d.filename }}</div>
             {% if d.published %}
-              <span class="badge badge-pub">PUBLISHED {{ d.published_at }}</span>
+              <span class="badge badge-pub">PUBLISHED {{ d.published_at }}{% if d.buffer_post_id %} · VIA BUFFER{% endif %}</span>
+            {% elif d.buffer_post_id %}
+              <span class="badge badge-hold">BUFFER · {{ (d.buffer_status or 'queued') | upper | replace('_', ' ') }} · {{ d.scheduled_for }}</span>
             {% else %}
               <span class="badge badge-hold">SCHEDULED {{ d.scheduled_for }}</span>
             {% endif %}
@@ -362,6 +396,60 @@
 </div>
 
 <!-- Prompt modal -->
+<!-- APPROVE Modal: the QA checklist, recorded per post -->
+<div class="modal-overlay" id="approve-modal" onclick="closeApprove()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>APPROVE FOR PUBLISHING</h3>
+    <div style="font-size:12px; color:var(--text-sec); margin-bottom:12px;" id="approve-title"></div>
+    <div style="font-size:11px; color:var(--text-dim); margin-bottom:12px;">
+      Read the draft once more, then confirm each check. Every one is required.
+    </div>
+    <label class="qa-item"><input type="checkbox" class="qa-chk" data-key="no_confidential"><span>No client names, internal metrics, roadmap or contract details</span></label>
+    <label class="qa-item"><input type="checkbox" class="qa-chk" data-key="no_security"><span>No security implementation details</span></label>
+    <label class="qa-item"><input type="checkbox" class="qa-chk" data-key="no_hr"><span>No employee or HR matters</span></label>
+    <label class="qa-item"><input type="checkbox" class="qa-chk" data-key="voice"><span>Reads like me — specific, first person, no hustle, not a job-seeker performing</span></label>
+    <div class="modal-actions" style="margin-top:14px;">
+      <button class="btn btn-green" id="approve-submit" onclick="submitApprove()">APPROVE</button>
+      <button class="btn btn-dim" onclick="closeApprove()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISH NOW Modal -->
+<div class="modal-overlay" id="publishnow-modal" onclick="closePublishNow()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>PUBLISH NOW</h3>
+    <div style="font-size:12px; color:var(--text-sec); margin-bottom:12px;" id="pn-title"></div>
+    <div style="font-size:11px; color:var(--text-dim); margin-bottom:16px;">
+      Buffer posts this to your LinkedIn profile immediately. The dashboard marks it published
+      only once Buffer confirms it went out, and pulls metrics from tomorrow.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-green" id="pn-submit" onclick="submitPublishNow()">YES — PUBLISH TO LINKEDIN</button>
+      <button class="btn btn-dim" onclick="closePublishNow()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCHEDULE (via Buffer) Modal -->
+<div class="modal-overlay" id="bschedule-modal" onclick="closeSchedule()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>SCHEDULE VIA BUFFER</h3>
+    <div style="font-size:12px; color:var(--text-sec); margin-bottom:12px;" id="bs-title"></div>
+    <label style="font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">DATE</label>
+    <input type="date" id="bs-date" style="margin-bottom:10px;">
+    <label style="font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px; font-family:'Orbitron',sans-serif; letter-spacing:1px;">TIME (Eastern)</label>
+    <input type="time" id="bs-time" value="08:30" style="margin-bottom:12px;">
+    <label style="display:flex; align-items:center; gap:10px; font-size:12px; color:var(--text-pri); margin-bottom:16px; cursor:pointer;">
+      <input type="checkbox" id="bs-hold"> Hold for a final approval inside Buffer before it goes out
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-blue" id="bs-submit" onclick="submitSchedule()">SCHEDULE</button>
+      <button class="btn btn-dim" onclick="closeSchedule()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="prompt-modal" onclick="closeModal()">
   <div class="modal" onclick="event.stopPropagation()">
     <h3>PROMPT FILE</h3>
@@ -418,6 +506,76 @@
 {% block scripts %}
 <script>
 let modalContent = '';
+
+// ── Approve → Publish now / Schedule (Buffer) ──
+let approveId = null, pnId = null, bsId = null;
+
+function cardTitle(idx) {
+  const el = document.getElementById(`card-${idx}`);
+  return el ? (el.dataset.title || '') : '';
+}
+function openApprove(logId, idx) {
+  approveId = logId;
+  document.getElementById('approve-title').textContent = cardTitle(idx);
+  document.querySelectorAll('.qa-chk').forEach(c => c.checked = false);
+  document.getElementById('approve-modal').classList.add('open');
+}
+function closeApprove() { document.getElementById('approve-modal').classList.remove('open'); }
+async function submitApprove() {
+  const qa = {};
+  document.querySelectorAll('.qa-chk').forEach(c => qa[c.dataset.key] = c.checked);
+  if (Object.values(qa).some(v => !v)) { toast('Every QA check is required', 'err'); return; }
+  const btn = document.getElementById('approve-submit'); btn.disabled = true;
+  const res = await postJSON(`/api/post-log/${approveId}/approve`, { qa });
+  if (res.ok) { toast('Approved — ready to publish'); setTimeout(() => location.reload(), 500); }
+  else { toast(res.error || 'Approval failed', 'err'); btn.disabled = false; }
+}
+async function unapprove(logId) {
+  const res = await postJSON(`/api/post-log/${logId}/unapprove`, {});
+  if (res.ok) { toast('Approval withdrawn'); setTimeout(() => location.reload(), 400); }
+  else toast(res.error || 'Could not withdraw', 'err');
+}
+
+function openPublishNow(logId, idx) {
+  pnId = logId;
+  document.getElementById('pn-title').textContent = cardTitle(idx);
+  const b = document.getElementById('pn-submit'); b.disabled = false; b.textContent = 'YES — PUBLISH TO LINKEDIN';
+  document.getElementById('publishnow-modal').classList.add('open');
+}
+function closePublishNow() { document.getElementById('publishnow-modal').classList.remove('open'); }
+async function submitPublishNow() {
+  const b = document.getElementById('pn-submit'); b.disabled = true; b.textContent = 'PUBLISHING...';
+  try {
+    const res = await postJSON(`/api/post-log/${pnId}/publish-now`, {});
+    if (res.ok && res.published) { toast('Published to LinkedIn'); setTimeout(() => location.reload(), 900); }
+    else if (res.ok) { toast('Sent to Buffer (' + (res.status || 'sending') + ') — the daily sync confirms it'); setTimeout(() => location.reload(), 900); }
+    else { toast(res.error || 'Buffer refused the post', 'err'); b.disabled = false; b.textContent = 'YES — PUBLISH TO LINKEDIN'; }
+  } catch (e) { toast('Request failed: ' + e, 'err'); b.disabled = false; b.textContent = 'YES — PUBLISH TO LINKEDIN'; }
+}
+
+function openSchedule(logId, idx) {
+  bsId = logId;
+  document.getElementById('bs-title').textContent = cardTitle(idx);
+  const d = new Date(); d.setDate(d.getDate() + 1);
+  document.getElementById('bs-date').value = d.toISOString().split('T')[0];
+  document.getElementById('bs-hold').checked = false;
+  const b = document.getElementById('bs-submit'); b.disabled = false; b.textContent = 'SCHEDULE';
+  document.getElementById('bschedule-modal').classList.add('open');
+}
+function closeSchedule() { document.getElementById('bschedule-modal').classList.remove('open'); }
+async function submitSchedule() {
+  const date = document.getElementById('bs-date').value;
+  const time = document.getElementById('bs-time').value || '08:30';
+  if (!date) { toast('Pick a date', 'err'); return; }
+  const b = document.getElementById('bs-submit'); b.disabled = true; b.textContent = 'SCHEDULING...';
+  try {
+    const res = await postJSON(`/api/post-log/${bsId}/buffer`, {
+      scheduled_for: date, time, needs_approval: document.getElementById('bs-hold').checked,
+    });
+    if (res.ok) { toast('Scheduled in Buffer for ' + res.due_local); setTimeout(() => location.reload(), 800); }
+    else { toast(res.error || 'Buffer refused the post', 'err'); b.disabled = false; b.textContent = 'SCHEDULE'; }
+  } catch (e) { toast('Request failed: ' + e, 'err'); b.disabled = false; b.textContent = 'SCHEDULE'; }
+}
 
 // ── Existing functions ──────────────────────────────────────────────────────
 

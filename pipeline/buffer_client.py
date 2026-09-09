@@ -259,22 +259,29 @@ class Buffer:
     POST_EXTRA = ("status", "sentAt", "externalLink", "isCustomScheduled",
                   "error { message rawError supportUrl }")
 
-    def create_post(self, text, channel_id, due_at_iso=None, needs_approval=False):
-        """Schedule a post on a channel.
+    def create_post(self, text, channel_id, due_at_iso=None, needs_approval=False, mode=None):
+        """Create a post on a channel.
 
-        due_at_iso   ISO 8601 UTC. Pins the post to that time (customScheduled).
-                     Without it Buffer takes the next free queue slot.
+        mode         ShareMode: shareNow (publish immediately), customScheduled
+                     (needs due_at_iso), addToQueue (next free slot), shareNext.
+                     Defaults to customScheduled when due_at_iso is given,
+                     else addToQueue.
+        due_at_iso   ISO 8601 UTC, used with customScheduled.
         needs_approval  True parks the post in Buffer as `needs_approval`, so
                      it will not go out until someone approves it in Buffer's
-                     UI — a second gate on top of the dashboard's QA toggle.
+                     UI — a second gate on top of the dashboard's approval.
         Returns the created post {id, status, dueAt, ...}.
         """
+        if mode is None:
+            mode = "customScheduled" if due_at_iso else "addToQueue"
+        if mode not in ("shareNow", "customScheduled", "addToQueue", "shareNext"):
+            raise BufferError(f"unknown share mode {mode!r}")
+        if mode == "customScheduled" and not due_at_iso:
+            raise BufferError("customScheduled needs due_at_iso")
         parts = [f"text: {_lit(text)}", f"channelId: {_lit(channel_id)}",
-                 "schedulingType: automatic"]
-        if due_at_iso:
-            parts += ["mode: customScheduled", f"dueAt: {_lit(due_at_iso)}"]
-        else:
-            parts += ["mode: addToQueue"]
+                 "schedulingType: automatic", f"mode: {mode}"]
+        if mode == "customScheduled":
+            parts.append(f"dueAt: {_lit(due_at_iso)}")
         if needs_approval:
             parts += ["needsApproval: true"]
         q = f"""mutation {{
