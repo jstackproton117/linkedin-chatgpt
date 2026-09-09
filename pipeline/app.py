@@ -632,16 +632,27 @@ def drafts_page():
                 "buffer_post_id": log_entry.get("buffer_post_id") if log_entry else None,
                 "buffer_status": log_entry.get("buffer_status") if log_entry else None,
                 "linkedin_url": log_entry.get("linkedin_url") if log_entry else None,
+                "draft_model": log_entry.get("draft_model") if log_entry else None,
+                "draft_engine": log_entry.get("draft_engine") if log_entry else None,
             }
             if is_published or is_scheduled:
                 archived_drafts.append(d)
             else:
                 active_drafts.append(d)
 
+    import drafting
+    settings = get_settings()
+    try:
+        claude_connected = bool(drafting.load_anthropic_config())
+    except drafting.DraftingError:
+        claude_connected = False
     return render_template("drafts.html",
         drafts=active_drafts,
         archived_drafts=archived_drafts,
         pending_queue=pending_queue,
+        drafting=drafting.drafting_settings(settings),
+        claude_connected=claude_connected,
+        claude_models=drafting.CLAUDE_MODELS,
     )
 
 
@@ -791,6 +802,95 @@ def api_save_draft():
     if revoked:
         save_json(POST_LOG_PATH, post_log)
     return jsonify({"ok": True, "approval_revoked": revoked})
+
+
+def _revoke_approval_for(filename, reason):
+    """Withdraw approval on the post-log row for this draft file, unless the
+    post has already left the draft stage (in Buffer or published)."""
+    post_log = load_json(POST_LOG_PATH, [])
+    revoked = False
+    for entry in post_log:
+        if (entry.get("draft_file") == filename and entry.get("approved_at")
+                and not entry.get("buffer_post_id") and not entry.get("published_at")):
+            for k in ("approved_at", "qa_checklist", "qa_passed_at"):
+                entry.pop(k, None)
+            entry["approval_revoked_at"] = datetime.now(timezone.utc).isoformat()
+            entry["approval_revoked_reason"] = reason
+            revoked = True
+    if revoked:
+        save_json(POST_LOG_PATH, post_log)
+    return revoked
+
+
+@app.route("/api/draft/generate", methods=["POST"])
+def api_draft_generate():
+    """Run a draft's prompt file through a model and write the answer into
+    the draft file — the same thing PASTE RESPONSE does, minus the trip to
+    a browser tab. Returns a job id; poll /api/draft/generate/<id>.
+
+    Refuses to overwrite a drafted file unless `overwrite` is set, and never
+    touches a draft that is already in Buffer or published."""
+    import drafting
+    data = request.get_json() or {}
+    filename = data.get("filename", "")
+    engine = data.get("engine") or drafting.drafting_settings(get_settings())["default_engine"]
+    model = (data.get("model") or "").strip() or None
+    if not filename or ".." in filename or not filename.endswith("_draft.md"):
+        return jsonify({"ok": False, "error": "Invalid filename"}), 400
+    if engine not in ("local", "claude"):
+        return jsonify({"ok": False, "error": f"Unknown engine {engine!r}"}), 400
+    draft_path = DRAFTS_DIR / filename
+    prompt_path = draft_path.with_name(filename.replace("_draft.md", "_prompt.txt"))
+    if not prompt_path.exists():
+        return jsonify({"ok": False, "error": "No prompt file yet — click BUILD PROMPT FILES first."}), 400
+    post_log = load_json(POST_LOG_PATH, [])
+    entry = next((x for x in post_log if x.get("draft_file") == filename), None)
+    if entry and (entry.get("buffer_post_id") or entry.get("published_at")):
+        return jsonify({"ok": False, "error": "This post is already in Buffer or published."}), 400
+    if _has_drafted_content(filename) and not data.get("overwrite"):
+        return jsonify({"ok": False, "error": "This draft already has content.", "needs_overwrite": True}), 409
+    if engine == "claude":
+        try:
+            if not drafting.load_anthropic_config():
+                return jsonify({"ok": False, "error": "Claude is not connected — add the API key on the Settings page."}), 400
+        except drafting.DraftingError as e:
+            return jsonify({"ok": False, "error": str(e)}), 400
+    running = drafting.active_job_for(filename)
+    if running:
+        return jsonify({"ok": True, "job_id": running["id"], "already_running": True})
+
+    prompt = prompt_path.read_text(encoding="utf-8", errors="replace")
+    settings = get_settings()
+    log_id = entry.get("id") if entry else None
+
+    def on_success(job, result):
+        draft_path.write_text(result["text"], encoding="utf-8")
+        _revoke_approval_for(filename, f"redrafted with {result.get('model')}")
+        pl = load_json(POST_LOG_PATH, [])
+        for e in pl:
+            if e.get("draft_file") == filename:
+                e["draft_engine"] = result.get("engine")
+                e["draft_model"] = result.get("model")
+                e["drafted_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+                if result.get("cost_usd") is not None:
+                    e["draft_cost_usd"] = result["cost_usd"]
+                e["draft_tokens"] = {"input": result.get("input_tokens"), "output": result.get("output_tokens")}
+        save_json(POST_LOG_PATH, pl)
+
+    job_id = drafting.start_job(filename, engine, model, prompt, settings, on_success)
+    return jsonify({"ok": True, "job_id": job_id, "engine": engine, "log_id": log_id})
+
+
+@app.route("/api/draft/generate/<job_id>")
+def api_draft_generate_status(job_id):
+    import drafting
+    try:
+        job = drafting.read_job(job_id)
+    except drafting.DraftingError:
+        abort(400)
+    if not job:
+        abort(404)
+    return jsonify({"ok": True, **job})
 
 
 @app.route("/api/draft/merge", methods=["POST"])
@@ -1054,6 +1154,7 @@ def settings_page():
     s = get_settings()
     post_log = load_json(POST_LOG_PATH, [])
     last_sync = max((p.get("metrics_updated_at") or "" for p in post_log), default="")
+    import drafting
     return render_template(
         "settings.html",
         settings=s,
@@ -1063,6 +1164,9 @@ def settings_page():
         last_sync=last_sync,
         qa_checks=QA_CHECKS,
         learning=_learning_status(),
+        drafting=drafting.drafting_settings(s),
+        anthropic=drafting.anthropic_status(s),
+        claude_models=drafting.CLAUDE_MODELS,
     )
 
 
@@ -1101,8 +1205,105 @@ def api_settings():
     # Never let the self-imposed budget exceed the plan.
     b["daily_call_budget"] = min(b.get("daily_call_budget", 40), 250)
     b["monthly_call_budget"] = min(b.get("monthly_call_budget", 600), 3000)
+
+    # Drafting engines. Only the keys that were sent are touched.
+    if "drafting" in data and isinstance(data["drafting"], dict):
+        import drafting
+        dd = data["drafting"]
+        d = s.setdefault("drafting", {})
+        if dd.get("default_engine") in ("local", "claude"):
+            d["default_engine"] = dd["default_engine"]
+        if isinstance(dd.get("local"), dict):
+            loc = d.setdefault("local", {})
+            url = (dd["local"].get("url") or "").strip().rstrip("/")
+            if url:
+                if not re.match(r"^https?://[^\s/]+$", url):
+                    return jsonify({"ok": False, "error": "Local endpoint must look like http://host:11434 (no path)."}), 400
+                loc["url"] = url
+            if dd["local"].get("model"):
+                loc["model"] = str(dd["local"]["model"]).strip()
+            if dd["local"].get("timeout"):
+                try:
+                    loc["timeout"] = max(30, int(dd["local"]["timeout"]))
+                except (TypeError, ValueError):
+                    return jsonify({"ok": False, "error": "Local timeout must be a whole number of seconds."}), 400
+        if isinstance(dd.get("claude"), dict):
+            cl = d.setdefault("claude", {})
+            if dd["claude"].get("model"):
+                if dd["claude"]["model"] not in drafting.CLAUDE_MODELS:
+                    return jsonify({"ok": False, "error": f"Unknown Claude model {dd['claude']['model']!r}."}), 400
+                cl["model"] = dd["claude"]["model"]
+            if dd["claude"].get("effort") in ("low", "medium", "high"):
+                cl["effort"] = dd["claude"]["effort"]
     save_settings(s)
     return jsonify({"ok": True, "publish_mode": publish_mode()})
+
+
+@app.route("/api/settings/drafting/local/test", methods=["POST"])
+def api_drafting_local_test():
+    """Ask the Ollama endpoint what it has loaded. Uses the URL in the
+    request if given (so you can test before saving), else the saved one."""
+    import drafting
+    data = request.get_json() or {}
+    ds = drafting.drafting_settings(get_settings())
+    url = (data.get("url") or ds["local"]["url"]).strip()
+    model = (data.get("model") or ds["local"]["model"]).strip()
+    try:
+        models = drafting.list_local_models(url)
+    except drafting.DraftingError as e:
+        return jsonify({"ok": False, "error": str(e)}), 502
+    return jsonify({"ok": True, "url": url, "models": models,
+                    "model": model, "model_present": model in models})
+
+
+@app.route("/api/settings/anthropic/connect", methods=["POST"])
+def api_anthropic_connect():
+    """Store an Anthropic API key. Validated with one GET /v1/models before
+    anything is written; never returned to the browser."""
+    import drafting
+    key = ((request.get_json() or {}).get("api_key") or "").strip()
+    if not key.startswith("sk-ant-") or len(key) < 40:
+        return jsonify({"ok": False, "error": "That doesn't look like an Anthropic API key (they start with sk-ant-)."}), 400
+    try:
+        models = drafting.validate_anthropic_key(key)
+    except drafting.DraftingError as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
+    if drafting.ANTHROPIC_CONFIG_PATH.exists():
+        drafting.ANTHROPIC_CONFIG_PATH.rename(drafting.ANTHROPIC_CONFIG_PATH.with_name(
+            f"anthropic_config.json.replaced-{datetime.now().strftime('%Y%m%d-%H%M%S')}"))
+    drafting.save_anthropic_config({
+        "api_key": key,
+        "validated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "models_seen": [m for m in models if m in drafting.CLAUDE_MODELS],
+    })
+    return jsonify({"ok": True, "models": models})
+
+
+@app.route("/api/settings/anthropic/disconnect", methods=["POST"])
+def api_anthropic_disconnect():
+    import drafting
+    if drafting.ANTHROPIC_CONFIG_PATH.exists():
+        # Kept, not deleted: reconnecting later is a rename away.
+        drafting.ANTHROPIC_CONFIG_PATH.rename(drafting.ANTHROPIC_CONFIG_PATH.with_name(
+            f"anthropic_config.json.disconnected-{datetime.now().strftime('%Y%m%d-%H%M%S')}"))
+    return jsonify({"ok": True})
+
+
+@app.route("/api/settings/anthropic/test", methods=["POST"])
+def api_anthropic_test():
+    """One request: proves the stored key still works. Costs nothing."""
+    import drafting
+    try:
+        cfg = drafting.load_anthropic_config()
+        if not cfg:
+            return jsonify({"ok": False, "error": "Claude is not connected."}), 400
+        models = drafting.validate_anthropic_key(cfg["api_key"])
+    except drafting.DraftingError as e:
+        return jsonify({"ok": False, "error": str(e)}), 502
+    cfg["validated_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    cfg["models_seen"] = [m for m in models if m in drafting.CLAUDE_MODELS]
+    drafting.save_anthropic_config(cfg)
+    return jsonify({"ok": True, "models": models, "usage": drafting.usage_summary()})
 
 
 @app.route("/api/settings/buffer/connect", methods=["POST"])

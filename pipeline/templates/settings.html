@@ -118,6 +118,78 @@
       {% endif %}
     </div>
 
+    <!-- ── DRAFTING ────────────────────────────────────────────────────── -->
+    <div class="set-card">
+      <h2>DRAFTING</h2>
+      <div class="set-sub">
+        The DRAFT LOCALLY and DRAFT WITH CLAUDE buttons on the Drafts page run a post's prompt file
+        through a model and drop the answer into the draft, exactly as if you had pasted it. Copying the
+        prompt to another AI still works. Every generation is logged with the model, token counts and
+        an estimated cost in <code>data/drafting_log.jsonl</code>; the model is recorded on the post.
+      </div>
+
+      <span class="set-label">DEFAULT ENGINE</span>
+      <label class="mode-opt"><input type="radio" name="draft-engine" value="local" {% if drafting.default_engine == 'local' %}checked{% endif %}>
+        <span>Local model <small>Free. Any Ollama endpoint on the tailnet or LAN — RedRose's own model now, the dual-5090 box when you point it there.</small></span></label>
+      <label class="mode-opt"><input type="radio" name="draft-engine" value="claude" {% if drafting.default_engine == 'claude' %}checked{% endif %}>
+        <span>Claude <small>Anthropic API. Best quality; each draft costs a few cents. {% if not anthropic.connected %}<span class="pill-bad">Not connected yet — add a key below.</span>{% endif %}</small></span></label>
+
+      <span class="set-label">LOCAL MODEL (OLLAMA)</span>
+      <div class="set-row">
+        <input type="text" id="local-url" value="{{ drafting.local.url }}" placeholder="http://127.0.0.1:11434" style="min-width:220px;">
+        <input type="text" id="local-model" value="{{ drafting.local.model }}" placeholder="qwen2.5:7b" style="min-width:160px;">
+        <input type="number" id="local-timeout" min="30" value="{{ drafting.local.timeout }}" style="width:90px;" title="seconds"> <span style="font-size:11px;color:var(--text-dim);">s timeout</span>
+        <button class="btn btn-blue" id="local-test-btn" onclick="testLocal()">TEST</button>
+      </div>
+      <div id="local-test-out" style="font-size:11px; color:var(--text-sec); margin-top:8px;"></div>
+
+      <span class="set-label">CLAUDE (ANTHROPIC API)</span>
+      {% if anthropic.connected %}
+      <div class="kv">
+        <div class="k">STATUS</div><div class="v pill-ok">CONNECTED</div>
+        <div class="k">API KEY</div><div class="v">{{ anthropic.key_hint }} <span style="color:var(--text-dim);">— stored on RedRose in <code>anthropic_config.json</code>, never shown</span></div>
+        <div class="k">MODEL</div>
+        <div class="v">
+          <select id="claude-model" style="background:rgba(0,0,0,0.35); border:1px solid var(--card-border); color:var(--text-pri); font-size:11px; padding:4px;">
+            {% for mid, m in claude_models.items() %}
+            <option value="{{ mid }}" {% if drafting.claude.model == mid %}selected{% endif %}>{{ m.label }} — ${{ '%.0f' % m.input }}/${{ '%.0f' % m.output }} per M tokens · {{ m.note }}</option>
+            {% endfor %}
+          </select>
+          <select id="claude-effort" style="background:rgba(0,0,0,0.35); border:1px solid var(--card-border); color:var(--text-pri); font-size:11px; padding:4px; margin-left:6px;">
+            {% for e in ['low','medium','high'] %}<option value="{{ e }}" {% if drafting.claude.effort == e %}selected{% endif %}>{{ e }} effort</option>{% endfor %}
+          </select>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:4px;">A 7 KB prompt plus a two-draft reply is roughly 2.5K in / 1K out — about 4¢ on Opus, 1.5¢ on Sonnet, under 1¢ on Haiku.</div>
+        </div>
+        {% set u = anthropic.usage %}
+        <div class="k">SPEND</div>
+        <div class="v">{{ u.calls_24h }} call(s) · ${{ '%.3f' % u.cost_24h }} today &nbsp;·&nbsp; {{ u.calls_30d }} call(s) · ${{ '%.2f' % u.cost_30d }} in 30 days
+          {% if u.last_call %}<div style="font-size:10px;color:var(--text-dim);margin-top:3px;">last: {{ u.last_call[:16].replace('T',' ') }} UTC on {{ u.last_model }}</div>{% endif %}
+        </div>
+        <div class="k">LOCAL DRAFTS</div><div class="v">{{ u.local_calls_30d }} in 30 days <span style="color:var(--text-dim);">(free)</span></div>
+      </div>
+      <div class="set-row" style="margin-top:10px;">
+        <button class="btn btn-blue" id="claude-test-btn" onclick="testClaude()">TEST KEY (FREE)</button>
+        <button class="btn btn-dim" style="color:rgba(255,68,68,0.7);border-color:rgba(255,68,68,0.25);" onclick="disconnectClaude()">DISCONNECT</button>
+      </div>
+      <div id="claude-test-out" style="font-size:11px; color:var(--text-sec); margin-top:8px;"></div>
+      {% else %}
+      <div class="set-sub" style="color:var(--text-sec);">
+        {% if anthropic.error %}<div class="pill-bad" style="margin-bottom:6px;">{{ anthropic.error }}</div>{% endif %}
+        1. At <strong>console.anthropic.com → API keys</strong> create a key (starts with <code>sk-ant-</code>).<br>
+        2. Paste it here. It is checked with one free request, stored only on RedRose (<code>anthropic_config.json</code>, gitignored), and never shown again.
+      </div>
+      <div class="set-row">
+        <input type="password" id="claude-key" autocomplete="off" placeholder="sk-ant-…">
+        <button class="btn btn-blue" id="claude-connect-btn" onclick="connectClaude()">CONNECT</button>
+      </div>
+      <div id="claude-connect-out" style="font-size:11px; color:var(--text-sec); margin-top:8px;"></div>
+      {% endif %}
+
+      <div class="set-row" style="margin-top:16px;">
+        <button class="btn btn-yellow" onclick="saveDrafting()">SAVE DRAFTING SETTINGS</button>
+      </div>
+    </div>
+
     <!-- ── OTHER CONNECTIONS ───────────────────────────────────────────── -->
     <div class="set-card">
       <h2>OTHER CONNECTIONS</h2>
@@ -231,6 +303,65 @@ async function saveSettings() {
   const res = await postJSON('/api/settings', body);
   if (res.ok) { toast('Saved — publishing is ' + res.publish_mode.toUpperCase()); setTimeout(() => location.reload(), 600); }
   else toast(res.error || 'Save failed', 'err');
+}
+
+async function saveDrafting() {
+  const body = { drafting: {
+    default_engine: (document.querySelector('input[name="draft-engine"]:checked') || {}).value,
+    local: {
+      url: document.getElementById('local-url').value.trim(),
+      model: document.getElementById('local-model').value.trim(),
+      timeout: document.getElementById('local-timeout').value,
+    },
+  }};
+  const cm = document.getElementById('claude-model');
+  const ce = document.getElementById('claude-effort');
+  if (cm) body.drafting.claude = { model: cm.value, effort: ce ? ce.value : undefined };
+  const res = await postJSON('/api/settings', body);
+  if (res.ok) { toast('Drafting settings saved'); setTimeout(() => location.reload(), 600); }
+  else toast(res.error || 'Save failed', 'err');
+}
+
+async function testLocal() {
+  const btn = document.getElementById('local-test-btn'); btn.disabled = true;
+  const out = document.getElementById('local-test-out'); out.textContent = 'Asking Ollama what it has loaded…';
+  const res = await postJSON('/api/settings/drafting/local/test', {
+    url: document.getElementById('local-url').value.trim(),
+    model: document.getElementById('local-model').value.trim(),
+  });
+  btn.disabled = false;
+  if (res.ok) {
+    out.innerHTML = (res.model_present
+      ? '<span class="pill-ok">OK</span> — ' + esc(res.model) + ' is available'
+      : '<span class="pill-bad">' + esc(res.model) + ' is not on this endpoint</span>')
+      + ' · models there: ' + esc(res.models.join(', ') || 'none');
+  } else out.innerHTML = '<span class="pill-bad">' + esc(res.error || 'Failed') + '</span>';
+}
+
+async function connectClaude() {
+  const key = document.getElementById('claude-key').value.trim();
+  if (!key) { toast('Paste the key first', 'err'); return; }
+  const btn = document.getElementById('claude-connect-btn'); btn.disabled = true; btn.textContent = 'CHECKING...';
+  const out = document.getElementById('claude-connect-out'); out.textContent = 'Checking the key against api.anthropic.com…';
+  const res = await postJSON('/api/settings/anthropic/connect', { api_key: key });
+  document.getElementById('claude-key').value = '';
+  if (res.ok) { toast('Claude connected'); setTimeout(() => location.reload(), 700); }
+  else { out.innerHTML = '<span style="color:var(--sw-red)">' + esc(res.error || 'Connection failed') + '</span>'; btn.disabled = false; btn.textContent = 'CONNECT'; }
+}
+
+async function testClaude() {
+  const btn = document.getElementById('claude-test-btn'); btn.disabled = true;
+  const out = document.getElementById('claude-test-out'); out.textContent = 'Contacting api.anthropic.com…';
+  const res = await postJSON('/api/settings/anthropic/test', {});
+  btn.disabled = false;
+  if (res.ok) out.innerHTML = '<span class="pill-ok">OK</span> — key valid · ' + res.models.length + ' models visible';
+  else out.innerHTML = '<span class="pill-bad">' + esc(res.error || 'Failed') + '</span>';
+}
+
+async function disconnectClaude() {
+  if (!confirm('Disconnect Claude? The key file is kept on RedRose (renamed); drafting falls back to the local model.')) return;
+  const res = await postJSON('/api/settings/anthropic/disconnect', {});
+  if (res.ok) { toast('Claude disconnected'); setTimeout(() => location.reload(), 600); }
 }
 
 async function connectBuffer() {

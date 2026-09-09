@@ -23,3 +23,4 @@ ENV/
 Thumbs.db
 discord_config.json
 buffer_config.json
+anthropic_config.json

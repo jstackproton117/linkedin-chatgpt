@@ -2,7 +2,7 @@
 {% set active = 'drafts' %}
 {% set step = 3 %}
 {% block title %}REBEL INTEL — WRITE DRAFTS{% endblock %}
-{% block step_hint %}Build a prompt file · Copy it · Paste into Claude.ai · Paste the response back here · <strong>Approve</strong> it · Then {% if publish_mode == 'buffer' %}<strong>Publish now</strong> or <strong>Schedule</strong> via Buffer{% else %}publish it yourself and mark it in Mission Log{% endif %}.{% endblock %}
+{% block step_hint %}Build a prompt file · <strong>Draft it here</strong> (local model or Claude) or copy the prompt to any AI and paste the reply back · <strong>Approve</strong> it · Then {% if publish_mode == 'buffer' %}<strong>Publish now</strong> or <strong>Schedule</strong> via Buffer{% else %}publish it yourself and mark it in Mission Log{% endif %}.{% endblock %}
 
 {% block extra_style %}
 .drafts-layout {
@@ -138,6 +138,12 @@
 }
 .draft-preview.empty-preview { color: var(--text-dim); font-style: italic; }
 .draft-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.draft-meta { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-top: 6px; }
+.gen-status { display: none; font-size: 11px; color: var(--sw-yellow); margin-top: 10px; line-height: 1.5; }
+.gen-status.show { display: block; }
+.gen-status.err { color: var(--sw-red); }
+.gen-status .spin { display: inline-block; width: 9px; height: 9px; border: 2px solid var(--sw-yellow); border-right-color: transparent; border-radius: 50%; animation: gspin 0.8s linear infinite; margin-right: 6px; vertical-align: -1px; }
+@keyframes gspin { to { transform: rotate(360deg); } }
 .paste-area {
   width: 100%; min-height: 120px;
   background: var(--card-bg); border: 1px solid var(--card-border);
@@ -266,6 +272,7 @@
 
       {% if d.has_real_content %}
         <div class="draft-preview">{{ d.content[:400] }}</div>
+        {% if d.draft_model %}<div class="draft-meta">DRAFTED BY {{ d.draft_model|upper }}{% if d.draft_engine == 'local' %} (LOCAL){% endif %}</div>{% endif %}
         {% if d.approved_at and d.log_id %}
         {# ── Approved: the only way forward is publishing. ── #}
         <div class="approved-strip">APPROVED {{ d.approved_at[:16] | replace('T', ' ') }} UTC · QA CHECKLIST PASSED</div>
@@ -288,6 +295,10 @@
           <button class="btn btn-yellow" onclick="copyDraft('{{ d.filename }}', {{ loop.index }})">COPY DRAFT</button>
           {% if d.prompt_content %}
           <button class="btn btn-dim" onclick="showPrompt({{ loop.index }})">VIEW PROMPT</button>
+          <button class="btn btn-dim" id="gen-local-{{ loop.index }}" onclick="generateDraft('{{ d.filename }}', 'local', {{ loop.index }}, true)">REDRAFT LOCALLY</button>
+          {% if claude_connected %}
+          <button class="btn btn-dim" id="gen-claude-{{ loop.index }}" onclick="generateDraft('{{ d.filename }}', 'claude', {{ loop.index }}, true)">REDRAFT WITH CLAUDE</button>
+          {% endif %}
           {% endif %}
           <button class="btn btn-dim" onclick="togglePaste({{ loop.index }})">UPDATE CONTENT</button>
           {% if d.article_url %}
@@ -298,15 +309,21 @@
         </div>
         {% endif %}
       {% else %}
-        <div class="draft-preview empty-preview">No content yet. Generate prompt file then paste Claude.ai response.</div>
+        <div class="draft-preview empty-preview">No content yet. Draft it here with {{ drafting.local.model }}{% if claude_connected %} or {{ claude_models[drafting.claude.model].label if drafting.claude.model in claude_models else drafting.claude.model }}{% endif %}, or copy the prompt to any AI and paste the reply back.</div>
         <div class="draft-actions">
           {% if d.prompt_content %}
+          <button class="btn btn-blue" id="gen-local-{{ loop.index }}" onclick="generateDraft('{{ d.filename }}', 'local', {{ loop.index }}, false)" title="{{ drafting.local.model }} at {{ drafting.local.url }}">DRAFT LOCALLY</button>
+          {% if claude_connected %}
+          <button class="btn btn-green" id="gen-claude-{{ loop.index }}" onclick="generateDraft('{{ d.filename }}', 'claude', {{ loop.index }}, false)" title="{{ drafting.claude.model }} via the Anthropic API">DRAFT WITH CLAUDE</button>
+          {% else %}
+          <button class="btn btn-dim" disabled title="Connect Claude on the Settings page">DRAFT WITH CLAUDE</button>
+          {% endif %}
           <button class="btn btn-yellow" onclick="copyPrompt({{ loop.index }})">COPY PROMPT</button>
           <button class="btn btn-dim"    onclick="showPrompt({{ loop.index }})">VIEW PROMPT</button>
           {% else %}
           <button class="btn btn-dim" disabled>NO PROMPT FILE YET</button>
           {% endif %}
-          <button class="btn btn-blue" onclick="togglePaste({{ loop.index }})">PASTE RESPONSE</button>
+          <button class="btn btn-dim" onclick="togglePaste({{ loop.index }})">PASTE RESPONSE</button>
           {% if d.article_url %}
           <button class="btn btn-dim" id="del-draft-{{ loop.index }}"
                   style="font-size:10px;padding:6px 12px;letter-spacing:1px;color:rgba(255,68,68,0.6);border-color:rgba(255,68,68,0.2);"
@@ -315,8 +332,10 @@
         </div>
       {% endif %}
 
+      <div class="gen-status" id="gen-status-{{ loop.index }}"></div>
+
       <textarea class="paste-area" id="paste-{{ loop.index }}"
-        placeholder="Paste the Claude.ai response here, then click SAVE..."></textarea>
+        placeholder="Paste the AI response here, then click SAVE..."></textarea>
       <div id="paste-actions-{{ loop.index }}" style="display:none; margin-top:8px;">
         <div class="draft-actions">
           <button class="btn btn-yellow" onclick="saveDraft('{{ d.filename }}', {{ loop.index }})">SAVE DRAFT</button>
@@ -611,6 +630,56 @@ function closeModal() {
 
 function copyModalContent() {
   copyText(modalContent, 'Prompt');
+}
+
+// ── Draft generation (local Ollama or Claude via the Anthropic API) ─────
+const ENGINE_LABEL = { local: '{{ drafting.local.model }}', claude: '{{ drafting.claude.model }}' };
+
+function setGenStatus(idx, html, isErr) {
+  const el = document.getElementById(`gen-status-${idx}`);
+  if (!el) return;
+  el.innerHTML = html;
+  el.classList.toggle('show', !!html);
+  el.classList.toggle('err', !!isErr);
+}
+function setGenButtons(idx, disabled) {
+  ['local', 'claude'].forEach(e => {
+    const b = document.getElementById(`gen-${e}-${idx}`);
+    if (b) b.disabled = disabled;
+  });
+}
+
+async function generateDraft(filename, engine, idx, overwrite) {
+  if (overwrite && !confirm(`Replace this draft with a fresh one from ${ENGINE_LABEL[engine]}? Any approval is withdrawn.`)) return;
+  setGenButtons(idx, true);
+  setGenStatus(idx, `<span class="spin"></span>Sending the prompt to ${ENGINE_LABEL[engine]}…`);
+  const res = await postJSON('/api/draft/generate', { filename, engine, overwrite: !!overwrite });
+  if (!res.ok) {
+    setGenStatus(idx, res.error || 'Could not start', true);
+    setGenButtons(idx, false);
+    return;
+  }
+  const t0 = Date.now();
+  const label = ENGINE_LABEL[engine];
+  const poll = async () => {
+    let job;
+    try { job = await (await fetch(`/api/draft/generate/${res.job_id}`)).json(); }
+    catch (e) { setTimeout(poll, 4000); return; }
+    const secs = Math.round((Date.now() - t0) / 1000);
+    if (job.status === 'running') {
+      setGenStatus(idx, `<span class="spin"></span>${label} is writing… ${secs}s${engine === 'local' ? ' (a 7B model takes a minute or two; a 30B one longer)' : ''}`);
+      setTimeout(poll, 3000);
+    } else if (job.status === 'done') {
+      const cost = job.cost_usd ? ` · ~$${Number(job.cost_usd).toFixed(3)}` : '';
+      setGenStatus(idx, `Done in ${job.elapsed_s}s — ${job.chars} chars from ${job.model}${cost}. Reloading…`);
+      toast(`Draft written by ${job.model}`);
+      setTimeout(() => location.reload(), 900);
+    } else {
+      setGenStatus(idx, job.error || 'Generation failed', true);
+      setGenButtons(idx, false);
+    }
+  };
+  setTimeout(poll, 2500);
 }
 
 async function saveDraft(filename, idx) {
