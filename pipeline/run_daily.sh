@@ -55,6 +55,15 @@ if ! "$PY" "$BASE/07_rank.py" >> "$LOG" 2>&1; then
 fi
 log "rank done in $(( $(date +%s) - start ))s"
 
+# Learn from picks: source stats, learned arXiv phrases, experience
+# proposals. Feeds tomorrow's fetch and rank. Never fails the run.
+start=$(date +%s)
+if "$PY" "$BASE/09_learn.py" >> "$LOG" 2>&1; then
+    log "learn done in $(( $(date +%s) - start ))s"
+else
+    log "WARN — 09_learn.py failed (see above); continuing"
+fi
+
 # Buffer -> post_log: confirms sends, pulls per-post metrics. Skips itself
 # when no key is configured; never fails the run.
 start=$(date +%s)

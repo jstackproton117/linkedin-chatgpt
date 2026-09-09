@@ -574,6 +574,8 @@ def api_action(num):
         "url": article.get("url", ""),
         "snippet": article.get("snippet", ""),
         "source": article.get("source", ""),
+        "type": article.get("type", "news"),
+        "learned_matches": article.get("learned_matches", []),
         "pillar": article.get("pillar", ""),
         "score": article.get("score", 0),
         "keywords_matched": article.get("keywords_matched", []),
@@ -929,6 +931,124 @@ def _discord_status():
             "channels": len(cfg.get("channels") or [])}
 
 
+def _learning_status():
+    """What 09_learn.py has learned, for the Settings page."""
+    learned = load_json(DATA / "learned_phrases.json", {})
+    proposals = load_json(DATA / "experience_proposals.json", {})
+    stats = load_json(DATA / "source_stats.json", {})
+    sources = sorted(((k, v) for k, v in (stats.get("sources") or {}).items() if v.get("informative")),
+                     key=lambda kv: -kv[1]["rate"])
+    items = []
+    try:
+        import yaml
+        exp = yaml.safe_load((BASE / "experience.yaml").read_text(encoding="utf-8"))
+        items = [(i["id"], i.get("label", i["id"])) for i in exp.get("experience", [])]
+    except Exception:
+        pass
+    return {
+        "phrases": learned.get("phrases", []),
+        "phrases_updated": learned.get("updated_at"),
+        "proposals": proposals.get("proposals", []),
+        "sources": sources[:12],
+        "sources_updated": stats.get("updated_at"),
+        "items": items,
+        "config": {**{"phrases_per_night": 3, "max_learned_phrases": 10, "decay_days": 21},
+                   **(get_settings().get("learning") or {})},
+    }
+
+
+def _add_experience_phrase(item_id, phrase):
+    """Append a phrase to one item's list in experience.yaml by text edit,
+    so the file's comments survive. Validates the result parses; restores
+    the backup if not."""
+    import yaml
+    path = BASE / "experience.yaml"
+    text = path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    start = next((i for i, l in enumerate(lines) if l.strip() == f"- id: {item_id}"), None)
+    if start is None:
+        return False, f"no experience item '{item_id}'"
+    pi = next((i for i in range(start, len(lines)) if lines[i].strip() == "phrases:"), None)
+    if pi is None:
+        return False, "item has no phrases list"
+    last = pi
+    for i in range(pi + 1, len(lines)):
+        s = lines[i]
+        if s.startswith("      - ") or s.startswith("      #"):
+            last = i
+        elif s.strip() == "":
+            continue
+        else:
+            break
+    safe = phrase.replace('"', "'").strip()
+    lines.insert(last + 1, f'      - "{safe}"   # learned from picks {date.today().isoformat()}')
+    new_text = "\n".join(lines) + ("\n" if text.endswith("\n") else "")
+    backup = path.with_name(f"experience.yaml.bak-{datetime.now().strftime('%Y%m%d-%H%M%S')}")
+    backup.write_text(text, encoding="utf-8")
+    path.write_text(new_text, encoding="utf-8")
+    try:
+        yaml.safe_load(new_text)
+    except Exception as e:
+        path.write_text(text, encoding="utf-8")
+        return False, f"edit produced invalid YAML, restored: {e}"
+    return True, str(backup.name)
+
+
+def _learning_log(event, **fields):
+    with (DATA / "learning_log.jsonl").open("a", encoding="utf-8") as f:
+        f.write(json.dumps({"at": datetime.now(timezone.utc).isoformat(), "event": event, "via": "settings", **fields}) + "\n")
+
+
+@app.route("/api/learning/arxiv/remove", methods=["POST"])
+def api_learning_arxiv_remove():
+    phrase = ((request.get_json() or {}).get("phrase") or "").strip().lower()
+    path = DATA / "learned_phrases.json"
+    data = load_json(path, {"phrases": []})
+    before = len(data.get("phrases", []))
+    data["phrases"] = [p for p in data.get("phrases", []) if p.get("phrase") != phrase]
+    if len(data["phrases"]) == before:
+        return jsonify({"ok": False, "error": "phrase not found"}), 404
+    # Remember the veto so the learner does not re-add it next week.
+    data.setdefault("vetoed", [])
+    if phrase not in data["vetoed"]:
+        data["vetoed"].append(phrase)
+    save_json(path, data)
+    _learning_log("phrase_removed", phrase=phrase)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/learning/experience/add", methods=["POST"])
+def api_learning_experience_add():
+    data = request.get_json() or {}
+    phrase = (data.get("phrase") or "").strip()
+    item_id = (data.get("item_id") or "").strip()
+    if not phrase or not item_id:
+        return jsonify({"ok": False, "error": "phrase and item_id required"}), 400
+    ok, info = _add_experience_phrase(item_id, phrase)
+    if not ok:
+        return jsonify({"ok": False, "error": info}), 400
+    path = DATA / "experience_proposals.json"
+    props = load_json(path, {"proposals": [], "dismissed": []})
+    props["proposals"] = [p for p in props.get("proposals", []) if p.get("phrase") != phrase.lower()]
+    save_json(path, props)
+    _learning_log("experience_phrase_added", phrase=phrase, item=item_id, backup=info)
+    return jsonify({"ok": True, "backup": info})
+
+
+@app.route("/api/learning/experience/dismiss", methods=["POST"])
+def api_learning_experience_dismiss():
+    phrase = ((request.get_json() or {}).get("phrase") or "").strip().lower()
+    path = DATA / "experience_proposals.json"
+    props = load_json(path, {"proposals": [], "dismissed": []})
+    props["proposals"] = [p for p in props.get("proposals", []) if p.get("phrase") != phrase]
+    props.setdefault("dismissed", [])
+    if phrase not in props["dismissed"]:
+        props["dismissed"].append(phrase)
+    save_json(path, props)
+    _learning_log("proposal_dismissed", phrase=phrase)
+    return jsonify({"ok": True})
+
+
 @app.route("/settings")
 def settings_page():
     s = get_settings()
@@ -942,6 +1062,7 @@ def settings_page():
         discord=_discord_status(),
         last_sync=last_sync,
         qa_checks=QA_CHECKS,
+        learning=_learning_status(),
     )
 
 

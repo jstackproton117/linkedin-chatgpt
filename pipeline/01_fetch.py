@@ -502,7 +502,26 @@ def sync_weights(pillars):
 
 
 def update_weights(weights):
-    """Adjust keyword weights based on draft/skip history. Small steps only."""
+    """Adjust keyword weights based on draft/skip history. Small steps only.
+
+    FROZEN by default since 2026-09-09. After 86 verdicts this had pinned
+    exactly four generic keywords at the 2.0 ceiling — openai, anthropic,
+    llm, ai model — i.e. it had learned "Joe likes articles about OpenAI",
+    which distorted the fetch cap without helping. The ranker (07_rank.py)
+    learns from picks properly; 09_learn.py adjusts the search. Re-enable
+    with settings.pipeline.keyword_learning = true if ever wanted.
+    """
+    if not SETTINGS["pipeline"].get("keyword_learning", False):
+        pinned = {k: v for k, v in weights.items() if abs(v - 1.0) > 1e-9}
+        if pinned:
+            for k in pinned:
+                weights[k] = 1.0
+            WEIGHTS_PATH.write_text(json.dumps(weights, indent=2, sort_keys=True))
+            print(f"  Keyword weight learning is frozen; reset {len(pinned)} drifted weight(s) to 1.0: "
+                  + ", ".join(sorted(pinned)))
+        else:
+            print("  Keyword weight learning: frozen (the ranker learns from picks instead).")
+        return weights
     if not SELECTION_LOG_PATH.exists():
         return weights
     log = json.loads(SELECTION_LOG_PATH.read_text())
@@ -628,6 +647,40 @@ def main():
     now = datetime.now(timezone.utc)
     yields = {}
 
+    # ── What 09_learn.py taught us ────────────────────────────────────────
+    # Learned phrases extend the arXiv query (the search itself changes);
+    # source stats nudge how many items a feed may contribute.
+    learned = []
+    try:
+        learned = [p["phrase"] for p in json.loads((DATA / "learned_phrases.json").read_text(encoding="utf-8")).get("phrases", [])]
+    except Exception:
+        pass
+    source_stats = {}
+    try:
+        source_stats = json.loads((DATA / "source_stats.json").read_text(encoding="utf-8")).get("sources", {})
+    except Exception:
+        pass
+    for feed_conf in feeds:
+        if feed_conf.get("learn_phrases") and learned and "search_query=" in feed_conf.get("url", ""):
+            extra = "".join("+OR+abs:%22" + p.replace(" ", "+") + "%22" for p in learned)
+            feed_conf["url"] = feed_conf["url"].replace("&sortBy=", extra + "&sortBy=", 1)
+            feed_conf["_learned"] = list(learned)
+        st = source_stats.get(feed_conf.get("name", ""))
+        if st and st.get("informative") and feed_conf.get("max_items"):
+            base = feed_conf["max_items"]
+            if st["rate"] >= 0.6:
+                feed_conf["max_items"] = min(base * 2, int(base * 1.5) + 1)
+            elif st["rate"] <= 0.2 and st["verdicts"] >= 5:
+                feed_conf["max_items"] = max(2, base // 2)
+            if feed_conf["max_items"] != base:
+                feed_conf["_nudged"] = (base, feed_conf["max_items"], st["rate"])
+    if learned:
+        print(f"  Search: {len(learned)} learned phrase(s) added to the arXiv query: "
+              + ", ".join(learned[:5]) + (" …" if len(learned) > 5 else ""))
+    nudged = [(f["name"], *f["_nudged"]) for f in feeds if f.get("_nudged")]
+    for name, base, new, rate in nudged:
+        print(f"  Search: {name} max_items {base} -> {new} (pick rate {rate:.2f})")
+
     # Fetch every source concurrently. 42 feeds fetched one after another is
     # 20-30s of pure network wait, and it also hides the HN resolver's arXiv
     # courtesy delays behind other feeds' downloads. Parsing, scoring and the
@@ -711,6 +764,13 @@ def main():
             }
             if item.get("upvotes") is not None:
                 record["upvotes"] = item["upvotes"]
+            if feed_conf.get("_learned"):
+                # Which learned phrases this item matches — 09_learn.py uses
+                # picks among these to keep or drop a phrase.
+                hay = f"{title} {snippet}".lower()
+                matched = [p for p in feed_conf["_learned"] if p in hay]
+                if matched:
+                    record["learned_matches"] = matched
             articles.append(record)
 
             if keywords:
@@ -805,7 +865,10 @@ def main():
     # articles the ranker had scored highly.
     fresh = [a for a in articles if not a.get("_carried")]
     held = [a for a in articles if a.get("_carried")]
-    fresh.sort(key=lambda a: a["score"] * _freshness(_age_hours(a)), reverse=True)
+    # New arrivals are ordered by recency. The keyword score used to decide
+    # this, but with its learner frozen it is a crude relevance proxy at
+    # best; the ranker scores everything properly moments later anyway.
+    fresh.sort(key=lambda a: (_age_hours(a), -a.get("score", 0)))
 
     # Carried items compete on rank_score PERCENTILE WITHIN THEIR OWN TYPE,
     # not raw rank_score. Papers score systematically higher (gentler

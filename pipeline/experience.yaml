@@ -218,6 +218,14 @@ tunables:
     takeability: 0.15
     freshness: 0.10
     corroboration: 0.05
+    # Source affinity: pick-rate of the feed an article came from, learned
+    # nightly by 09_learn.py. Small on purpose — a good feed should not carry
+    # a weak article. Only applies to feeds with enough verdicts.
+    source: 0.05
+
+  # Per-type taste: a type's own verdicts count fully once their total weight
+  # reaches this; below it the type leans on the global model.
+  type_shrinkage: 8
 
   # Taste model. Needs this many of each label before it is trusted at all;
   # below the threshold its weight is redistributed to the other factors.

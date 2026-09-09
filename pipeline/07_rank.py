@@ -319,35 +319,78 @@ def build_training_set():
         if q.get("title"):
             by_title[q["title"].strip().lower()] = q
 
+    # Signal tiers. A verdict is not one bit: what Joe actually published
+    # (and how it performed) says more than what he merely drafted.
+    #   published + engagement percentile  2.0 .. 2.5
+    #   published, no metrics yet          2.0
+    #   approved, not yet out              1.5
+    #   draft                              1.0
+    #   hold                               0.5
+    #   skip                               negative, 1.0
+    TIER_W = {"draft": 1.0, "hold": 0.5, "approved": 1.5, "published": 2.0}
+
     examples = {}
+
+    def put(key, title, snippet, label, tier, weight, typ):
+        cur = examples.get(key)
+        # Higher tier wins; a skip never overrides a later positive tier and
+        # a positive never erases a skip from the same article — keep the
+        # stronger claim.
+        if cur and cur["weight"] >= weight and cur["label"] == label:
+            if not cur["snippet"] and snippet:
+                cur["snippet"] = snippet
+                cur["has_snippet"] = True
+            return
+        if cur and cur["label"] != label and cur["weight"] > weight:
+            return
+        examples[key] = {"title": title, "snippet": snippet, "has_snippet": bool(snippet),
+                         "label": label, "tier": tier, "weight": weight, "type": typ,
+                         # kept for older call sites
+                         "action": {"published": "draft", "approved": "draft"}.get(tier, tier)}
+
     for entry in load_json(SELECTION_LOG_PATH, []):
         title = (entry.get("article_title") or "").strip()
         action = entry.get("action")
         if not title or action not in ("draft", "skip", "hold"):
             continue
+        key = title.lower()
         snippet = entry.get("snippet") or ""
-        if not snippet:
-            match = by_title.get(title.lower())
-            if match:
-                snippet = match.get("snippet", "")
-        # Later decisions on the same article supersede earlier ones.
-        examples[title.lower()] = {
-            "title": title,
-            "snippet": snippet,
-            "action": action,
-            "has_snippet": bool(snippet),
-        }
+        match = by_title.get(key)
+        if not snippet and match:
+            snippet = match.get("snippet", "")
+        typ = entry.get("type") or (match.get("type") if match else None) or "news"
+        if action == "skip":
+            put(key, title, snippet, "neg", "skip", 1.0, typ)
+        else:
+            put(key, title, snippet, "pos", action, TIER_W[action], typ)
 
-    # Anything sitting in the queue that never made it into the selection log.
     for q in queue:
         key = (q.get("title") or "").strip().lower()
         if key and key not in examples and q.get("status") in ("draft", "skip", "hold"):
-            examples[key] = {
-                "title": q["title"],
-                "snippet": q.get("snippet", ""),
-                "action": q["status"],
-                "has_snippet": bool(q.get("snippet")),
-            }
+            st = q["status"]
+            put(key, q["title"], q.get("snippet", ""), "neg" if st == "skip" else "pos",
+                st, 1.0 if st == "skip" else TIER_W[st], q.get("type", "news"))
+
+    # Post log: approvals and real publications, weighted by how the post did.
+    post_log = load_json(POST_LOG_PATH, [])
+    rates = sorted(p["metrics"]["engagement_rate"] for p in post_log
+                   if (p.get("metrics") or {}).get("engagement_rate") is not None)
+    for p in post_log:
+        title = (p.get("article_title") or "").strip()
+        if not title:
+            continue
+        key = title.lower()
+        match = by_title.get(key)
+        snippet = (match or {}).get("snippet", "") or (examples.get(key) or {}).get("snippet", "")
+        typ = (match or {}).get("type") or (examples.get(key) or {}).get("type") or "news"
+        if p.get("published_at"):
+            w = TIER_W["published"]
+            r = (p.get("metrics") or {}).get("engagement_rate")
+            if r is not None and len(rates) >= 5:
+                w = 1.5 + sum(1 for x in rates if x <= r) / len(rates)   # 1.5 .. 2.5
+            put(key, title, snippet, "pos", "published", round(w, 3), typ)
+        elif p.get("approved_at"):
+            put(key, title, snippet, "pos", "approved", TIER_W["approved"], typ)
 
     return list(examples.values())
 
@@ -600,13 +643,32 @@ def main():
     print(f"  [B] experience corpus: {len(exp_vectors)} item(s), {phrase_total} phrase(s) embedded")
 
     training = build_training_set()
-    drafts = [t for t in training if t["action"] == "draft"]
-    skips = [t for t in training if t["action"] == "skip"]
-    holds = [t for t in training if t["action"] == "hold"]
+    positives = [t for t in training if t["label"] == "pos"]
+    negatives = [t for t in training if t["label"] == "neg"]
+    drafts = [t for t in positives if t["tier"] != "hold"]
+    holds = [t for t in positives if t["tier"] == "hold"]
+    skips = negatives
+    tiers = {}
+    for t in training:
+        tiers[t["tier"]] = tiers.get(t["tier"], 0) + 1
 
     min_d = tun.get("min_draft_samples", 12)
     min_s = tun.get("min_skip_samples", 12)
     taste_active = len(drafts) >= min_d and len(skips) >= min_s
+
+    # Source affinity from 09_learn.py: pick-rate per feed, min-max scaled
+    # across the informative sources so the factor is relative, not absolute.
+    source_rate = {}
+    try:
+        _ss = load_json(DATA / "source_stats.json", {}).get("sources", {})
+        inf = {k: v["rate"] for k, v in _ss.items() if v.get("informative")}
+        if len(inf) >= 2:
+            lo, hi = min(inf.values()), max(inf.values())
+            source_rate = {k: ((v - lo) / (hi - lo) if hi > lo else 0.5) for k, v in inf.items()}
+    except Exception:
+        source_rate = {}
+    if source_rate:
+        print(f"  [B] source affinity: {len(source_rate)} informative source(s)")
 
     train_vecs = {}
     if taste_active:
@@ -637,18 +699,41 @@ def main():
                     for item, vecs in exp_vectors]
 
     c_draft = c_skip = None
+    c_pos_by_type, c_neg_by_type = {}, {}
     if taste_active:
-        hold_w = tun.get("hold_weight", 0.5)
-        pos_vecs, pos_ws = [], []
-        for t in drafts:
-            pos_vecs.append(centered(train_vecs[t["title"]]))
-            pos_ws.append(1.0)
-        for t in holds:
-            pos_vecs.append(centered(train_vecs[t["title"]]))
-            pos_ws.append(hold_w)
-        neg_vecs = [centered(train_vecs[t["title"]]) for t in skips]
+        # Global centroids, weighted by tier (published > approved > draft > hold).
+        pos_vecs = [centered(train_vecs[t["title"]]) for t in positives]
+        pos_ws = [t["weight"] for t in positives]
+        neg_vecs = [centered(train_vecs[t["title"]]) for t in negatives]
+        neg_ws = [t["weight"] for t in negatives]
         c_draft = centroid(pos_vecs, pos_ws)
-        c_skip = centroid(neg_vecs)
+        c_skip = centroid(neg_vecs, neg_ws)
+
+        # Per-type centroids with shrinkage toward the global one. A paper is
+        # judged mostly against paper verdicts once there are enough of them;
+        # with few, it leans on everything Joe has picked. k is the number of
+        # weighted examples at which the type's own evidence equals the prior.
+        k = float(tun.get("type_shrinkage", 8))
+
+        def blended(items, c_global):
+            out = {}
+            for typ in {t["type"] for t in items}:
+                vs = [centered(train_vecs[t["title"]]) for t in items if t["type"] == typ]
+                ws = [t["weight"] for t in items if t["type"] == typ]
+                n = sum(ws)
+                c_raw = centroid(vs, ws)
+                if c_raw is None or c_global is None:
+                    continue
+                out[typ] = [(n * a + k * b) / (n + k) for a, b in zip(c_raw, c_global)]
+            return out
+
+        c_pos_by_type = blended(positives, c_draft)
+        c_neg_by_type = blended(negatives, c_skip)
+        by_t = {}
+        for t in training:
+            by_t.setdefault(t["type"], [0, 0])[0 if t["label"] == "pos" else 1] += 1
+        print("  [B] taste by type: " + ", ".join(f"{k2}={v[0]}+/{v[1]}-" for k2, v in sorted(by_t.items()))
+              + f" (shrinkage k={k:g})")
 
     min_gap = tun.get("min_attribution_gap", 0.02)
     min_cos = tun.get("min_attribution_cosine", 0.12)
@@ -706,9 +791,13 @@ def main():
             unattributed += 1
 
         if taste_active:
-            a["_taste_raw"] = cosine(vec_c, c_draft) - cosine(vec_c, c_skip)
+            typ = a.get("type", "news")
+            cp = c_pos_by_type.get(typ, c_draft)
+            cn = c_neg_by_type.get(typ, c_skip)
+            a["_taste_raw"] = cosine(vec_c, cp) - cosine(vec_c, cn)
         else:
             a["_taste_raw"] = None
+        a["_source_raw"] = source_rate.get(a.get("source", ""))
 
     print(f"  [B] experience match: {len(articles) - unattributed} attributed, "
           f"{unattributed} unlabelled (cosine < {min_cos}, or < {strong_cos} "
@@ -835,6 +924,9 @@ def main():
         factors["takeability"] = take
         factors["freshness"] = freshness(age_hours(a.get("published", "")),
                                          a.get("type", "news"))
+        # Source affinity: None (renormalised away) for feeds with too few
+        # verdicts to say anything, so a new feed is neither helped nor hurt.
+        factors["source"] = a.get("_source_raw")
         n_dupes = len(a["_dupe_sources"])
         factors["corroboration"] = min(n_dupes, max_corr) / max_corr if n_dupes else 0.0
 
@@ -971,7 +1063,12 @@ def main():
         "judge_failures": judge_failures,
         "taste_active": taste_active,
         "training": {"draft": len(drafts), "skip": len(skips), "hold": len(holds),
-                     "with_snippet": sum(1 for t in training if t["has_snippet"])},
+                     "with_snippet": sum(1 for t in training if t["has_snippet"]),
+                     "tiers": tiers,
+                     "by_type": {typ: [sum(1 for t in training if t["type"] == typ and t["label"] == "pos"),
+                                       sum(1 for t in training if t["type"] == typ and t["label"] == "neg")]
+                                 for typ in {t["type"] for t in training}}},
+        "source_affinity_sources": sorted(source_rate.keys()),
         "weights": weights_cfg,
         "taste_weight_requested": requested_taste,
         "taste_weight_applied": taste_weight,

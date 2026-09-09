@@ -135,6 +135,70 @@
       </div>
     </div>
 
+    <!-- ── LEARNING ────────────────────────────────────────────────────── -->
+    <div class="set-card" style="grid-column: 1 / -1;">
+      <h2>LEARNING FROM YOUR PICKS</h2>
+      <div class="set-sub">
+        Nightly, the pipeline looks at what you drafted, approved and published (weighted by engagement) against what you
+        skipped. It re-ranks by that taste, per type. It also learns which <em>sources</em> earn their place, and which
+        <em>phrases</em> distinguish your picks — those are added to the arXiv search automatically
+        ({{ learning.config.phrases_per_night }} a night, at most {{ learning.config.max_learned_phrases }},
+        dropped after {{ learning.config.decay_days }} days without a pick). Your experience corpus is never edited
+        automatically — additions are proposed below.
+      </div>
+
+      <div class="set-grid">
+        <div>
+          <span class="set-label">SOURCES BY PICK RATE {% if learning.sources_updated %}· {{ learning.sources_updated[:10] }}{% endif %}</span>
+          {% if learning.sources %}
+          <table style="width:100%; font-size:11px; border-collapse:collapse;">
+            {% for name, v in learning.sources %}
+            <tr style="border-bottom:1px solid var(--card-border);">
+              <td style="padding:5px 0; color:var(--text-pri);">{{ name }}</td>
+              <td style="padding:5px 6px; text-align:right; color:{{ 'var(--sw-green)' if v.rate >= 0.6 else ('var(--sw-red)' if v.rate <= 0.2 else 'var(--text-sec)') }};">{{ (v.rate * 100) | round(0) | int }}%</td>
+              <td style="padding:5px 0; text-align:right; color:var(--text-dim);">{{ v.draft }}d · {{ v.hold }}h · {{ v.skip }}s</td>
+            </tr>
+            {% endfor %}
+          </table>
+          <div style="font-size:10px; color:var(--text-dim); margin-top:6px;">Green feeds get up to 2× their item cap; red ones (5+ verdicts) half. Everything else is unchanged.</div>
+          {% else %}
+          <div style="font-size:11px; color:var(--text-dim);">No source has enough verdicts yet.</div>
+          {% endif %}
+        </div>
+
+        <div>
+          <span class="set-label">LEARNED ARXIV PHRASES {% if learning.phrases_updated %}· {{ learning.phrases_updated[:10] }}{% endif %}</span>
+          {% if learning.phrases %}
+          {% for p in learning.phrases %}
+          <div style="display:flex; align-items:center; gap:8px; font-size:12px; padding:5px 0; border-bottom:1px solid var(--card-border);">
+            <span style="color:var(--text-pri); flex:1;">"{{ p.phrase }}"</span>
+            <span style="color:var(--text-dim); font-size:10px;">{{ p.hits or 0 }} fetched · {{ p.picks or 0 }} picked</span>
+            <button class="btn btn-dim" style="font-size:9px; padding:4px 8px;" onclick="removePhrase('{{ p.phrase | replace("'", "\\'") }}')">REMOVE</button>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div style="font-size:11px; color:var(--text-dim);">Nothing learned yet — runs after the next nightly fetch.</div>
+          {% endif %}
+
+          <span class="set-label" style="margin-top:18px;">PROPOSED FOR YOUR EXPERIENCE CORPUS</span>
+          {% if learning.proposals %}
+          {% for p in learning.proposals %}
+          <div style="display:flex; align-items:center; gap:8px; font-size:12px; padding:5px 0; border-bottom:1px solid var(--card-border); flex-wrap:wrap;">
+            <span style="color:var(--text-pri); flex:1; min-width:140px;">"{{ p.phrase }}"</span>
+            <select id="item-{{ loop.index }}" style="background:rgba(0,0,0,0.35); border:1px solid var(--card-border); color:var(--text-pri); font-size:11px; padding:4px;">
+              {% for id, label in learning.items %}<option value="{{ id }}">{{ label }}</option>{% endfor %}
+            </select>
+            <button class="btn btn-green" style="font-size:9px; padding:4px 8px;" onclick="addProposal('{{ p.phrase | replace("'", "\\'") }}', {{ loop.index }})">ADD</button>
+            <button class="btn btn-dim" style="font-size:9px; padding:4px 8px;" onclick="dismissProposal('{{ p.phrase | replace("'", "\\'") }}')">DISMISS</button>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div style="font-size:11px; color:var(--text-dim);">No proposals pending.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
     <!-- ── QA CHECKLIST (reference) ────────────────────────────────────── -->
     <div class="set-card">
       <h2>QA CHECKLIST</h2>
@@ -188,6 +252,23 @@ async function testBuffer() {
   if (res.ok) out.innerHTML = '<span class="pill-ok">OK</span> — account ' + esc(res.account_id) + ' · ' + esc((res.organizations || []).join(', ')) +
     ' · usage now ' + res.usage.calls_24h + '/' + res.usage.daily_budget + ' today';
   else out.innerHTML = '<span class="pill-bad">' + esc(res.error || 'Failed') + '</span>';
+}
+
+async function removePhrase(phrase) {
+  const res = await postJSON('/api/learning/arxiv/remove', { phrase });
+  if (res.ok) { toast('Removed — it will not be re-learned'); setTimeout(() => location.reload(), 500); }
+  else toast(res.error || 'Failed', 'err');
+}
+async function addProposal(phrase, idx) {
+  const item = document.getElementById('item-' + idx).value;
+  const res = await postJSON('/api/learning/experience/add', { phrase, item_id: item });
+  if (res.ok) { toast('Added to experience.yaml (backup ' + res.backup + ')'); setTimeout(() => location.reload(), 600); }
+  else toast(res.error || 'Failed', 'err');
+}
+async function dismissProposal(phrase) {
+  const res = await postJSON('/api/learning/experience/dismiss', { phrase });
+  if (res.ok) { toast('Dismissed'); setTimeout(() => location.reload(), 400); }
+  else toast(res.error || 'Failed', 'err');
 }
 
 async function disconnectBuffer() {

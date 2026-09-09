@@ -456,6 +456,7 @@ feeds:
   # Trained on RTX 5090") slipped through — the earlier queries covered
   # inference but never training on consumer hardware.
   - name: "arXiv - Joe's topics"
+    learn_phrases: true
     url: "https://export.arxiv.org/api/query?search_query=abs:%22LLM+inference%22+OR+abs:%22inference+serving%22+OR+abs:%22model+quantization%22+OR+abs:%22consumer+GPU%22+OR+abs:%22single+GPU%22+OR+abs:%22low-cost+training%22+OR+abs:%22efficient+pretraining%22+OR+abs:%22model+routing%22+OR+abs:%22LLM+cascade%22+OR+abs:%22inference+cost%22+OR+abs:%22LLM+agent%22+OR+abs:%22multi-agent+system%22+OR+abs:%22agent+harness%22+OR+abs:%22agentic+workflow%22+OR+abs:%22retrieval-augmented+generation%22+OR+abs:%22benchmark+contamination%22+OR+abs:%22evaluation+harness%22+OR+abs:%22text-to-SQL%22+OR+abs:%22code+generation%22+OR+abs:%22developer+productivity%22+OR+abs:%22software+engineering+management%22+OR+abs:%22engineering+teams%22&sortBy=submittedDate&sortOrder=descending&max_results=100"
     category: "ai"
     type: "paper"

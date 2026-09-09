@@ -7,7 +7,8 @@
   "pipeline": {
     "max_articles": 200,
     "freshness_hours": 72,
-    "review_ttl_hours": 72
+    "review_ttl_hours": 72,
+    "keyword_learning": false
   },
   "content_radar_config": "C:/Users/Prome/OneDrive/Documents/Joe/content-radar/config.yaml",
   "buffer": {
@@ -17,5 +18,13 @@
     "monthly_call_budget": 600,
     "metrics_window_days": 60,
     "batch_size": 50
+  },
+  "learning": {
+    "phrases_per_night": 3,
+    "max_learned_phrases": 10,
+    "decay_days": 21,
+    "min_positive_docs": 2,
+    "min_log_odds": 1.0,
+    "source_min_verdicts": 3
   }
 }
