@@ -158,6 +158,18 @@ body { overflow: hidden; }
 
 .detail-content { padding: 24px 28px; }
 
+/* Mobile-only "back to list" control at the top of the detail sheet.
+   Shown by the max-width:700px block below; never rendered on desktop. */
+.mobile-back {
+  display: none; align-items: center; gap: 8px;
+  width: 100%; margin: 0 0 14px; padding: 12px 14px;
+  background: rgba(0,0,0,0.35); color: var(--sw-blue);
+  border: 1px solid var(--card-border); border-radius: 4px;
+  font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: 2px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.mobile-back:active { background: rgba(46,184,204,0.12); }
+
 .detail-num {
   font-family: 'Orbitron', sans-serif; font-size: 11px;
   color: var(--text-dim); letter-spacing: 2px; margin-bottom: 8px;
@@ -297,21 +309,36 @@ body { overflow: hidden; }
     overflow: visible;
   }
 
-  /* List panel: full width, capped height so detail is reachable */
+  /* List panel takes the whole screen. The old 42vh cap left the actual
+     list ~100px tall on an iPhone once the header, search and filter chips
+     had taken their share — reviewing through a letterbox. */
   .list-panel {
     width: 100%;
     min-width: 0;
-    max-height: 42vh;
+    max-height: none;
     border-right: none;
-    border-bottom: 1px solid var(--card-border);
+    border-bottom: none;
   }
+  .article-list { flex: none; overflow: visible; padding-bottom: 12px; }
 
-  /* Detail panel: full width, natural height */
+  /* Detail becomes a full-screen sheet that slides over the list when an
+     article is tapped, between the top nav and the bottom tab bar. It
+     closes on the BACK button or the iPhone back-swipe — not on a verdict,
+     because markAction already advances to the next unreviewed article,
+     which is the right flow for reviewing straight through on a phone. */
   .detail-panel {
-    flex: none;
-    width: 100%;
-    overflow-y: visible;
+    position: fixed;
+    top: var(--nav-h); left: 0; right: 0; bottom: var(--hw-b);
+    width: 100%; flex: none; z-index: 800;
+    background: var(--space);
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    transform: translateX(100%);
+    transition: transform 0.22s ease-out;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.6);
   }
+  .detail-panel.open { transform: translateX(0); }
+  .mobile-back { display: flex; }
+  body.detail-open { overflow: hidden; }
 
   .detail-content { padding: 14px 14px 24px; }
   .detail-title   { font-size: 14px; }
@@ -612,9 +639,34 @@ function openArticle(num) {
   const dc = document.getElementById('detail-content');
   dc.style.display = 'block';
   dc.innerHTML = buildDetail(a);
+  if (isMobile()) openDetailSheet();
 
   loadAngle(num, a);
 }
+
+// ── Mobile detail sheet ──
+function isMobile() {
+  return window.matchMedia('(max-width: 700px)').matches;
+}
+function openDetailSheet() {
+  const dp = document.querySelector('.detail-panel');
+  if (!dp.classList.contains('open')) {
+    dp.classList.add('open');
+    document.body.classList.add('detail-open');
+    // A history entry so the iPhone back-swipe closes the sheet instead of
+    // leaving the page. popstate below does the actual closing.
+    history.pushState({ detail: true }, '');
+  }
+  dp.scrollTop = 0;
+}
+function closeDetail(fromPop) {
+  const dp = document.querySelector('.detail-panel');
+  if (!dp.classList.contains('open')) return;
+  dp.classList.remove('open');
+  document.body.classList.remove('detail-open');
+  if (!fromPop && history.state && history.state.detail) history.back();
+}
+window.addEventListener('popstate', () => closeDetail(true));
 
 function buildDetail(a) {
   const st = STATUS[a.url];
@@ -654,6 +706,7 @@ function buildDetail(a) {
   }
 
   return `
+    <button class="mobile-back" onclick="closeDetail()" aria-label="Back to list">&#8249;&nbsp; BACK TO LIST</button>
     <div class="detail-num">ARTICLE #${a.num}</div>
     <div class="detail-title">${esc(a.title)}</div>
     <div class="detail-meta-row">
