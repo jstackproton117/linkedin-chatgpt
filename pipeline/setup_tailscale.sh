@@ -41,7 +41,15 @@ fi
 
 step "3/4  Where the dashboard lives on your tailnet"
 IP4=$(tailscale ip -4 2>/dev/null || echo "?")
-FQDN=$(tailscale status --json 2>/dev/null | python3 -c 'import json,sys;d=json.load(sys.stdin);print(d.get("Self",{}).get("DNSName","").rstrip("."))')
+# The MagicDNS name lags sign-in by a few seconds. Without this wait the
+# first real run read an empty name, printed "http://:5000" and skipped the
+# email-link rewrite below.
+FQDN=""
+for _ in $(seq 1 30); do
+  FQDN=$(tailscale status --json 2>/dev/null | python3 -c 'import json,sys;r=sys.stdin.read();print(json.loads(r).get("Self",{}).get("DNSName","").rstrip(".") if r.strip() else "")' 2>/dev/null)
+  [ -n "$FQDN" ] && break
+  sleep 1
+done
 SHORT=${FQDN%%.*}
 echo "tailnet IP : $IP4"
 echo "MagicDNS   : $FQDN"
