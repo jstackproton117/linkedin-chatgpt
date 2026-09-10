@@ -139,6 +139,14 @@
 .draft-preview.empty-preview { color: var(--text-dim); font-style: italic; }
 .draft-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 .draft-meta { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-top: 6px; }
+.draft-editor {
+  width: 100%; min-height: 55vh; resize: vertical;
+  font-family: 'Share Tech Mono', monospace; font-size: 13px; line-height: 1.6;
+  color: var(--text-pri); background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 4px; padding: 14px; white-space: pre-wrap;
+}
+.draft-editor:focus { outline: none; border-color: var(--sw-yellow); }
+@media (max-width: 700px) { .draft-editor { font-size: 16px; min-height: 50vh; } }
 .gen-status { display: none; font-size: 11px; color: var(--sw-yellow); margin-top: 10px; line-height: 1.5; }
 .gen-status.show { display: block; }
 .gen-status.err { color: var(--sw-red); }
@@ -271,7 +279,7 @@
       <div class="draft-title">{{ d.title }}</div>
 
       {% if d.has_real_content %}
-        <div class="draft-preview">{{ d.content[:400] }}</div>
+        <div class="draft-preview" onclick="openDraftEditor('{{ d.filename }}', {{ loop.index }}, event)" title="Click to read or edit the full draft" style="cursor:pointer;">{{ d.content[:400] }}{% if d.content|length > 400 %}<span style="color:var(--sw-yellow);"> … READ MORE</span>{% endif %}</div>
         {% if d.draft_model %}<div class="draft-meta">DRAFTED BY {{ d.draft_model|upper }}{% if d.draft_engine == 'local' %} (LOCAL){% endif %}</div>{% endif %}
         {% if d.approved_at and d.log_id %}
         {# ── Approved: the only way forward is publishing. ── #}
@@ -283,8 +291,8 @@
           {% else %}
           <a href="/post-log" class="btn btn-yellow">PUBLISH / SCHEDULE IN LOG &#8594;</a>
           {% endif %}
+          <button class="btn btn-dim" onclick="openDraftEditor('{{ d.filename }}', {{ loop.index }})">READ / EDIT (REVOKES)</button>
           <button class="btn btn-dim" onclick="copyDraft('{{ d.filename }}', {{ loop.index }})">COPY DRAFT</button>
-          <button class="btn btn-dim" onclick="togglePaste({{ loop.index }})">EDIT (REVOKES)</button>
           <button class="btn btn-dim" onclick="unapprove('{{ d.log_id }}')">REVOKE APPROVAL</button>
         </div>
         {% else %}
@@ -292,6 +300,7 @@
           {% if d.log_id %}
           <button class="btn btn-green" onclick="openApprove('{{ d.log_id }}', {{ loop.index }})">APPROVE</button>
           {% endif %}
+          <button class="btn btn-blue" onclick="openDraftEditor('{{ d.filename }}', {{ loop.index }})">READ / EDIT</button>
           <button class="btn btn-yellow" onclick="copyDraft('{{ d.filename }}', {{ loop.index }})">COPY DRAFT</button>
           {% if d.prompt_content %}
           <button class="btn btn-dim" onclick="showPrompt({{ loop.index }})">VIEW PROMPT</button>
@@ -300,7 +309,7 @@
           <button class="btn btn-dim" id="gen-claude-{{ loop.index }}" onclick="generateDraft('{{ d.filename }}', 'claude', {{ loop.index }}, true)">REDRAFT WITH CLAUDE</button>
           {% endif %}
           {% endif %}
-          <button class="btn btn-dim" onclick="togglePaste({{ loop.index }})">UPDATE CONTENT</button>
+          <button class="btn btn-dim" onclick="togglePaste({{ loop.index }})">PASTE NEW CONTENT</button>
           {% if d.article_url %}
           <button class="btn btn-dim" id="del-draft-{{ loop.index }}"
                   style="font-size:10px;padding:6px 12px;letter-spacing:1px;color:rgba(255,68,68,0.6);border-color:rgba(255,68,68,0.2);"
@@ -480,6 +489,21 @@
   </div>
 </div>
 
+<!-- Draft read / edit modal -->
+<div class="modal-overlay" id="draft-modal" onclick="closeDraftEditor()">
+  <div class="modal merge-modal-wide" onclick="event.stopPropagation()">
+    <h3 id="draft-modal-title">DRAFT</h3>
+    <div id="draft-modal-meta" style="font-size:11px; color:var(--text-dim); margin-bottom:10px;"></div>
+    <textarea id="draft-modal-text" class="draft-editor" spellcheck="true"></textarea>
+    <div style="font-size:10px; color:var(--text-dim); margin-top:6px;"><span id="draft-modal-count">0</span> characters · LinkedIn cuts the preview at ~210 · aim for 900–1,500 per post</div>
+    <div class="modal-actions">
+      <button class="btn btn-yellow" id="draft-modal-save" onclick="saveDraftEditor()">SAVE</button>
+      <button class="btn btn-dim" onclick="copyText(document.getElementById('draft-modal-text').value, 'Draft')">COPY</button>
+      <button class="btn btn-dim" onclick="closeDraftEditor()">CLOSE</button>
+    </div>
+  </div>
+</div>
+
 <!-- Merge modal -->
 <div class="modal-overlay" id="merge-modal" onclick="closeMergeModal()">
   <div class="modal merge-modal-wide" onclick="event.stopPropagation()">
@@ -626,6 +650,46 @@ function showPrompt(idx) {
 
 function closeModal() {
   document.getElementById('prompt-modal').classList.remove('open');
+}
+
+// ── Read / edit the full draft ───────────────────────────────────────────
+let draftEditorFile = null, draftEditorOriginal = '';
+function openDraftEditor(filename, idx, ev) {
+  if (ev && document.getElementById('drafts-layout').classList.contains('merge-mode')) return;
+  if (ev) ev.stopPropagation();
+  const card = document.getElementById(`card-${idx}`);
+  const text = document.getElementById(`draft-data-${idx}`).textContent;
+  draftEditorFile = filename; draftEditorOriginal = text;
+  document.getElementById('draft-modal-title').textContent = (card.dataset.title || filename).toUpperCase().slice(0, 70);
+  const meta = card.querySelector('.draft-meta');
+  document.getElementById('draft-modal-meta').textContent = filename + (meta ? ' · ' + meta.textContent : '')
+    + (card.classList.contains('approved') ? ' · APPROVED — saving an edit withdraws the approval' : '');
+  const ta = document.getElementById('draft-modal-text');
+  ta.value = text; updateDraftCount();
+  document.getElementById('draft-modal-save').disabled = true;
+  document.getElementById('draft-modal').classList.add('open');
+}
+function updateDraftCount() {
+  const ta = document.getElementById('draft-modal-text');
+  document.getElementById('draft-modal-count').textContent = ta.value.length;
+  document.getElementById('draft-modal-save').disabled = (ta.value === draftEditorOriginal);
+}
+document.getElementById('draft-modal-text').addEventListener('input', updateDraftCount);
+function closeDraftEditor() {
+  const ta = document.getElementById('draft-modal-text');
+  if (ta.value !== draftEditorOriginal && !confirm('Discard your edits?')) return;
+  document.getElementById('draft-modal').classList.remove('open');
+}
+async function saveDraftEditor() {
+  const content = document.getElementById('draft-modal-text').value.trim();
+  if (!content) { toast('Draft is empty', 'err'); return; }
+  const btn = document.getElementById('draft-modal-save'); btn.disabled = true; btn.textContent = 'SAVING…';
+  const res = await postJSON('/api/draft/save', { filename: draftEditorFile, content });
+  if (res.ok) {
+    toast(res.approval_revoked ? 'Saved — approval withdrawn, approve again when ready' : 'Draft saved');
+    draftEditorOriginal = content;
+    setTimeout(() => location.reload(), 700);
+  } else { toast('Save failed', 'err'); btn.disabled = false; btn.textContent = 'SAVE'; }
 }
 
 function copyModalContent() {
