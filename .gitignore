@@ -24,3 +24,9 @@ Thumbs.db
 discord_config.json
 buffer_config.json
 anthropic_config.json
+
+
+# Rebel Intel moved to its own repo (jstackproton117/RebelNews) 2026-09-09.
+# Files remain on disk here, untracked; history is preserved in this repo's log.
+pipeline/*
+!pipeline/MOVED_TO_REBELNEWS.md

@@ -1,6 +1,0 @@
-feedparser
-flask
-python-dateutil
-pyyaml
-requests
-anthropic>=1.0
